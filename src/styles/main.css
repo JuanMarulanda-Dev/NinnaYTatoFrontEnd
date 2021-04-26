@@ -1,0 +1,17 @@
+@font-face {
+    font-family: "Rebellion Knight";
+    src: url("../assets/fonts/Rebellion Knight Personal Use Only.ttf");
+}
+
+@font-face {
+    font-family: "TenorSans";
+    src: url("../assets/fonts/TenorSans-Regular.ttf");
+}
+
+*{
+    font-family: "TenorSans";
+}
+
+h1{
+    font-family: "Rebellion Knight";
+}

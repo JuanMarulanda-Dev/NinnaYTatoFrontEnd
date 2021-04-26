@@ -69,14 +69,33 @@ export default {
 </script>
 
 <style scoped>
+#login {
+  position: relative;
+  z-index: 10;
+}
+
+/* MEdia para celulares */
 @media (max-width: 600px) {
   #content-login {
     height: 80vh !important;
   }
 }
 
+/* Fondo de pantalla */
 div[data-app="true"] {
-  /* background: url("../assets/cover.jpg") no-repeat center center fixed !important; */
+  background: url("../assets/cover1.jpg") no-repeat center center fixed !important;
   background-size: cover;
+}
+
+/* Opacidad */
+div[data-app="true"]::after {
+  content: "";
+  background: #2a4c9bb4;
+  position: absolute;
+  z-index: -1;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
 }
 </style>
