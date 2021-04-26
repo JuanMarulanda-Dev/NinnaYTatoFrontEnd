@@ -21,7 +21,7 @@
                   </v-img>
                   <h1 class="flex my-4 primary--text">¡{{ bienvenida }}!</h1>
                 </div>
-                <v-form ref="form" lazy-validation>
+                <v-form ref="form" @submit.prevent="login">
                   <v-text-field
                     v-model="email"
                     :error-messages="emailErrors"
@@ -46,7 +46,7 @@
                     @blur="$v.password.$touch()"
                   ></v-text-field>
 
-                  <v-btn block color="secondary" class="mb-6">
+                  <v-btn type="submit" block color="secondary" class="mb-6">
                     <v-icon left>mdi-paw</v-icon> EditIngresar
                   </v-btn>
                 </v-form>
@@ -88,6 +88,11 @@ export default {
       if (!this.$v.password.$dirty) return errors;
       !this.$v.password.required && errors.push("La contraseña es requerida");
       return errors;
+    },
+  },
+  methods: {
+    login() {
+      this.$router.push({ name: "Home" });
     },
   },
 };

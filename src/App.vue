@@ -1,9 +1,11 @@
 <template>
   <div id="app">
-    <!-- Dashboard -->
+    <!-- Dashboard (Home) -->
     <template v-if="!$route.path.includes('/')">
       <v-app>
-        <v-main> </v-main>
+        <v-main>
+          <router-view></router-view>
+        </v-main>
       </v-app>
     </template>
 
