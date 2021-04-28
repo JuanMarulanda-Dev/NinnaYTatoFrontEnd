@@ -9,9 +9,20 @@
 }
 
 *{
-    font-family: "TenorSans";
+    font-family: "Roboto";
 }
 
 h1{
     font-family: "Rebellion Knight";
+}
+
+main {
+    background-color: #e7e9f1;
+}
+
+footer a{
+    font-weight: 600;
+    color: #666 !important;
+    text-decoration: none;
+    border: 0;
 }
