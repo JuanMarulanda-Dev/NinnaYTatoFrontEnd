@@ -16,7 +16,12 @@ export default new Vuex.Store({
         text: "Sucuarsales",
         icon: "mdi-home-group",
         to: "/sucursales",
-        permissions: ["C", "R", "U", "D"],
+        permissions: {
+          create: 1,
+          read: 1,
+          update: 1,
+          delete: 1,
+        },
       },
       {
         text: "Usuarios",
@@ -72,7 +77,10 @@ export default new Vuex.Store({
       { title: "Opcion 2", message: "esta es una notificación", redirect: "" },
       { title: "Opcion 3", message: "esta es una notificación", redirect: "" },
     ],
-    //
+    //General Icons
+    editIcon: process.env.VUE_APP_ICON_EDIT ?? "mdi-pencil",
+    deleteIcon: process.env.VUE_APP_ICON_DELETE ?? "mdi-delete",
+    detailsIcon: process.env.VUE_APP_ICON_DETAILS ?? "mdi-book-open-variant",
   },
   mutations: {
     SET_USER(state, user) {

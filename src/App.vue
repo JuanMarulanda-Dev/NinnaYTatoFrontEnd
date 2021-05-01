@@ -32,7 +32,7 @@
           <v-divider></v-divider>
           <!-- Menu options -->
           <v-list nav dense shaped>
-            <v-list-item-group :value="selectedMenuOption" color="secondary">
+            <v-list-item-group color="secondary">
               <div v-for="(option, i) in menu" :key="i">
                 <!-- Multiple option -->
                 <v-list-group
@@ -40,7 +40,6 @@
                   :key="i"
                   :prepend-icon="option.icon"
                   no-action
-                  :group="selectedMenuOption"
                   color="secondary"
                 >
                   <template v-slot:activator>
@@ -78,18 +77,6 @@
                 </v-list-item>
               </div>
             </v-list-item-group>
-
-            <!-- <v-list-item-group v-model="selectedMenuOption" color="secondary">
-              <v-list-item v-for="(option, i) in menu" :key="i">
-                <v-list-item-icon>
-                  <v-icon v-text="option.icon"></v-icon>
-                </v-list-item-icon>
-
-                <v-list-item-content>
-                  <v-list-item-title v-text="option.text"></v-list-item-title>
-                </v-list-item-content>
-              </v-list-item>
-            </v-list-item-group> -->
           </v-list>
         </v-navigation-drawer>
 
@@ -165,8 +152,10 @@
 
         <!-- Content -->
         <v-main>
-          <v-container>
-            <router-view></router-view>
+          <v-container transition="slide-x-transition" class="pb-10 pa-5">
+            <transition mode="out-in" name="slide-fade">
+              <router-view></router-view>
+            </transition>
           </v-container>
 
           <!-- Footer -->
@@ -211,7 +200,6 @@ export default {
   data: () => ({
     drawer: null,
     logout: false,
-    selectedMenuOption: null,
     countedSubOptions: 0,
   }),
   computed: {
