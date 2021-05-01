@@ -21,7 +21,7 @@
                   </v-img>
                   <h1 class="flex my-4 primary--text">¡{{ bienvenida }}!</h1>
                 </div>
-                <v-form ref="form" @submit.prevent="login">
+                <v-form ref="form" @submit.prevent="login({ email, password })">
                   <v-text-field
                     v-model="email"
                     :error-messages="emailErrors"
@@ -40,6 +40,7 @@
                     name="input-10-1"
                     label="Contraseña"
                     counter
+                    required
                     @click:append="showPassword = !showPassword"
                     class="mb-8"
                     @input="$v.password.$touch()"
@@ -60,6 +61,8 @@
 </template>
 
 <script>
+import { validationMixin } from "vuelidate";
+import { mapActions } from "vuex";
 import { required, email } from "vuelidate/lib/validators";
 export default {
   name: "Login",
@@ -71,6 +74,7 @@ export default {
       showPassword: false,
     };
   },
+  mixins: [validationMixin],
   validations: {
     email: { required, email },
     password: { required },
@@ -91,9 +95,7 @@ export default {
     },
   },
   methods: {
-    login() {
-      this.$router.push({ name: "Home" });
-    },
+    ...mapActions(["login"]),
   },
 };
 </script>

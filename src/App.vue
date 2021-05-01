@@ -5,6 +5,7 @@
       <v-app>
         <!-- Menu navigation -->
         <v-navigation-drawer v-model="drawer" app>
+          <!-- Header Sidebar -->
           <v-list class="text-center">
             <v-list-item>
               <v-img src="@/assets/logo.png">
@@ -21,7 +22,6 @@
                   </v-row> </template
               ></v-img>
             </v-list-item>
-
             <v-list-item link>
               <v-list-item-content>
                 <v-list-item-title class="title">John Leider</v-list-item-title>
@@ -32,17 +32,55 @@
           <v-divider></v-divider>
           <!-- Menu options -->
           <v-list nav dense shaped>
-            <v-list-item
-              v-for="subItem in menuOptions.items"
-              :key="subItem.title"
-            >
-              <v-list-item-content>
-                <v-list-item-title v-text="subItem.title"></v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
+            <v-list-item-group :value="selectedMenuOption" color="secondary">
+              <div v-for="(option, i) in menu" :key="i">
+                <!-- Multiple option -->
+                <v-list-group
+                  v-if="option.items"
+                  :key="i"
+                  :prepend-icon="option.icon"
+                  no-action
+                  :group="selectedMenuOption"
+                  color="secondary"
+                >
+                  <template v-slot:activator>
+                    <v-list-item-content>
+                      <v-list-item-title
+                        v-text="option.text"
+                      ></v-list-item-title>
+                    </v-list-item-content>
+                  </template>
 
-            <v-list-item-group v-model="selectedMenuOption" color="secondary">
-              <v-list-item v-for="(option, i) in menuOptions" :key="i">
+                  <v-list-item
+                    v-for="(subItem, j) in option.items"
+                    :key="j"
+                    router
+                    :to="subItem.to"
+                  >
+                    <v-list-item-title
+                      v-text="subItem.text"
+                    ></v-list-item-title>
+                    <v-list-item-icon>
+                      <v-icon v-text="subItem.icon"></v-icon>
+                    </v-list-item-icon>
+                  </v-list-item>
+                </v-list-group>
+
+                <!-- One Element -->
+                <v-list-item v-else :key="i" router :to="option.to">
+                  <v-list-item-icon>
+                    <v-icon v-text="option.icon"></v-icon>
+                  </v-list-item-icon>
+
+                  <v-list-item-content>
+                    <v-list-item-title v-text="option.text"></v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+              </div>
+            </v-list-item-group>
+
+            <!-- <v-list-item-group v-model="selectedMenuOption" color="secondary">
+              <v-list-item v-for="(option, i) in menu" :key="i">
                 <v-list-item-icon>
                   <v-icon v-text="option.icon"></v-icon>
                 </v-list-item-icon>
@@ -51,7 +89,7 @@
                   <v-list-item-title v-text="option.text"></v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
-            </v-list-item-group>
+            </v-list-item-group> -->
           </v-list>
         </v-navigation-drawer>
 
@@ -154,7 +192,7 @@
       </v-app>
     </template>
 
-    <!-- Login -->
+    <!-- Login page-->
     <template v-else>
       <transition name="fade">
         <keep-alive>
@@ -166,27 +204,19 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
+
 export default {
   name: "App",
   data: () => ({
     drawer: null,
     logout: false,
-    selectedMenuOption: 0,
-    menuOptions: [
-      { text: "My Files", icon: "mdi-folder" },
-      { text: "Shared with me", icon: "mdi-account-multiple" },
-      { text: "Starred", icon: "mdi-star" },
-      { text: "Recent", icon: "mdi-history" },
-      { text: "Offline", icon: "mdi-check-circle" },
-      { text: "Uploads", icon: "mdi-upload" },
-      { text: "Backups", icon: "mdi-cloud-upload" },
-    ],
-    notifications: [
-      { title: "Opcion 1", message: "esta es una notificación", redirect: "" },
-      { title: "Opcion 2", message: "esta es una notificación", redirect: "" },
-      { title: "Opcion 3", message: "esta es una notificación", redirect: "" },
-    ],
+    selectedMenuOption: null,
+    countedSubOptions: 0,
   }),
+  computed: {
+    ...mapState(["menu", "notifications"]),
+  },
   methods: {
     logoutAction() {
       // Eliminar la cookie de sesión y el CSRF token
