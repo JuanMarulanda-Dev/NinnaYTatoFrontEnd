@@ -31,6 +31,10 @@ export default {
         commit("SET_LOADING_DATATABLE", false);
       }
     },
+
+    async storeBranchOffice() {},
+
+    async updateBranchOffice() {},
   },
   getters: {},
 };
