@@ -24,12 +24,32 @@
             </v-list-item>
             <v-list-item link>
               <v-list-item-content>
-                <v-list-item-title class="title">John Leider</v-list-item-title>
-                <v-list-item-subtitle>john@vuetifyjs.com</v-list-item-subtitle>
+                <v-list-item-title class="title">
+                  {{ user.first_name }} {{ user.last_name }}
+                </v-list-item-title>
+                <v-list-item-subtitle>{{ user.email }} </v-list-item-subtitle>
               </v-list-item-content>
             </v-list-item>
           </v-list>
           <v-divider></v-divider>
+          <!-- Loading Menu Secction -->
+          <!-- <div
+            :style="{ visibility: loadingMenu ? 'visible' : 'hidden' }"
+            class="loading-section d-flex justify-center align-center"
+          >
+            <v-progress-circular
+              :size="50"
+              color="primary"
+              indeterminate
+              v-show="loadingMenu"
+            ></v-progress-circular>
+          </div> -->
+          <!-- Agregar las cargas del menu lateral -->
+          <!-- <v-skeleton-loader
+            class="mx-auto"
+            max-width="300"
+            type="list-item,list-item,list-item,list-item,list-item,list-item,list-item"
+          ></v-skeleton-loader> -->
           <!-- Menu options -->
           <v-list nav dense shaped>
             <v-list-item-group color="secondary">
@@ -193,7 +213,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapState, mapActions } from "vuex";
 
 export default {
   name: "App",
@@ -202,10 +222,26 @@ export default {
     logout: false,
     countedSubOptions: 0,
   }),
+  created() {
+    // Validar si existe la info del usuario
+    if (this.user == null) {
+      this.getUserLocalStorage();
+    }
+    if (this.menu.length == 0) {
+      this.getMenuLocalStorage();
+    }
+    // Validar si existe la info del menu
+  },
   computed: {
-    ...mapState(["menu", "notifications"]),
+    ...mapState(["user", "menu", "notifications", "loadingMenu"]),
   },
   methods: {
+    ...mapActions([
+      "getUserLocalStorage",
+      "getMenuLocalStorage",
+      "getUser",
+      "getMenu",
+    ]),
     logoutAction() {
       // Eliminar la cookie de sesión y el CSRF token
       // Redireccionar al login

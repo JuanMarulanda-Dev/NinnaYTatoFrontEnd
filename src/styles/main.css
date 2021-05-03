@@ -20,6 +20,10 @@ main {
     background-color: #e7e9f1;
 }
 
+.loading-section{
+    height: 50%;
+}
+
 footer a{
     font-weight: 600;
     color: #666 !important;
@@ -45,4 +49,43 @@ footer a{
 /* .slide-fade-leave-active below version 2.1.8 */ {
     transform: translateX(10px);
     opacity: 0;
+}
+
+/* Loaders */
+
+.custom-loader {
+    animation: loader 1s infinite;
+    display: flex;
+}
+@-moz-keyframes loader {
+from {
+    transform: rotate(0);
+}
+to {
+    transform: rotate(360deg);
+}
+}
+@-webkit-keyframes loader {
+from {
+    transform: rotate(0);
+}
+to {
+    transform: rotate(360deg);
+}
+}
+@-o-keyframes loader {
+from {
+    transform: rotate(0);
+}
+to {
+    transform: rotate(360deg);
+}
+}
+@keyframes loader {
+from {
+    transform: rotate(0);
+}
+to {
+    transform: rotate(360deg);
+}
 }

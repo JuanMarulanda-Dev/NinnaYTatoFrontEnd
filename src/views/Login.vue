@@ -47,8 +47,15 @@
                     @blur="$v.password.$touch()"
                   ></v-text-field>
 
-                  <v-btn type="submit" block color="secondary" class="mb-6">
-                    <v-icon left>mdi-paw</v-icon> EditIngresar
+                  <v-btn
+                    :loading="loadingLogin"
+                    :disabled="loadingLogin"
+                    type="submit"
+                    block
+                    color="secondary"
+                    class="mb-6"
+                  >
+                    <v-icon left>mdi-paw</v-icon> Ingresar
                   </v-btn>
                 </v-form>
               </v-card-text>
@@ -62,7 +69,7 @@
 
 <script>
 import { validationMixin } from "vuelidate";
-import { mapActions } from "vuex";
+import { mapActions, mapState } from "vuex";
 import { required, email } from "vuelidate/lib/validators";
 export default {
   name: "Login",
@@ -93,6 +100,7 @@ export default {
       !this.$v.password.required && errors.push("La contraseña es requerida");
       return errors;
     },
+    ...mapState(["loadingLogin"]),
   },
   methods: {
     ...mapActions(["login"]),

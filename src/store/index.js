@@ -1,5 +1,6 @@
 import Vue from "vue";
 import Vuex from "vuex";
+import router from "@/router";
 
 Vue.use(Vuex);
 import axios from "axios";
@@ -8,75 +9,19 @@ axios.defaults.baseURL = process.env.VUE_APP_API_URL;
 
 export default new Vuex.Store({
   state: {
+    // Login
+    loadingLogin: false,
     // Dashboard
     user: null,
     auth: false,
-    menu: [
-      {
-        text: "Sucuarsales",
-        icon: "mdi-home-group",
-        to: "/sucursales",
-        permissions: {
-          create: 1,
-          read: 1,
-          update: 1,
-          delete: 1,
-        },
-      },
-      {
-        text: "Usuarios",
-        icon: "mdi-account-multiple",
-        to: "/usuarios",
-      },
-      { text: "Clientes", icon: "mdi-paw", to: "/clientes" },
-      {
-        text: "Inventario",
-        icon: "mdi-clipboard-check",
-        items: [
-          {
-            text: "Ingreso de stock",
-            icon: "mdi-clipboard-text",
-            to: "/stock",
-          },
-          { text: "Accesorios", icon: "mdi-puzzle", to: "/accesorios" },
-          { text: "Planes", icon: "mdi-note-outline", to: "/planes" },
-        ],
-      },
-      { text: "Tienda", icon: "mdi-cart", to: "/tienda" },
-      {
-        text: "Guarderia",
-        icon: "mdi-home-heart",
-        items: [
-          {
-            text: "Entrada y salida",
-            icon: "mdi-transit-transfer",
-            to: "/ingresos",
-          },
-          {
-            text: "Recomendaciones",
-            icon: "mdi-file-edit-outline",
-            to: "/recomendaciones",
-          },
-          {
-            text: "Habitaciones",
-            icon: "mdi-home-modern",
-            to: "/habitaciones",
-          },
-        ],
-      },
-      { text: "Finanzas", icon: "mdi-wallet", to: "/finanzas" },
-      {
-        text: "Estadistica",
-        icon: "mdi-chart-timeline-variant",
-        to: "/estadisticas",
-      },
-      { text: "Historial", icon: "mdi-history", to: "/historial" },
-    ],
+    menu: [],
     notifications: [
       { title: "Opcion 1", message: "esta es una notificación", redirect: "" },
       { title: "Opcion 2", message: "esta es una notificación", redirect: "" },
       { title: "Opcion 3", message: "esta es una notificación", redirect: "" },
     ],
+    loadingMenu: false,
+
     //General Icons
     editIcon: process.env.VUE_APP_ICON_EDIT ?? "mdi-pencil",
     deleteIcon: process.env.VUE_APP_ICON_DELETE ?? "mdi-delete",
@@ -87,26 +32,99 @@ export default new Vuex.Store({
       state.user = user;
       state.auth = Boolean(user);
     },
+    SET_MENU(state, menu) {
+      state.menu = menu;
+    },
+    SET_LOADER_LOGIN(state, loader = false) {
+      state.loadingLogin = loader;
+    },
+    SET_LOADER_MENU(state, loader = false) {
+      state.loadingMenu = loader;
+    },
   },
   actions: {
-    async login({ dispatch }, credentials) {
-      console.log(credentials);
-      await axios.get("/sanctum/csrf-cookie");
-      let result = await axios.post("/api/login", credentials);
-      console.log(result.data.errors);
-      return dispatch("getUser");
+    async login({ dispatch, commit }, credentials) {
+      try {
+        // Activar el loading del boton ingresar
+        commit("SET_LOADER_LOGIN", true);
+        // Obtener la cookie de autentificación y CSRF Token para la sutentificacion del SPA y politicas CORS
+        await axios.get("/sanctum/csrf-cookie");
+        // Hacer login con las credenciales del usuario
+        let result = await axios.post("/api/login", credentials);
+        if (result.data.errors) {
+          // Ocurrio algun error en la autentificación
+          console.log(result.data.errors);
+          // Mostar la notificación
+          return;
+        }
+        // Obtener el usuario
+        dispatch("getUser");
+        // Obtener los permisos del usuario
+        dispatch("getMenu");
+        // Obtener la ruta principal a donde se va a redireccionar al usuario
+        // Redirrecionar a la ruta pertiente para el usuario
+        router.push("Sucursales");
+      } catch (error) {
+        // Mostrar el mensaje al usuario que ocurrio algun inconveninte
+        console.log(error);
+      } finally {
+        commit("SET_LOADER_LOGIN");
+      }
     },
-    getUser({ commit }) {
-      axios
+
+    async getUser({ commit, dispatch }) {
+      await axios
         .get("/api/user", this.form)
         .then((result) => {
           commit("SET_USER", result.data);
+          // Guardar el usuario en el local storage
+          dispatch("storeUserLocalStorage");
         })
         .catch(() => {
           commit("SET_USER", null);
         });
     },
-    getMenu() {},
+
+    async getMenu({ commit, dispatch }) {
+      // El menu se deberia guardar en cache
+      commit("SET_LOADER_MENU", true);
+      try {
+        // Obtener el menu del usuario que se logueo
+        let result = await axios.get("/api/permissions");
+        let menuJson = JSON.parse(result.data.menu);
+        commit("SET_MENU", menuJson);
+        // Guardar el menu en el local storage
+        dispatch("storeMenuLocalStorage");
+      } catch (error) {
+        console.log(error);
+      } finally {
+        commit("SET_LOADER_MENU");
+      }
+    },
+    // Almacenamiento en local storage
+    storeUserLocalStorage({ state }) {
+      // Se encripta el contenido antes de almacenarlo
+      let encrypt = window.btoa(JSON.stringify(state.user));
+      localStorage.setItem("User", encrypt);
+    },
+
+    storeMenuLocalStorage({ state }) {
+      // Se encripta el contenido antes de almacenarlo
+      let encrypt = window.btoa(JSON.stringify(state.menu));
+      localStorage.setItem("Menu", encrypt);
+    },
+
+    getUserLocalStorage({ commit }) {
+      let user = atob(localStorage.getItem("User"));
+      let decryp = JSON.parse(user);
+      commit("SET_USER", decryp);
+    },
+
+    getMenuLocalStorage({ commit }) {
+      let menu = atob(localStorage.getItem("Menu"));
+      let decryp = JSON.parse(menu);
+      commit("SET_MENU", decryp);
+    },
   },
   modules: {},
 });
