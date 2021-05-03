@@ -158,13 +158,11 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapState, mapActions } from "vuex";
 
 export default {
   data: () => ({
     dialog: false,
-    loading: false,
-    loadingText: "Cargando datos...",
     headers: [
       {
         text: "Nombre",
@@ -176,7 +174,6 @@ export default {
       { text: "Estado", value: "state" },
       { text: "Actions", value: "actions", sortable: false },
     ],
-    sucursales: [],
     editedIndex: -1,
     editedItem: {
       id: 0,
@@ -195,7 +192,8 @@ export default {
   }),
 
   computed: {
-    ...mapState(["editIcon", "deleteIcon", "detailsIcon"]),
+    ...mapState(["editIcon", "deleteIcon", "detailsIcon", "loadingText"]),
+    ...mapState("sucursales", ["sucursales", "loading"]),
     formTitle() {
       return this.editedIndex === -1 ? "Nueva Sucursal" : "Editar Sucursal";
     },
@@ -212,44 +210,9 @@ export default {
   },
 
   methods: {
+    ...mapActions("sucursales", ["getAllBranchOffices"]),
     initialize() {
-      this.sucursales = [
-        {
-          id: 30,
-          name: "Ninna y tato (Principal)",
-          address: "Calle 48 cc #120E 113 san javier la loma",
-          phone: "2528099",
-          state: true,
-        },
-        {
-          id: 32,
-          name: "Ninna y tato (Principal)",
-          address: "Calle 48 cc #120E 113 san javier la loma",
-          phone: "2528099",
-          state: false,
-        },
-        {
-          id: 33,
-          name: "Ninna y tato (Principal)",
-          address: "Calle 48 cc #120E 113 san javier la loma",
-          phone: "2528099",
-          state: true,
-        },
-        {
-          id: 34,
-          name: "Ninna y tato (Principal)",
-          address: "Calle 48 cc #120E 113 san javier la loma",
-          phone: "2528099",
-          state: false,
-        },
-        {
-          id: 36,
-          name: "Ninna y tato (Principal)",
-          address: "Calle 48 cc #120E 113 san javier la loma",
-          phone: "2528099",
-          state: false,
-        },
-      ];
+      this.getAllBranchOffices();
     },
 
     changeStateSucursal(item) {

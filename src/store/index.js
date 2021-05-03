@@ -4,6 +4,7 @@ import router from "@/router";
 
 Vue.use(Vuex);
 import axios from "axios";
+import sucursales from "@/modules/sucursales.js";
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL = process.env.VUE_APP_API_URL;
 
@@ -11,6 +12,7 @@ export default new Vuex.Store({
   state: {
     // Login
     loadingLogin: false,
+
     // Dashboard
     user: null,
     auth: false,
@@ -21,6 +23,7 @@ export default new Vuex.Store({
       { title: "Opcion 3", message: "esta es una notificación", redirect: "" },
     ],
     loadingMenu: false,
+    loadingText: "Cargando datos...",
 
     //General Icons
     editIcon: process.env.VUE_APP_ICON_EDIT ?? "mdi-pencil",
@@ -101,6 +104,7 @@ export default new Vuex.Store({
         commit("SET_LOADER_MENU");
       }
     },
+
     // Almacenamiento en local storage
     storeUserLocalStorage({ state }) {
       // Se encripta el contenido antes de almacenarlo
@@ -126,5 +130,7 @@ export default new Vuex.Store({
       commit("SET_MENU", decryp);
     },
   },
-  modules: {},
+  modules: {
+    sucursales,
+  },
 });
