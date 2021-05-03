@@ -6,6 +6,7 @@ import vuetify from "./plugins/vuetify";
 import "roboto-fontface/css/roboto/roboto-fontface.css";
 import "@mdi/font/css/materialdesignicons.css";
 import "@/styles/main.css";
+import "@/styles/main.scss";
 import axios from "axios";
 import VueAxios from "vue-axios";
 import Vuelidate from "vuelidate";

@@ -1,5 +1,9 @@
 <template>
   <div id="app">
+    <!-- Scren Loading -->
+    <v-overlay :value="loadingOverlay" z-index="10000" opacity="0.62">
+      <pawLoading></pawLoading>
+    </v-overlay>
     <!-- Dashboard (Home) -->
     <template v-if="!$route.path.includes('/login')">
       <v-app>
@@ -214,7 +218,7 @@
 
 <script>
 import { mapState, mapActions } from "vuex";
-
+import pawLoading from "@/components/pawLoading.vue";
 export default {
   name: "App",
   data: () => ({
@@ -233,7 +237,13 @@ export default {
     // Validar si existe la info del menu
   },
   computed: {
-    ...mapState(["user", "menu", "notifications", "loadingMenu"]),
+    ...mapState([
+      "user",
+      "menu",
+      "notifications",
+      "loadingMenu",
+      "loadingOverlay",
+    ]),
   },
   methods: {
     ...mapActions([
@@ -248,6 +258,9 @@ export default {
       this.$router.push({ name: "Login" });
       this.logout = false;
     },
+  },
+  components: {
+    pawLoading,
   },
 };
 </script>

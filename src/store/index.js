@@ -22,6 +22,7 @@ export default new Vuex.Store({
       { title: "Opcion 2", message: "esta es una notificación", redirect: "" },
       { title: "Opcion 3", message: "esta es una notificación", redirect: "" },
     ],
+    loadingOverlay: false,
     loadingMenu: false,
     loadingText: "Cargando datos...",
 
