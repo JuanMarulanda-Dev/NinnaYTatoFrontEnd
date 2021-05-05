@@ -15,7 +15,7 @@ export default new Vuex.Store({
 
     // Dashboard
     user: null,
-    auth: false,
+    isAuthenticated: false,
     menu: [],
     notifications: [
       { title: "Opcion 1", message: "esta es una notificación", redirect: "" },
@@ -34,7 +34,7 @@ export default new Vuex.Store({
   mutations: {
     SET_USER(state, user) {
       state.user = user;
-      state.auth = Boolean(user);
+      state.isAuthenticated = Boolean(user);
     },
     SET_MENU(state, menu) {
       state.menu = menu;
@@ -67,7 +67,7 @@ export default new Vuex.Store({
         dispatch("getMenu");
         // Obtener la ruta principal a donde se va a redireccionar al usuario
         // Redirrecionar a la ruta pertiente para el usuario
-        router.push("Sucursales");
+        router.push("sucursales");
       } catch (error) {
         // Mostrar el mensaje al usuario que ocurrio algun inconveninte
         console.log(error);
@@ -120,15 +120,19 @@ export default new Vuex.Store({
     },
 
     getUserLocalStorage({ commit }) {
-      let user = atob(localStorage.getItem("User"));
-      let decryp = JSON.parse(user);
-      commit("SET_USER", decryp);
+      let user = localStorage.getItem("User");
+      if (user) {
+        let decryp = JSON.parse(atob(user));
+        commit("SET_USER", decryp);
+      }
     },
 
     getMenuLocalStorage({ commit }) {
-      let menu = atob(localStorage.getItem("Menu"));
-      let decryp = JSON.parse(menu);
-      commit("SET_MENU", decryp);
+      let menu = localStorage.getItem("Menu");
+      if (menu) {
+        let decryp = JSON.parse(atob(menu));
+        commit("SET_MENU", decryp);
+      }
     },
   },
   modules: {

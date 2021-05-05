@@ -29,9 +29,9 @@
             <v-list-item link>
               <v-list-item-content>
                 <v-list-item-title class="title">
-                  {{ user.first_name }} {{ user.last_name }}
+                  <!-- {{ user.first_name }} {{ user.last_name }} -->
                 </v-list-item-title>
-                <v-list-item-subtitle>{{ user.email }} </v-list-item-subtitle>
+                <!-- <v-list-item-subtitle>{{ user.email }} </v-list-item-subtitle> -->
               </v-list-item-content>
             </v-list-item>
           </v-list>
