@@ -5,7 +5,7 @@
       <pawLoading></pawLoading>
     </v-overlay>
     <!-- Dashboard (Home) -->
-    <template v-if="!$route.path.includes('/login')">
+    <template v-if="!$route.meta.guest">
       <v-app>
         <!-- Menu navigation -->
         <v-navigation-drawer v-model="drawer" app>
@@ -29,9 +29,9 @@
             <v-list-item link>
               <v-list-item-content>
                 <v-list-item-title class="title">
-                  <!-- {{ user.first_name }} {{ user.last_name }} -->
+                  {{ user.first_name }} {{ user.last_name }}
                 </v-list-item-title>
-                <!-- <v-list-item-subtitle>{{ user.email }} </v-list-item-subtitle> -->
+                <v-list-item-subtitle>{{ user.email }} </v-list-item-subtitle>
               </v-list-item-content>
             </v-list-item>
           </v-list>
@@ -227,6 +227,7 @@ export default {
     countedSubOptions: 0,
   }),
   created() {
+    // this.$toast("I'm a toast!");
     // Validar si existe la info del usuario
     if (this.user == null) {
       this.getUserLocalStorage();

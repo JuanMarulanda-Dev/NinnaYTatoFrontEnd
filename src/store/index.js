@@ -62,9 +62,9 @@ export default new Vuex.Store({
           return;
         }
         // Obtener el usuario
-        dispatch("getUser");
+        await dispatch("getUser");
         // Obtener los permisos del usuario
-        dispatch("getMenu");
+        await dispatch("getMenu");
         // Obtener la ruta principal a donde se va a redireccionar al usuario
         // Redirrecionar a la ruta pertiente para el usuario
         router.push("sucursales");

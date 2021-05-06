@@ -1,5 +1,5 @@
 import Vue from "vue";
-// import store from "@/store";
+import store from "@/store";
 import VueRouter from "vue-router";
 
 Vue.use(VueRouter);
@@ -8,6 +8,15 @@ const routes = [
   {
     path: "/",
     redirect: "/login",
+  },
+  {
+    path: "/404",
+    name: "NotFound",
+    component: () =>
+      import(/* webpackChunkName: "404" */ "@/views/code/404.vue"),
+    meta: {
+      guest: true,
+    },
   },
   {
     path: "/login",
@@ -23,6 +32,9 @@ const routes = [
     name: "Sucursales",
     component: () =>
       import(/* webpackChunkName: "BranchOffice" */ "@/views/BranchOffice.vue"),
+    meta: {
+      permissions: {},
+    },
   },
 ];
 
@@ -32,32 +44,51 @@ const router = new VueRouter({
   routes,
 });
 
-// router.beforeEach((to, from, next) => {
-//   // Validar si la ruta es designada para un visitante
-//   if (to.matched.some((record) => record.meta.guest)) {
-//     next();
-//   } else {
-//     // Validar si el menu y el usuario estan en el local storage
-//     if (
-//       localStorage.getItem("user") == null ||
-//       localStorage.getItem("menu") == null
-//     ) {
-//       // Hacer logout del usuario
-//       // Redireccionar al login
-//       next({ name: "Login" });
-//     } else {
-//       // Si existe el menu y el usuario en el local storage
-//       if (!store.state.isAuthenticated) {
-//         next({ name: "Login" });
-//       } else {
-//         // Validar que ese usuario tenga permiso de ingresar a ese modulo
-//         for (const permission in store.state.menu) {
-//           console.log(permission);
-//         }
-//         next();
-//       }
-//     }
-//   }
-// });
+router.beforeEach((to, from, next) => {
+  // Validar si la ruta es designada para un visitante
+  if (to.matched.some((record) => record.meta.guest)) {
+    next();
+  } else {
+    // Validar si el menu y el usuario estan en el local storage
+    if (
+      localStorage.getItem("User") == null ||
+      localStorage.getItem("Menu") == null
+    ) {
+      // Hacer logout del usuario
+      // Redireccionar al login
+      next({ name: "Login" });
+    } else {
+      // Traer el menu de local storage
+      store.dispatch("getMenuLocalStorage");
+      // Validar que ese usuario tenga permiso de ingresar a ese modulo
+      let result = store.state.menu.some((option) => {
+        // Validar si existen subopciones en la opcion
+        if (option.items) {
+          // Validar si esa opcion existe como subOpcion
+          let subResult = option.items.some((subOption) => {
+            if (to.fullPath.includes(subOption.to)) {
+              // Se añaden los metadatos de permisos
+              to.meta.permissions = subOption.permissions;
+              next();
+              return true;
+            }
+          });
+          if (subResult) {
+            return true;
+          }
+        } else if (to.fullPath.includes(option.to)) {
+          // Se añaden los metadatos de permisos
+          to.meta.permissions = option.permissions;
+          next();
+          return true;
+        }
+      });
+
+      if (!result) {
+        next({ name: "NotFound" });
+      }
+    }
+  }
+});
 
 export default router;
