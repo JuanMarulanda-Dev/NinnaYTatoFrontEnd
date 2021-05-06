@@ -152,7 +152,7 @@
           </v-menu>
 
           <!-- Logout -->
-          <v-dialog v-model="logout" persistent max-width="300">
+          <v-dialog v-model="logoutModal" persistent max-width="300">
             <template v-slot:activator="{ on, attrs }">
               <v-btn icon v-bind="attrs" v-on="on">
                 <v-icon>mdi-power-standby</v-icon>
@@ -163,7 +163,7 @@
               <v-card-text>Se saldra del sistema...</v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="gray darken-1" text @click="logout = false"
+                <v-btn color="gray darken-1" text @click="logoutModal = false"
                   >Cancelar</v-btn
                 >
                 <v-btn color="red darken-1" text @click="logoutAction"
@@ -223,7 +223,7 @@ export default {
   name: "App",
   data: () => ({
     drawer: null,
-    logout: false,
+    logoutModal: false,
     countedSubOptions: 0,
   }),
   created() {
@@ -252,12 +252,35 @@ export default {
       "getMenuLocalStorage",
       "getUser",
       "getMenu",
+      "logout",
     ]),
-    logoutAction() {
-      // Eliminar la cookie de sesión y el CSRF token
-      // Redireccionar al login
-      this.$router.push({ name: "Login" });
-      this.logout = false;
+    setCookie(name, value, expirydays) {
+      var d = new Date();
+      d.setTime(d.getTime() + expirydays * 24 * 60 * 60 * 1000);
+      var expires = "expires=" + d.toUTCString();
+      document.cookie = name + "=" + value + "; " + expires;
+    },
+    deleteAllCookies() {
+      var cookies = document.cookie.split(";");
+      for (var i = 0; i < cookies.length; i++)
+        this.deleteCookie(cookies[i].split("=")[0]);
+    },
+    deleteCookie(name) {
+      this.setCookie(name, "", -1);
+    },
+    async logoutAction() {
+      // Ejecutar el cerrar session
+      let result = await this.logout();
+      if (result) {
+        // Eliminar la cookies de al aplicación
+        await this.deleteAllCookies();
+        // Eliminar la info del local storage
+        localStorage.clear();
+        // Redireccionar al login
+        this.$router.push({ name: "Login" });
+      }
+
+      this.logoutModal = false;
     },
   },
   components: {

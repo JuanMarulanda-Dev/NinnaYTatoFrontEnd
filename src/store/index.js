@@ -45,6 +45,9 @@ export default new Vuex.Store({
     SET_LOADER_MENU(state, loader = false) {
       state.loadingMenu = loader;
     },
+    SET_OVERLAY_LOADING(state, loader = false) {
+      state.loadingOverlay = loader;
+    },
   },
   actions: {
     async login({ dispatch, commit }, credentials) {
@@ -73,6 +76,19 @@ export default new Vuex.Store({
         console.log(error);
       } finally {
         commit("SET_LOADER_LOGIN");
+      }
+    },
+
+    async logout({ commit }) {
+      try {
+        commit("SET_OVERLAY_LOADING", true);
+        await axios.get("/api/logout");
+        return true;
+      } catch (error) {
+        console.log(error);
+        return false;
+      } finally {
+        commit("SET_OVERLAY_LOADING");
       }
     },
 
