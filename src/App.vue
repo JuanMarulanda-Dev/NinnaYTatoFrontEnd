@@ -36,24 +36,6 @@
             </v-list-item>
           </v-list>
           <v-divider></v-divider>
-          <!-- Loading Menu Secction -->
-          <!-- <div
-            :style="{ visibility: loadingMenu ? 'visible' : 'hidden' }"
-            class="loading-section d-flex justify-center align-center"
-          >
-            <v-progress-circular
-              :size="50"
-              color="primary"
-              indeterminate
-              v-show="loadingMenu"
-            ></v-progress-circular>
-          </div> -->
-          <!-- Agregar las cargas del menu lateral -->
-          <!-- <v-skeleton-loader
-            class="mx-auto"
-            max-width="300"
-            type="list-item,list-item,list-item,list-item,list-item,list-item,list-item"
-          ></v-skeleton-loader> -->
           <!-- Menu options -->
           <v-list nav dense shaped>
             <v-list-item-group color="secondary">
@@ -238,13 +220,7 @@ export default {
     // Validar si existe la info del menu
   },
   computed: {
-    ...mapState([
-      "user",
-      "menu",
-      "notifications",
-      "loadingMenu",
-      "loadingOverlay",
-    ]),
+    ...mapState(["user", "menu", "notifications", "loadingOverlay"]),
   },
   methods: {
     ...mapActions([

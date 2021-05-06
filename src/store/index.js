@@ -42,9 +42,6 @@ export default new Vuex.Store({
     SET_LOADER_LOGIN(state, loader = false) {
       state.loadingLogin = loader;
     },
-    SET_LOADER_MENU(state, loader = false) {
-      state.loadingMenu = loader;
-    },
     SET_OVERLAY_LOADING(state, loader = false) {
       state.loadingOverlay = loader;
     },
@@ -52,6 +49,7 @@ export default new Vuex.Store({
   actions: {
     async login({ dispatch, commit }, credentials) {
       try {
+        commit("SET_OVERLAY_LOADING", true);
         // Activar el loading del boton ingresar
         commit("SET_LOADER_LOGIN", true);
         // Obtener la cookie de autentificación y CSRF Token para la sutentificacion del SPA y politicas CORS
@@ -75,6 +73,7 @@ export default new Vuex.Store({
         // Mostrar el mensaje al usuario que ocurrio algun inconveninte
         console.log(error);
       } finally {
+        commit("SET_OVERLAY_LOADING");
         commit("SET_LOADER_LOGIN");
       }
     },
@@ -107,7 +106,6 @@ export default new Vuex.Store({
 
     async getMenu({ commit, dispatch }) {
       // El menu se deberia guardar en cache
-      commit("SET_LOADER_MENU", true);
       try {
         // Obtener el menu del usuario que se logueo
         let result = await axios.get("/api/permissions");
@@ -117,8 +115,6 @@ export default new Vuex.Store({
         dispatch("storeMenuLocalStorage");
       } catch (error) {
         console.log(error);
-      } finally {
-        commit("SET_LOADER_MENU");
       }
     },
 
