@@ -29,6 +29,7 @@
               dark
               v-bind="attrs"
               v-on="on"
+              v-show="permissions.create"
             >
               <v-icon>mdi-plus-thick</v-icon>
             </v-btn>
@@ -95,6 +96,7 @@
       <v-switch
         :input-value="item.state"
         @change="changeStateSucursal(item)"
+        v-show="permissions.delete"
       ></v-switch>
     </template>
 
@@ -111,6 +113,7 @@
             v-bind="attrs"
             v-on="on"
             @click="editItem(item)"
+            v-show="permissions.update"
           >
             <v-icon> {{ editIcon }} </v-icon>
           </v-btn>
@@ -129,6 +132,7 @@
             v-bind="attrs"
             v-on="on"
             @click="deleteItem(item)"
+            v-show="permissions.delete"
           >
             <v-icon> {{ deleteIcon }} </v-icon>
           </v-btn>
@@ -162,6 +166,7 @@ import { mapState, mapActions } from "vuex";
 
 export default {
   data: () => ({
+    permissions: {},
     dialog: false,
     headers: [
       {
@@ -206,7 +211,12 @@ export default {
   },
 
   created() {
-    this.initialize();
+    // Obtener los permisos
+    this.permissions = this.$route.meta.permissions;
+    // Acciones que debe realizar el componente una vez creado
+    if (this.permissions.read) {
+      this.initialize();
+    }
   },
 
   methods: {
