@@ -23,8 +23,8 @@ export default new Vuex.Store({
       { title: "Opcion 3", message: "esta es una notificación", redirect: "" },
     ],
     loadingOverlay: false,
-    loadingMenu: false,
     loadingText: "Cargando datos...",
+    deleteDialog: false,
 
     //General Icons
     editIcon: process.env.VUE_APP_ICON_EDIT ?? "mdi-pencil",

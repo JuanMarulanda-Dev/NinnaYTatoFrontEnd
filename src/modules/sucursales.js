@@ -8,6 +8,20 @@ export default {
     // Generals loading datatables
     loading: false,
     sucursales: [],
+    editedItem: {
+      id: 0,
+      name: "",
+      address: "",
+      phone: "",
+      state: false,
+    },
+    defaultItem: {
+      id: 0,
+      name: "",
+      address: "",
+      phone: "",
+      state: true,
+    },
   },
   mutations: {
     SET_BRANCH_OFFICES(state, sucursales) {
@@ -15,6 +29,9 @@ export default {
     },
     SET_LOADING_DATATABLE(state, status) {
       state.loading = status;
+    },
+    SET_EDIT_ITEM(state, object) {
+      state.editedItem = object;
     },
   },
   actions: {

@@ -46,7 +46,7 @@
             <v-card-text>
               <v-container>
                 <v-row>
-                  <v-col cols="12" sm="6" md="8">
+                  <v-col cols="12">
                     <v-text-field
                       v-model="editedItem.name"
                       label="Nombre*"
@@ -54,12 +54,6 @@
                       prepend-inner-icon="mdi-format-letter-matches"
                       counter="50"
                     ></v-text-field>
-                  </v-col>
-                  <v-col cols="12" sm="6" md="4">
-                    <v-switch
-                      label="Estado"
-                      v-model="editedItem.state"
-                    ></v-switch>
                   </v-col>
                   <v-col cols="12" sm="6" md="6">
                     <v-text-field
@@ -162,7 +156,7 @@
 </template>
 
 <script>
-import { mapState, mapActions } from "vuex";
+import { mapState, mapActions, mapMutations } from "vuex";
 
 export default {
   data: () => ({
@@ -177,28 +171,21 @@ export default {
       { text: "Dirección", value: "address" },
       { text: "Telefono", value: "phone" },
       { text: "Estado", value: "state" },
+      { text: "Creado", value: "created_at" },
+      { text: "Eliminado", value: "deleted_at" },
       { text: "Actions", value: "actions", sortable: false },
     ],
     editedIndex: -1,
-    editedItem: {
-      id: 0,
-      name: "",
-      address: "",
-      phone: "",
-      state: false,
-    },
-    defaultItem: {
-      id: 0,
-      name: "",
-      address: "",
-      phone: "",
-      state: false,
-    },
   }),
 
   computed: {
     ...mapState(["editIcon", "deleteIcon", "detailsIcon", "loadingText"]),
-    ...mapState("sucursales", ["sucursales", "loading"]),
+    ...mapState("sucursales", [
+      "sucursales",
+      "loading",
+      "editedItem",
+      "defaultItem",
+    ]),
     formTitle() {
       return this.editedIndex === -1 ? "Nueva Sucursal" : "Editar Sucursal";
     },
@@ -221,6 +208,7 @@ export default {
 
   methods: {
     ...mapActions("sucursales", ["getAllBranchOffices"]),
+    ...mapMutations("sucursales", ["SET_EDIT_ITEM"]),
     initialize() {
       this.getAllBranchOffices();
     },
@@ -234,14 +222,20 @@ export default {
 
     editItem(item) {
       this.editedIndex = this.sucursales.indexOf(item);
-      this.editedItem = Object.assign({}, item);
+      this.SET_EDIT_ITEM(Object.assign({}, item));
+      // this.editedItem = ;
       this.dialog = true;
     },
 
-    deleteItem(item) {
+    async deleteItem(item) {
       const index = this.sucursales.indexOf(item);
-      confirm("Are you sure you want to delete this item?") &&
+      const result = await this.$confirm("¿Estas Seugro?", {
+        title: "Advertencia",
+      });
+      if (result) {
         this.sucursales.splice(index, 1);
+        this.$toast.success("Sucursal Eliminada exitosamente!");
+      }
     },
 
     goToShowDetailSucursal(item) {
@@ -254,7 +248,7 @@ export default {
     close() {
       this.dialog = false;
       this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem);
+        this.SET_EDIT_ITEM(Object.assign({}, this.defaultItem));
         this.editedIndex = -1;
       });
     },

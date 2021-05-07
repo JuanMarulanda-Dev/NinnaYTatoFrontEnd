@@ -209,7 +209,6 @@ export default {
     countedSubOptions: 0,
   }),
   created() {
-    // this.$toast("I'm a toast!");
     // Validar si existe la info del usuario
     if (this.user == null) {
       this.getUserLocalStorage();
