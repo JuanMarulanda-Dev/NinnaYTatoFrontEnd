@@ -52,7 +52,10 @@
                       label="Nombre*"
                       required
                       prepend-inner-icon="mdi-format-letter-matches"
-                      counter="50"
+                      counter="255"
+                      :error-messages="nameErrors"
+                      @input="$v.editedItem.name.$touch()"
+                      @blur="$v.editedItem.name.$touch()"
                     ></v-text-field>
                   </v-col>
                   <v-col cols="12" sm="6" md="6">
@@ -60,7 +63,10 @@
                       v-model="editedItem.address"
                       label="Dirrección*"
                       prepend-inner-icon="mdi-map-marker"
-                      counter="70"
+                      counter="255"
+                      :error-messages="addressErrors"
+                      @input="$v.editedItem.address.$touch()"
+                      @blur="$v.editedItem.address.$touch()"
                     ></v-text-field>
                   </v-col>
                   <v-col cols="12" sm="6" md="6">
@@ -68,7 +74,10 @@
                       v-model="editedItem.phone"
                       label="Telefono*"
                       prepend-inner-icon="mdi-phone"
-                      counter="13"
+                      counter="255"
+                      :error-messages="phoneErrors"
+                      @input="$v.editedItem.phone.$touch()"
+                      @blur="$v.editedItem.phone.$touch()"
                     ></v-text-field>
                   </v-col>
                 </v-row>
@@ -156,6 +165,8 @@
 </template>
 
 <script>
+import { validationMixin } from "vuelidate";
+import { required, maxLength, numeric } from "vuelidate/lib/validators";
 import { mapState, mapActions, mapMutations } from "vuex";
 
 export default {
@@ -177,7 +188,14 @@ export default {
     ],
     editedIndex: -1,
   }),
-
+  mixins: [validationMixin],
+  validations: {
+    editedItem: {
+      name: { required, maxLength: maxLength(255) },
+      address: { required, maxLength: maxLength(255) },
+      phone: { required, numeric, maxLength: maxLength(255) },
+    },
+  },
   computed: {
     ...mapState(["editIcon", "deleteIcon", "detailsIcon", "loadingText"]),
     ...mapState("sucursales", [
@@ -189,11 +207,41 @@ export default {
     formTitle() {
       return this.editedIndex === -1 ? "Nueva Sucursal" : "Editar Sucursal";
     },
+    nameErrors() {
+      const errors = [];
+      if (!this.$v.editedItem.name.$dirty) return errors;
+      !this.$v.editedItem.name.required &&
+        errors.push("El nombre es requerido");
+      !this.$v.editedItem.name.maxLength &&
+        errors.push("Longitud no permitida");
+      return errors;
+    },
+    addressErrors() {
+      const errors = [];
+      if (!this.$v.editedItem.address.$dirty) return errors;
+      !this.$v.editedItem.address.required &&
+        errors.push("La dirección es requerido");
+      !this.$v.editedItem.address.maxLength &&
+        errors.push("Longitud no permitida");
+      return errors;
+    },
+    phoneErrors() {
+      const errors = [];
+      if (!this.$v.editedItem.phone.$dirty) return errors;
+      !this.$v.editedItem.phone.required &&
+        errors.push("El telefono es requerido");
+      !this.$v.editedItem.phone.maxLength &&
+        errors.push("Longitud no permitida");
+      !this.$v.editedItem.phone.numeric &&
+        errors.push("Solo se permiten numeros");
+      return errors;
+    },
   },
 
   watch: {
     dialog(val) {
       val || this.close();
+      this.$v.$reset();
     },
   },
 
@@ -207,7 +255,11 @@ export default {
   },
 
   methods: {
-    ...mapActions("sucursales", ["getAllBranchOffices"]),
+    ...mapActions("sucursales", [
+      "getAllBranchOffices",
+      "storeBranchOffice",
+      "updateBranchOffice",
+    ]),
     ...mapMutations("sucursales", ["SET_EDIT_ITEM"]),
     initialize() {
       this.getAllBranchOffices();
@@ -257,11 +309,20 @@ export default {
       if (this.editedIndex > -1) {
         // Update
         Object.assign(this.sucursales[this.editedIndex], this.editedItem);
+        // Close modal
+        this.close();
       } else {
-        // Create
-        this.sucursales.push(this.editedItem);
+        // Create new branch office
+        this.$v.$touch();
+        if (!this.$v.$invalid) {
+          // do store
+          this.storeBranchOffice();
+          // Add de new branch office or reload information from backend
+          this.sucursales.push(this.editedItem);
+          // Close modal
+          this.close();
+        }
       }
-      this.close();
     },
   },
 };
