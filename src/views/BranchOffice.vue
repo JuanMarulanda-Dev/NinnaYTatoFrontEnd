@@ -306,22 +306,19 @@ export default {
     },
 
     save() {
-      if (this.editedIndex > -1) {
-        // Update
-        Object.assign(this.sucursales[this.editedIndex], this.editedItem);
+      // activate validations form
+      this.$v.$touch();
+      // Correct validations
+      if (!this.$v.$invalid) {
+        if (this.editedIndex > -1) {
+          // Do update
+          this.updateBranchOffice();
+        } else {
+          // Do store
+          this.storeBranchOffice();
+        }
         // Close modal
         this.close();
-      } else {
-        // Create new branch office
-        this.$v.$touch();
-        if (!this.$v.$invalid) {
-          // do store
-          this.storeBranchOffice();
-          // Add de new branch office or reload information from backend
-          // this.sucursales.push(this.editedItem);
-          // Close modal
-          this.close();
-        }
       }
     },
   },

@@ -65,7 +65,25 @@ export default {
       }
     },
 
-    async updateBranchOffice() {},
+    async updateBranchOffice({ state, commit, dispatch }) {
+      try {
+        commit("SET_OVERLAY_LOADING", true, { root: true });
+        let result = await axios.put(
+          `/api/branch-offices/${state.editedItem.id}`,
+          state.editedItem
+        );
+        if (result.status == 201) {
+          // show message
+          this._vm.$toast.success("Sucursal actualizada exitosamente");
+          // Reload branch officess
+          dispatch("getAllBranchOffices");
+        }
+      } catch (error) {
+        this._vm.$toast.error("Ocurrio un error");
+      } finally {
+        commit("SET_OVERLAY_LOADING", false, { root: true });
+      }
+    },
   },
   getters: {},
 };
