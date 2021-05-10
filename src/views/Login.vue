@@ -21,9 +21,12 @@
                   </v-img>
                   <h1 class="flex my-4 primary--text">¡{{ bienvenida }}!</h1>
                 </div>
-                <v-form ref="form" @submit.prevent="login({ email, password })">
+                <v-form
+                  ref="form"
+                  @submit.prevent="submit({ email, password })"
+                >
                   <v-text-field
-                    v-model="email"
+                    v-model.trim="email"
                     :error-messages="emailErrors"
                     label="E-mail"
                     required
@@ -33,7 +36,7 @@
                   ></v-text-field>
 
                   <v-text-field
-                    v-model="password"
+                    v-model.trim="password"
                     :error-messages="passwordErrors"
                     :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
                     :type="showPassword ? 'text' : 'password'"
@@ -104,6 +107,13 @@ export default {
   },
   methods: {
     ...mapActions(["login"]),
+    submit(credencials) {
+      this.$v.$touch();
+      if (!this.$v.$invalid) {
+        // do login
+        this.login(credencials);
+      }
+    },
   },
 };
 </script>

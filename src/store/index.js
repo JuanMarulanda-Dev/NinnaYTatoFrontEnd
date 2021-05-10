@@ -70,8 +70,8 @@ export default new Vuex.Store({
         // Redirrecionar a la ruta pertiente para el usuario
         router.push("sucursales");
       } catch (error) {
-        // Mostrar el mensaje al usuario que ocurrio algun inconveninte
-        console.log(error);
+        // Mostrar el mensaje al usuario que ocurrio algun inconveninte (Los mensajes deben venir del backend)
+        this._vm.$toast.warning("El usuario o la contraseña son incorrectos.");
       } finally {
         commit("SET_OVERLAY_LOADING");
         commit("SET_LOADER_LOGIN");
