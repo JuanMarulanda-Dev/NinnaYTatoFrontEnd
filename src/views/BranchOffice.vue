@@ -318,7 +318,7 @@ export default {
           // do store
           this.storeBranchOffice();
           // Add de new branch office or reload information from backend
-          this.sucursales.push(this.editedItem);
+          // this.sucursales.push(this.editedItem);
           // Close modal
           this.close();
         }

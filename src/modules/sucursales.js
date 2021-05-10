@@ -39,7 +39,6 @@ export default {
       try {
         // Activar el loading del datatable
         commit("SET_LOADING_DATATABLE", true);
-
         let result = await axios.get("/api/branch-offices");
         commit("SET_BRANCH_OFFICES", result.data.branch_offices);
       } catch (error) {
@@ -49,7 +48,22 @@ export default {
       }
     },
 
-    async storeBranchOffice() {},
+    async storeBranchOffice({ state, commit, dispatch }) {
+      try {
+        commit("SET_OVERLAY_LOADING", true, { root: true });
+        let result = await axios.post("/api/branch-offices", state.editedItem);
+        if (result.status == 201) {
+          // show message
+          this._vm.$toast.success("Sucursal creada exitosamente");
+          // Reload branch officess
+          dispatch("getAllBranchOffices");
+        }
+      } catch (error) {
+        this._vm.$toast.error("Ocurrio un error");
+      } finally {
+        commit("SET_OVERLAY_LOADING", false, { root: true });
+      }
+    },
 
     async updateBranchOffice() {},
   },
