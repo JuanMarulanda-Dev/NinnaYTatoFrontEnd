@@ -98,6 +98,7 @@
     <template v-slot:[`item.state`]="{ item }">
       <v-switch
         :input-value="item.state"
+        v-model="item.state"
         @change="changeStateSucursal(item)"
         v-show="permissions.delete"
       ></v-switch>
@@ -259,6 +260,7 @@ export default {
       "getAllBranchOffices",
       "storeBranchOffice",
       "updateBranchOffice",
+      "changeStatusBranchOffices",
     ]),
     ...mapMutations("sucursales", ["SET_EDIT_ITEM"]),
     initialize() {
@@ -266,10 +268,30 @@ export default {
     },
 
     changeStateSucursal(item) {
-      // Cambiar el estado de la sucursal
-      this.editedIndex = this.sucursales.indexOf(item);
-      // let itemObject = Object.assign({}, item); // Convertir a un objeto json
-      console.log(item);
+      // Confirmation to change de status
+      this.$confirm("¿Quieres cambiar el estado de esta sucursal?", {
+        title: "Advertencia",
+      }).then((res) => {
+        if (res) {
+          // Make to change status to backend
+          this.changeStatusBranchOffices(item.id).then((result) => {
+            if (!result) {
+              // Rollback the state from branch office
+              this.rollbackStateBranchOffice(item);
+            }
+          });
+        } else {
+          // Rollback the state from branch office
+          this.rollbackStateBranchOffice(item);
+        }
+      });
+    },
+
+    rollbackStateBranchOffice(item) {
+      let branchOfficeIndex = this.sucursales.indexOf(item);
+      this.sucursales[branchOfficeIndex].state = !this.sucursales[
+        branchOfficeIndex
+      ].state;
     },
 
     editItem(item) {
@@ -291,6 +313,7 @@ export default {
     },
 
     goToShowDetailSucursal(item) {
+      // Esto de desarrollara más adelante
       // Ir a monstrar los detalles de esta sucursal (Caja, stocks, trabajadores, clientes registrados en esa sucursal, mascotas en esa sucursal, sus habitaciones, etc)
       this.editedIndex = this.sucursales.indexOf(item);
       // let itemObject = Object.assign({}, item); // Convertir a un objeto json

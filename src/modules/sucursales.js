@@ -84,6 +84,27 @@ export default {
         commit("SET_OVERLAY_LOADING", false, { root: true });
       }
     },
+
+    async changeStatusBranchOffices({ commit, dispatch }, id) {
+      try {
+        commit("SET_OVERLAY_LOADING", true, { root: true });
+        let result = await axios.delete(`/api/branch-offices/${id}`);
+        if (result.status == 200) {
+          // show message
+          this._vm.$toast.success("Estado cambiado exitosamente");
+          // Reload branch officess
+          dispatch("getAllBranchOffices");
+          return true;
+        } else {
+          return false;
+        }
+      } catch (error) {
+        this._vm.$toast.error("Ocurrio un error");
+        return false;
+      } finally {
+        commit("SET_OVERLAY_LOADING", false, { root: true });
+      }
+    },
   },
   getters: {},
 };
