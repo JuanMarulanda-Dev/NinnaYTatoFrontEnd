@@ -5,6 +5,8 @@ import router from "@/router";
 Vue.use(Vuex);
 import axios from "axios";
 import sucursales from "@/modules/sucursales.js";
+import users from "@/modules/users.js";
+
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL = process.env.VUE_APP_API_URL;
 
@@ -47,6 +49,7 @@ export default new Vuex.Store({
     },
   },
   actions: {
+    // Todas estas acciones pertenecen a las funcionalidades del login (Modular)
     async login({ dispatch, commit }, credentials) {
       try {
         commit("SET_OVERLAY_LOADING", true);
@@ -149,5 +152,6 @@ export default new Vuex.Store({
   },
   modules: {
     sucursales,
+    users,
   },
 });

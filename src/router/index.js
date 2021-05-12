@@ -36,6 +36,15 @@ const routes = [
       permissions: {},
     },
   },
+  {
+    path: "/usuarios",
+    name: "Usuarios",
+    component: () =>
+      import(/* webpackChunkName: "Users" */ "@/views/Users.vue"),
+    meta: {
+      permissions: {},
+    },
+  },
 ];
 
 const router = new VueRouter({
@@ -54,7 +63,7 @@ router.beforeEach((to, from, next) => {
       localStorage.getItem("User") == null ||
       localStorage.getItem("Menu") == null
     ) {
-      // Hacer logout del usuario
+      // Hacer logout del usuario (Pendiente)
       // Redireccionar al login
       next({ name: "Login" });
     } else {
