@@ -125,25 +125,6 @@
         <span>Editar</span>
       </v-tooltip>
 
-      <!-- Eliminar -->
-      <v-tooltip bottom>
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn
-            fab
-            x-small
-            dark
-            color="error mr-1"
-            v-bind="attrs"
-            v-on="on"
-            @click="deleteItem(item)"
-            v-show="permissions.delete"
-          >
-            <v-icon> {{ deleteIcon }} </v-icon>
-          </v-btn>
-        </template>
-        <span>Eliminar</span>
-      </v-tooltip>
-
       <!-- Detalles sucursal -->
       <v-tooltip bottom>
         <template v-slot:activator="{ on, attrs }">
@@ -299,17 +280,6 @@ export default {
       this.SET_EDIT_ITEM(Object.assign({}, item));
       // this.editedItem = ;
       this.dialog = true;
-    },
-
-    async deleteItem(item) {
-      const index = this.sucursales.indexOf(item);
-      const result = await this.$confirm("¿Estas Seugro?", {
-        title: "Advertencia",
-      });
-      if (result) {
-        this.sucursales.splice(index, 1);
-        this.$toast.success("Sucursal Eliminada exitosamente!");
-      }
     },
 
     goToShowDetailSucursal(item) {
