@@ -12,34 +12,38 @@ export default {
     branchOffices: [],
     editedItem: {
       id: 0,
-      firstName: "",
-      lastName: "",
-      fullName: "",
+      first_name: "",
+      last_name: "",
       phone: "",
       email: "",
-      rol: "",
-      branchOffice: "",
+      rol_id: "",
+      branch_office_id: "",
       password: "",
-      confirmatinPassword: "",
+      password_confirmation: "",
       state: false,
     },
     defaultItem: {
       id: 0,
-      firstName: "",
-      lastName: "",
-      fullName: "",
+      first_name: "",
+      last_name: "",
       phone: "",
       email: "",
-      rol: "",
-      branchOffice: "",
+      rol_id: "",
+      branch_office_id: "",
       password: "",
-      confirmatinPassword: "",
+      password_confirmation: "",
       state: false,
     },
   },
   mutations: {
     SET_USERS(state, users) {
       state.users = users;
+    },
+    SET_ROLES(state, roles) {
+      state.roles = roles;
+    },
+    SET_BRANCH_OFFICES_AVAILABLES(state, branchOffices) {
+      state.branchOffices = branchOffices;
     },
     SET_LOADING_DATATABLE(state, status) {
       state.loading = status;
@@ -49,11 +53,28 @@ export default {
     },
   },
   actions: {
+    async getAllRoles({ commit }) {
+      try {
+        let result = await axios.get("/api/roles");
+        commit("SET_ROLES", result.data.roles);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async getBranchOfficesAvailable({ commit }) {
+      try {
+        // If status is 1 will get only availables branch offices and the status is 0 will get all branch offices
+        let result = await axios.get("/api/branch-offices/1");
+        commit("SET_BRANCH_OFFICES_AVAILABLES", result.data.branch_offices);
+      } catch (error) {
+        console.log(error);
+      }
+    },
     async getAllUsers({ commit }) {
       try {
         // Activar el loading del datatable
         commit("SET_LOADING_DATATABLE", true);
-        let result = await axios.get("/api/branch-offices");
+        let result = await axios.get("/api/users");
         commit("SET_USERS", result.data.users);
       } catch (error) {
         console.log(error);
