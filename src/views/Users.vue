@@ -97,12 +97,12 @@
                       item-text="name"
                       item-value="id"
                       label="Rol"
-                      v-model="editedItem.rol_id"
+                      v-model="editedItem.role_id"
                       dense
                       append-icon="mdi-account-supervisor-circle"
                       :error-messages="rolErrors"
-                      @input="$v.editedItem.rol_id.$touch()"
-                      @blur="$v.editedItem.rol_id.$touch()"
+                      @input="$v.editedItem.role_id.$touch()"
+                      @blur="$v.editedItem.role_id.$touch()"
                     ></v-select>
                   </v-col>
                   <v-col cols="12" sm="6" md="6">
@@ -115,8 +115,8 @@
                       dense
                       append-icon="mdi-office-building-marker"
                       :error-messages="branch_officeErrors"
-                      @input="$v.editedItem.rol_id.$touch()"
-                      @blur="$v.editedItem.rol_id.$touch()"
+                      @input="$v.editedItem.branch_office_id.$touch()"
+                      @blur="$v.editedItem.branch_office_id.$touch()"
                     ></v-select>
                   </v-col>
                   <v-col cols="12" sm="6" md="6">
@@ -125,7 +125,7 @@
                       v-model="editedItem.password"
                       label="Contraseña*"
                       prepend-inner-icon="mdi-lock"
-                      counter="255"
+                      counter="25"
                       :error-messages="passwordErrors"
                       @input="$v.editedItem.password.$touch()"
                       @blur="$v.editedItem.password.$touch()"
@@ -137,7 +137,7 @@
                       v-model="editedItem.password_confirmation"
                       label="Confirmar contraseña*"
                       prepend-inner-icon="mdi-lock"
-                      counter="255"
+                      counter="25"
                       :error-messages="password_confirmationErrors"
                       @input="$v.editedItem.password_confirmation.$touch()"
                       @blur="$v.editedItem.password_confirmation.$touch()"
@@ -229,16 +229,17 @@ export default {
       last_name: { required, maxLength: maxLength(255) },
       phone: { required, numeric, maxLength: maxLength(255) },
       email: { required, maxLength: maxLength(255), email },
-      rol_id: { required, numeric },
-      branch_office_id: { required, numeric },
+      role_id: { required },
+      branch_office_id: { required },
       password: {
         required,
-        maxLength: maxLength(255),
+        maxLength: maxLength(25),
         minLength: minLength(8),
       },
       password_confirmation: {
         required,
         minLength: minLength(8),
+        maxLength: maxLength(25),
         sameAsPassword: sameAs("password"),
       },
     },
@@ -281,6 +282,7 @@ export default {
         errors.push("El email es requerido.");
       !this.$v.editedItem.email.maxLength &&
         errors.push("Longitud no permitida.");
+      !this.$v.editedItem.email.email && errors.push("No es un email valido.");
       return errors;
     },
 
@@ -298,16 +300,16 @@ export default {
 
     rolErrors() {
       const errors = [];
-      if (!this.$v.editedItem.rol_id.$dirty) return errors;
-      !this.$v.editedItem.rol_id.required &&
+      if (!this.$v.editedItem.role_id.$dirty) return errors;
+      !this.$v.editedItem.role_id.required &&
         errors.push("El rol es requerido.");
       return errors;
     },
 
     branch_officeErrors() {
       const errors = [];
-      if (!this.$v.editedItem.rol_id.$dirty) return errors;
-      !this.$v.editedItem.rol_id.required &&
+      if (!this.$v.editedItem.role_id.$dirty) return errors;
+      !this.$v.editedItem.role_id.required &&
         errors.push("La sucursal es requerido.");
       return errors;
     },
@@ -320,6 +322,8 @@ export default {
           errors.push("La contraseña es requerida.");
         !this.$v.editedItem.password.minLength &&
           errors.push("Minimo 8 caracteres.");
+        !this.$v.editedItem.password.maxLength &&
+          errors.push("Maximo 25 caracteres.");
       }
       return errors;
     },
@@ -334,6 +338,8 @@ export default {
           errors.push("Minimo 8 caracteres.");
         !this.$v.editedItem.password_confirmation.sameAsPassword &&
           errors.push("Las contraseñas no coinciden.");
+        !this.$v.editedItem.password_confirmation.maxLength &&
+          errors.push("Maximo 25 caracteres.");
       }
       return errors;
     },
@@ -360,7 +366,7 @@ export default {
       "getAllUsers",
       "getAllRoles",
       "getBranchOfficesAvailable",
-      "storeBranchOffice",
+      "storeUser",
       "updateBranchOffice",
       "changeStatusBranchOffices",
     ]),
@@ -422,10 +428,13 @@ export default {
           this.updateBranchOffice();
         } else {
           // Do store
-          this.storeBranchOffice();
+          this.storeUser().then((result) => {
+            if (result) {
+              // Close modal
+              this.close();
+            }
+          });
         }
-        // Close modal
-        this.close();
       }
     },
   },

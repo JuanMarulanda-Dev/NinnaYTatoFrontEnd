@@ -16,7 +16,7 @@ export default {
       last_name: "",
       phone: "",
       email: "",
-      rol_id: "",
+      role_id: "",
       branch_office_id: "",
       password: "",
       password_confirmation: "",
@@ -28,7 +28,7 @@ export default {
       last_name: "",
       phone: "",
       email: "",
-      rol_id: "",
+      role_id: "",
       branch_office_id: "",
       password: "",
       password_confirmation: "",
@@ -83,18 +83,22 @@ export default {
       }
     },
 
-    async storeBranchOffice({ state, commit, dispatch }) {
+    async storeUser({ state, commit, dispatch }) {
       try {
         commit("SET_OVERLAY_LOADING", true, { root: true });
-        let result = await axios.post("/api/branch-offices", state.editedItem);
+        let result = await axios.post("/api/users", state.editedItem);
         if (result.status == 201) {
           // show message
-          this._vm.$toast.success("Sucursal creada exitosamente");
+          this._vm.$toast.success("Usuario creado exitosamente");
           // Reload branch officess
           dispatch("getAllUsers");
+          // Result
+          return true;
         }
-      } catch (error) {
+      } catch (ex) {
+        console.log(ex.data);
         this._vm.$toast.error("Ocurrio un error");
+        return false;
       } finally {
         commit("SET_OVERLAY_LOADING", false, { root: true });
       }
