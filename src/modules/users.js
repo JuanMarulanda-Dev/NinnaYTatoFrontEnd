@@ -19,7 +19,7 @@ export default {
       role_id: "",
       branch_office_id: "",
       password: "",
-      password_confirmation: "",
+      password_confirmation: 0,
       state: false,
     },
     defaultItem: {
@@ -104,21 +104,23 @@ export default {
       }
     },
 
-    async updateBranchOffice({ state, commit, dispatch }) {
+    async updateUser({ state, commit, dispatch }) {
       try {
         commit("SET_OVERLAY_LOADING", true, { root: true });
         let result = await axios.put(
-          `/api/branch-offices/${state.editedItem.id}`,
+          `/api/users/${state.editedItem.id}`,
           state.editedItem
         );
         if (result.status == 201) {
           // show message
-          this._vm.$toast.success("Sucursal actualizada exitosamente");
+          this._vm.$toast.success("Usuario actualizado exitosamente");
           // Reload branch officess
           dispatch("getAllUsers");
+          return true;
         }
       } catch (error) {
         this._vm.$toast.error("Ocurrio un error");
+        return false;
       } finally {
         commit("SET_OVERLAY_LOADING", false, { root: true });
       }

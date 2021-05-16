@@ -223,14 +223,21 @@ export default {
     editedIndex: -1,
   }),
   mixins: [validationMixin],
-  validations: {
-    editedItem: {
-      first_name: { required, maxLength: maxLength(255) },
-      last_name: { required, maxLength: maxLength(255) },
-      phone: { required, numeric, maxLength: maxLength(255) },
-      email: { required, maxLength: maxLength(255), email },
-      role_id: { required },
-      branch_office_id: { required },
+  validations() {
+    let rules = {
+      editedItem: {
+        first_name: { required, maxLength: maxLength(255) },
+        last_name: { required, maxLength: maxLength(255) },
+        phone: { required, numeric, maxLength: maxLength(255) },
+        email: { required, maxLength: maxLength(255), email },
+        role_id: { required },
+        branch_office_id: { required },
+        password: {},
+        password_confirmation: {},
+      },
+    };
+
+    let passwordValidations = {
       password: {
         required,
         maxLength: maxLength(25),
@@ -242,7 +249,19 @@ export default {
         maxLength: maxLength(25),
         sameAsPassword: sameAs("password"),
       },
-    },
+    };
+
+    if (
+      this.editedItem.id == 0 ||
+      this.editedItem.password ||
+      this.editedItem.password_confirmation
+    ) {
+      rules = {
+        editedItem: Object.assign(rules.editedItem, passwordValidations),
+      };
+    }
+
+    return rules;
   },
   computed: {
     ...mapState(["editIcon", "deleteIcon", "detailsIcon", "loadingText"]),
@@ -308,15 +327,19 @@ export default {
 
     branch_officeErrors() {
       const errors = [];
-      if (!this.$v.editedItem.role_id.$dirty) return errors;
-      !this.$v.editedItem.role_id.required &&
+      if (!this.$v.editedItem.branch_office_id.$dirty) return errors;
+      !this.$v.editedItem.branch_office_id.required &&
         errors.push("La sucursal es requerido.");
       return errors;
     },
 
     passwordErrors() {
       const errors = [];
-      if (this.editedItem.id == 0 || this.editedItem.password) {
+      if (
+        this.editedItem.id == 0 ||
+        this.editedItem.password ||
+        this.editedItem.password_confirmation
+      ) {
         if (!this.$v.editedItem.password.$dirty) return errors;
         !this.$v.editedItem.password.required &&
           errors.push("La contraseña es requerida.");
@@ -330,7 +353,11 @@ export default {
 
     password_confirmationErrors() {
       const errors = [];
-      if (this.editedItem.id == 0 || this.editedItem.password_confirmation) {
+      if (
+        this.editedItem.id == 0 ||
+        this.editedItem.password ||
+        this.editedItem.password_confirmation
+      ) {
         if (!this.$v.editedItem.password_confirmation.$dirty) return errors;
         !this.$v.editedItem.password_confirmation.required &&
           errors.push("La confirmacion es requerida.");
@@ -367,7 +394,7 @@ export default {
       "getAllRoles",
       "getBranchOfficesAvailable",
       "storeUser",
-      "updateBranchOffice",
+      "updateUser",
       "changeStatusUser",
     ]),
     ...mapMutations("users", ["SET_EDIT_ITEM"]),
@@ -404,6 +431,7 @@ export default {
     },
 
     editItem(item) {
+      console.log("edit");
       this.editedIndex = this.users.indexOf(item);
       this.SET_EDIT_ITEM(Object.assign({}, item));
       // this.editedItem = ;
@@ -425,7 +453,12 @@ export default {
       if (!this.$v.$invalid) {
         if (this.editedIndex > -1) {
           // Do update
-          this.updateBranchOffice();
+          this.updateUser().then((result) => {
+            if (result) {
+              // Close modal
+              this.close();
+            }
+          });
         } else {
           // Do store
           this.storeUser().then((result) => {
