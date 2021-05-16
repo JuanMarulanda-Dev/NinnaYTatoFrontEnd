@@ -162,7 +162,7 @@
       <v-switch
         :input-value="item.state"
         v-model="item.state"
-        @change="changeStateSucursal(item)"
+        @change="changeState(item)"
         v-show="permissions.delete"
       ></v-switch>
     </template>
@@ -368,7 +368,7 @@ export default {
       "getBranchOfficesAvailable",
       "storeUser",
       "updateBranchOffice",
-      "changeStatusBranchOffices",
+      "changeStatusUser",
     ]),
     ...mapMutations("users", ["SET_EDIT_ITEM"]),
     initialize() {
@@ -377,27 +377,27 @@ export default {
       this.getAllUsers();
     },
 
-    changeStateSucursal(item) {
+    changeState(item) {
       // Confirmation to change de status
-      this.$confirm("¿Quieres cambiar el estado de esta sucursal?", {
+      this.$confirm("¿Quieres cambiar el estado de este usuario?", {
         title: "Advertencia",
       }).then((res) => {
         if (res) {
           // Make to change status to backend
-          this.changeStatusBranchOffices(item.id).then((result) => {
+          this.changeStatusUser(item.id).then((result) => {
             if (!result) {
               // Rollback the state from branch office
-              this.rollbackStateBranchOffice(item);
+              this.rollbackStateUser(item);
             }
           });
         } else {
           // Rollback the state from branch office
-          this.rollbackStateBranchOffice(item);
+          this.rollbackStateUser(item);
         }
       });
     },
 
-    rollbackStateBranchOffice(item) {
+    rollbackStateUser(item) {
       let branchOfficeIndex = this.users.indexOf(item);
       this.users[branchOfficeIndex].state = !this.users[branchOfficeIndex]
         .state;

@@ -124,11 +124,11 @@ export default {
       }
     },
 
-    async changeStatusBranchOffices({ commit, dispatch }, id) {
+    async changeStatusUser({ commit, dispatch }, id) {
       try {
         commit("SET_OVERLAY_LOADING", true, { root: true });
-        let result = await axios.delete(`/api/branch-offices/${id}`);
-        if (result.status == 200) {
+        let result = await axios.delete(`/api/users/${id}`);
+        if (result.status == 204) {
           // show message
           this._vm.$toast.success("Estado cambiado exitosamente");
           // Reload branch officess
