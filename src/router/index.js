@@ -45,6 +45,23 @@ const routes = [
       permissions: {},
     },
   },
+  {
+    path: "/clientes",
+    name: "Clientes",
+    component: () =>
+      import(/* webpackChunkName: "Customers" */ "@/views/Customers.vue"),
+    meta: {
+      permissions: {},
+    },
+    children: [
+      {
+        path: "crear",
+        name: "",
+        component: () =>
+          import(/* webpackChunkName: "Customers" */ "@/views/Customers.vue"),
+      },
+    ],
+  },
 ];
 
 const router = new VueRouter({

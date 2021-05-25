@@ -166,7 +166,7 @@ export default {
       { text: "Estado", value: "state" },
       { text: "Creado", value: "created_at" },
       { text: "Eliminado", value: "deleted_at" },
-      { text: "Actions", value: "actions", sortable: false },
+      { text: "Acciones", value: "actions", sortable: false },
     ],
     editedIndex: -1,
   }),

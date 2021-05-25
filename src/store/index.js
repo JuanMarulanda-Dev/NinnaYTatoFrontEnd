@@ -6,6 +6,7 @@ Vue.use(Vuex);
 import axios from "axios";
 import sucursales from "@/modules/sucursales.js";
 import users from "@/modules/users.js";
+import customers from "@/modules/customers.js";
 
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL = process.env.VUE_APP_API_URL;
@@ -153,5 +154,6 @@ export default new Vuex.Store({
   modules: {
     sucursales,
     users,
+    customers,
   },
 });
