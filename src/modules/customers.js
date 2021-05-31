@@ -10,7 +10,7 @@ export default {
     loading: false,
     customers: [
       {
-        id: 0,
+        id: 1,
         image: "https://cdn.vuetifyjs.com/images/john.jpg",
         dni: "1216727816",
         name: "Camilo muñoz",
@@ -19,7 +19,7 @@ export default {
         state: true,
       },
       {
-        id: 0,
+        id: 2,
         image: "",
         dni: "1216727816",
         name: "Juan David Marulanda",
@@ -28,7 +28,7 @@ export default {
         state: false,
       },
       {
-        id: 0,
+        id: 3,
         image: "https://cdn.vuetifyjs.com/images/john.jpg",
         dni: "1216727816",
         name: "Juan David Marulanda",
@@ -37,7 +37,7 @@ export default {
         state: false,
       },
       {
-        id: 0,
+        id: 4,
         image: "https://cdn.vuetifyjs.com/images/john.jpg",
         dni: "1216727816",
         name: "Juan David Marulanda",

@@ -55,10 +55,18 @@ const routes = [
     },
     children: [
       {
-        path: "crear",
-        name: "",
+        path: "",
         component: () =>
-          import(/* webpackChunkName: "Customers" */ "@/views/Customers.vue"),
+          import(
+            /* webpackChunkName: "CustomersTable" */ "@/components/customers/CustomersTable.vue"
+          ),
+      },
+      {
+        path: "registro",
+        component: () =>
+          import(
+            /* webpackChunkName: "CustomerForm" */ "@/components/customers/CustomersForm.vue"
+          ),
       },
     ],
   },
@@ -81,6 +89,7 @@ router.beforeEach((to, from, next) => {
       localStorage.getItem("Menu") == null
     ) {
       // Hacer logout del usuario (Pendiente)
+      // *******
       // Redireccionar al login
       next({ name: "Login" });
     } else {

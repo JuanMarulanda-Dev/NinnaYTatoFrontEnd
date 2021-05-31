@@ -150,6 +150,10 @@ export default new Vuex.Store({
         commit("SET_MENU", decryp);
       }
     },
+
+    goBack() {
+      this.$router.go(-1);
+    },
   },
   modules: {
     sucursales,
