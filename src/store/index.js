@@ -152,7 +152,7 @@ export default new Vuex.Store({
     },
 
     goBack() {
-      this.$router.go(-1);
+      router.go(-1);
     },
   },
   modules: {
