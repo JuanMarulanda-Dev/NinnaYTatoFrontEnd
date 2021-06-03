@@ -67,6 +67,13 @@ const routes = [
             /* webpackChunkName: "CustomerForm" */ "@/components/customers/CustomersForm.vue"
           ),
       },
+      {
+        path: "detalles/:id",
+        component: () =>
+          import(
+            /* webpackChunkName: "CustomerDetails" */ "@/components/customers/CustomerDetails.vue"
+          ),
+      },
     ],
   },
 ];

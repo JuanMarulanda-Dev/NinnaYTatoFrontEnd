@@ -82,7 +82,7 @@
             color="info"
             v-bind="attrs"
             v-on="on"
-            @click="console.log(item)"
+            @click="goToCustomerDetails(item.id)"
           >
             <v-icon> {{ detailsIcon }} </v-icon>
           </v-btn>
@@ -122,6 +122,11 @@ export default {
   methods: {
     goToFormCreateCustomer() {
       this.$router.push({ path: "/clientes/registro" }).catch((error) => {
+        console.log(error);
+      });
+    },
+    goToCustomerDetails(id) {
+      this.$router.push({ path: `/clientes/detalles/${id}` }).catch((error) => {
         console.log(error);
       });
     },
