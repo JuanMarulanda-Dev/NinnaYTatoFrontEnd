@@ -362,7 +362,7 @@
                           :items="races"
                           item-text="name"
                           item-value="id"
-                          label="Pelaje"
+                          label="Alimento"
                         ></v-select
                       ></v-col>
                       <v-col xs="12" sm="12" md="6" cols="12">
@@ -370,7 +370,7 @@
                           :items="races"
                           item-text="name"
                           item-value="id"
-                          label="Pelaje"
+                          label="Tamaño"
                         ></v-select
                       ></v-col>
                     </v-row>

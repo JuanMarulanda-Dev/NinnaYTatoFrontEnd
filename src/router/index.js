@@ -68,10 +68,17 @@ const routes = [
           ),
       },
       {
-        path: "detalles/:id",
+        path: "detalles/:customer",
         component: () =>
           import(
             /* webpackChunkName: "CustomerDetails" */ "@/components/customers/CustomerDetails.vue"
+          ),
+      },
+      {
+        path: "detalles/:customer/mascota/:pet",
+        component: () =>
+          import(
+            /* webpackChunkName: "PetDetails" */ "@/components/customers/pets/PetDetails.vue"
           ),
       },
     ],

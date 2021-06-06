@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- titel -->
-    <v-row class="my-1" align="center">
+    <v-row align="center">
       <v-btn icon @click="goBack()">
         <v-icon>mdi-arrow-left-circle</v-icon>
       </v-btn>
@@ -32,7 +32,7 @@
               <v-col xs="12" sm="12" md="4" cols="12">
                 <!-- Icon profile -->
                 <v-row justify="center" align="center">
-                  <v-avatar size="125" color="grey lighten-1" class="my-2 mr-1">
+                  <v-avatar size="160" color="grey lighten-1" class="my-2 mr-1">
                     <v-icon dark x-large> mdi-account-circle </v-icon>
                   </v-avatar>
                   <v-col cols="12">
@@ -125,16 +125,22 @@
                 <v-simple-table height="193px">
                   <template v-slot:default>
                     <tbody>
-                      <tr v-for="item in pets" :key="item.name">
-                        <td class="pa-0">
+                      <tr v-for="item in pets" :key="item.id">
+                        <td class="pa-0 cursor" @click="goToShowPet(item.id)">
                           <div class="d-flex pa-1">
                             <v-avatar class="mr-2" color="primary"></v-avatar>
                             <div>
                               <label>
-                                Nico&nbsp;
-                                <v-icon x-small>mdi-gender-male</v-icon> </label
-                              ><br />
-                              <small>Jack Terrier - 1 año/s y 7 mes/es</small>
+                                {{ item.name }}&nbsp;
+                                <v-icon v-if="item.gender" x-small
+                                  >mdi-gender-male</v-icon
+                                >
+                                <v-icon v-else x-small
+                                  >mdi-gender-female</v-icon
+                                >
+                              </label>
+                              <br />
+                              <small>{{ item.race }} - {{ item.age }}</small>
                             </div>
                           </div>
                         </td>
@@ -157,53 +163,36 @@ import { mapActions } from "vuex";
 export default {
   data() {
     return {
+      customerId: null,
       pets: [
         {
+          id: 1,
           name: "Frozen Yogurt",
-          calories: 159,
+          gender: 0,
+          race: "Jack Terrier",
+          age: "1 año/s y 7 mes/es",
         },
         {
-          name: "Ice cream sandwich",
-          calories: 237,
-        },
-        {
-          name: "Eclair",
-          calories: 262,
-        },
-        {
-          name: "Cupcake",
-          calories: 305,
-        },
-        {
-          name: "Gingerbread",
-          calories: 356,
-        },
-        {
-          name: "Jelly bean",
-          calories: 375,
-        },
-        {
-          name: "Lollipop",
-          calories: 392,
-        },
-        {
-          name: "Honeycomb",
-          calories: 408,
-        },
-        {
-          name: "Donut",
-          calories: 452,
-        },
-        {
-          name: "KitKat",
-          calories: 518,
+          id: 2,
+          name: "Frozen Yogurt",
+          gender: 1,
+          race: "Jack Terrier",
+          age: "1 año/s y 7 mes/es",
         },
       ],
     };
   },
+  created() {
+    //take id customer details
+    this.customerId = this.$route.params.customer;
+  },
   methods: {
-    // Pendiente colocar este metodo a funcionar
     ...mapActions(["goBack"]),
+    goToShowPet(petId) {
+      this.$router.push({
+        path: `${this.customerId}/mascota/${petId}`,
+      });
+    },
   },
 };
 </script>
