@@ -88,6 +88,20 @@ const routes = [
             /* webpackChunkName: "PetDetails" */ "@/components/customers/pets/PetDetails.vue"
           ),
       },
+      {
+        path: "detalles/:customer/mascota/:pet/editar",
+        component: () =>
+          import(
+            /* webpackChunkName: "PetForm" */ "@/components/customers/pets/PetForm.vue"
+          ),
+      },
+      {
+        path: "detalles/:customer/mascota",
+        component: () =>
+          import(
+            /* webpackChunkName: "PetForm" */ "@/components/customers/pets/PetForm.vue"
+          ),
+      },
     ],
   },
 ];

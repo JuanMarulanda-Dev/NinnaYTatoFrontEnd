@@ -116,7 +116,13 @@
               <h3><v-icon>mdi-paw</v-icon>&nbsp;Mascotas</h3>
               <v-tooltip bottom>
                 <template v-slot:activator="{ on, attrs }">
-                  <v-btn color="secondary" icon v-bind="attrs" v-on="on">
+                  <v-btn
+                    color="secondary"
+                    icon
+                    v-bind="attrs"
+                    v-on="on"
+                    @click="goToPetFormCreate()"
+                  >
                     <v-icon>mdi-plus-thick</v-icon>
                   </v-btn>
                 </template>
@@ -202,6 +208,11 @@ export default {
     goToCustomerFormUpdate() {
       this.$router.push({
         path: `${this.customerId}/editar`,
+      });
+    },
+    goToPetFormCreate() {
+      this.$router.push({
+        path: `${this.customerId}/mascota`,
       });
     },
   },

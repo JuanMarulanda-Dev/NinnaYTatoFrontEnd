@@ -44,10 +44,18 @@
 </template>
 
 <script>
+import ImageInput from "@/components/imageUploader.vue";
+
 export default {
   name: "customer-additional-information",
   data() {
-    return {};
+    return {
+      userImage: null,
+      meet: [{ id: 1, name: "Redes sociales" }],
+    };
+  },
+  components: {
+    ImageInput,
   },
 };
 </script>

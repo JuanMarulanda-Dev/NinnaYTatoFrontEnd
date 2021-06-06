@@ -16,7 +16,13 @@
               <h3><v-icon>mdi-paw</v-icon>&nbsp;Perfil de mascota</h3>
               <v-tooltip bottom>
                 <template v-slot:activator="{ on, attrs }">
-                  <v-btn color="secondary" icon v-bind="attrs" v-on="on">
+                  <v-btn
+                    color="secondary"
+                    icon
+                    v-bind="attrs"
+                    v-on="on"
+                    @click="goToEditPetForm()"
+                  >
                     <v-icon>mdi-pencil-box-multiple-outline</v-icon>
                   </v-btn>
                 </template>
@@ -284,12 +290,13 @@ export default {
   created() {
     //take id customer details
     this.customerId = this.$route.params.customer;
+    this.petId = this.$route.params.pet;
   },
   methods: {
     ...mapActions(["goBack"]),
-    goToShowPet(petId) {
+    goToEditPetForm() {
       this.$router.push({
-        path: `detalles/${this.customerId}/mascota/${petId}`,
+        path: `${this.petId}/editar`,
       });
     },
   },
