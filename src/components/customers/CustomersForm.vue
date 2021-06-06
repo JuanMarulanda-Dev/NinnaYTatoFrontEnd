@@ -55,45 +55,8 @@
             <v-row>
               <v-divider></v-divider>
             </v-row>
-            <v-row>
-              <v-col xs="12" sm="12" md="6" cols="12">
-                <v-text-field
-                  label="Documento de identidad"
-                  required
-                  prepend-inner-icon="mdi-card-account-details-outline"
-                ></v-text-field>
-              </v-col>
-              <v-col xs="12" sm="12" md="6" cols="12">
-                <v-text-field
-                  label="Nombres"
-                  required
-                  prepend-inner-icon="mdi-alphabet-latin"
-                ></v-text-field>
-              </v-col>
-              <v-col xs="12" sm="12" md="6" cols="12">
-                <v-text-field
-                  label="Apellidos"
-                  required
-                  prepend-inner-icon="mdi-alphabet-latin"
-                ></v-text-field>
-              </v-col>
-              <v-col xs="12" sm="12" md="6" cols="12">
-                <v-radio-group row>
-                  <v-radio
-                    color="secondary"
-                    on-icon="mdi-gender-female"
-                    label="Femenino"
-                    value="0"
-                  ></v-radio>
-                  <v-radio
-                    color="secondary"
-                    on-icon="mdi-gender-male"
-                    label="Masculino"
-                    value="1"
-                  ></v-radio>
-                </v-radio-group>
-              </v-col>
-            </v-row>
+            <!-- Formulario -->
+            <customer-personal-information></customer-personal-information>
             <v-row justify="end">
               <v-btn color="secondary" @click="step = 2"> Continue </v-btn>
             </v-row>
@@ -109,53 +72,8 @@
             <v-row>
               <v-divider></v-divider>
             </v-row>
-            <v-row>
-              <v-col xs="12" sm="12" md="6" cols="12">
-                <v-text-field
-                  label="E-mail"
-                  required
-                  prepend-inner-icon="mdi-email-outline"
-                ></v-text-field>
-              </v-col>
-              <v-col xs="12" sm="12" md="6" cols="12">
-                <v-text-field
-                  label="Teléfono"
-                  required
-                  prepend-inner-icon="mdi-phone"
-                  type="number"
-                ></v-text-field>
-              </v-col>
-              <v-col xs="12" sm="12" md="6" cols="12">
-                <v-text-field
-                  label="Nombre contacto de emergencia"
-                  required
-                  prepend-inner-icon="mdi-alphabet-latin"
-                ></v-text-field>
-              </v-col>
-              <v-col xs="12" sm="12" md="6" cols="12">
-                <v-text-field
-                  label="Teléfono"
-                  required
-                  prepend-inner-icon="mdi-phone"
-                  type="number"
-                ></v-text-field>
-              </v-col>
-              <v-col xs="12" sm="12" md="6" cols="12">
-                <v-text-field
-                  label="Nombre contacto de respaldo"
-                  required
-                  prepend-inner-icon="mdi-alphabet-latin"
-                ></v-text-field>
-              </v-col>
-              <v-col xs="12" sm="12" md="6" cols="12">
-                <v-text-field
-                  label="Teléfono"
-                  required
-                  prepend-inner-icon="mdi-phone"
-                  type="number"
-                ></v-text-field>
-              </v-col>
-            </v-row>
+            <!-- Formulario -->
+            <customer-contact-information></customer-contact-information>
             <v-row justify="end">
               <v-btn class="mr-3" @click="step--"> volver </v-btn>
               <v-btn color="secondary" @click="step++"> Continue </v-btn>
@@ -172,48 +90,8 @@
             <v-row>
               <v-divider></v-divider>
             </v-row>
-            <v-row class="mt-5">
-              <v-col xs="12" sm="12" md="4" cols="12">
-                <v-row justify="center">
-                  <image-input v-model="userImage">
-                    <div slot="activator">
-                      <v-avatar
-                        size="200px"
-                        v-ripple
-                        v-if="!userImage"
-                        class="grey lighten-3 mb-3"
-                      >
-                        <span>Click para añadir</span>
-                      </v-avatar>
-                      <v-avatar size="200px" v-ripple v-else class="mb-3">
-                        <img :src="userImage.imageURL" alt="avatar" />
-                      </v-avatar>
-                    </div>
-                  </image-input>
-                </v-row>
-              </v-col>
-              <v-col xs="12" sm="12" md="8" cols="12">
-                <v-row>
-                  <v-col cols="12">
-                    <v-text-field
-                      label="Red social"
-                      required
-                      prepend-inner-icon="mdi-instagram"
-                    ></v-text-field>
-                  </v-col>
-                  <v-col cols="12">
-                    <v-select
-                      :items="meet"
-                      item-text="name"
-                      item-value="id"
-                      label="¿Como nos conoció?"
-                      dense
-                      prepend-icon="mdi-account-supervisor-circle"
-                    ></v-select>
-                  </v-col>
-                </v-row>
-              </v-col>
-            </v-row>
+            <!-- Formulario -->
+            <customer-additional-information></customer-additional-information>
             <v-row justify="end">
               <v-btn class="mr-3" @click="step--"> volver </v-btn>
               <v-btn color="secondary" @click="step++"> Continue </v-btn>
@@ -676,6 +554,9 @@
 <script>
 import { mapActions } from "vuex";
 import ImageInput from "@/components/imageUploader.vue";
+import CustomerPersonalInformation from "@/components/customers/CustomerPersonalInformation.vue";
+import CustomerContactInformation from "@/components/customers/CustomerContactInformation.vue";
+import CustomerAdditionalInformation from "@/components/customers/CustomerAdditionalInformation.vue";
 
 export default {
   data() {
@@ -697,6 +578,9 @@ export default {
   },
   components: {
     ImageInput,
+    CustomerPersonalInformation,
+    CustomerContactInformation,
+    CustomerAdditionalInformation,
   },
   methods: {
     // Pendiente colocar este metodo a funcionar

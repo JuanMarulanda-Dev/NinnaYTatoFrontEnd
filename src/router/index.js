@@ -75,6 +75,13 @@ const routes = [
           ),
       },
       {
+        path: "detalles/:customer/editar",
+        component: () =>
+          import(
+            /* webpackChunkName: "CustomerFormUpdate" */ "@/components/customers/CustomerFormUpdate.vue"
+          ),
+      },
+      {
         path: "detalles/:customer/mascota/:pet",
         component: () =>
           import(

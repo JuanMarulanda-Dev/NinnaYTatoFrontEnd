@@ -5,7 +5,7 @@
       <v-btn icon @click="goBack()">
         <v-icon>mdi-arrow-left-circle</v-icon>
       </v-btn>
-      <h2>Perfil de cliente&nbsp;<v-icon large>mdi-paw</v-icon></h2>
+      <h2>Perfil de cliente&nbsp;<v-icon large>mdi-account</v-icon></h2>
     </v-row>
     <v-row>
       <v-col xs="12" sm="12" md="8" cols="12">
@@ -18,7 +18,13 @@
               </h3>
               <v-tooltip bottom>
                 <template v-slot:activator="{ on, attrs }">
-                  <v-btn color="secondary" icon v-bind="attrs" v-on="on">
+                  <v-btn
+                    color="secondary"
+                    icon
+                    v-bind="attrs"
+                    v-on="on"
+                    @click="goToCustomerFormUpdate()"
+                  >
                     <v-icon>mdi-pencil-box-multiple-outline</v-icon>
                   </v-btn>
                 </template>
@@ -191,6 +197,11 @@ export default {
     goToShowPet(petId) {
       this.$router.push({
         path: `${this.customerId}/mascota/${petId}`,
+      });
+    },
+    goToCustomerFormUpdate() {
+      this.$router.push({
+        path: `${this.customerId}/editar`,
       });
     },
   },
