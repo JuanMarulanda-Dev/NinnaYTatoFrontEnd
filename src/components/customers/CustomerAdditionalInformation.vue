@@ -25,11 +25,13 @@
           <v-text-field
             label="Red social"
             required
+            v-model="additional_information.social_network"
             prepend-inner-icon="mdi-instagram"
           ></v-text-field>
         </v-col>
         <v-col cols="12">
           <v-select
+            v-model="additional_information.how_contact_id"
             :items="meet"
             item-text="name"
             item-value="id"
@@ -45,6 +47,7 @@
 
 <script>
 import ImageInput from "@/components/imageUploader.vue";
+import { mapState } from "vuex";
 
 export default {
   name: "customer-additional-information",
@@ -53,6 +56,14 @@ export default {
       userImage: null,
       meet: [{ id: 1, name: "Redes sociales" }],
     };
+  },
+  computed: {
+    ...mapState("customers", ["additional_information"]),
+  },
+  watch: {
+    userImage: function () {
+      this.additional_information.customer_avatar = this.userImage.formData;
+    },
   },
   components: {
     ImageInput,
