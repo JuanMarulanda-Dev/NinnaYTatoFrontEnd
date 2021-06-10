@@ -53,7 +53,7 @@
 
 <script>
 import ImageInput from "@/components/imageUploader.vue";
-import { mapState } from "vuex";
+import { mapState, mapActions } from "vuex";
 import { validationMixin } from "vuelidate";
 import { required, maxLength } from "vuelidate/lib/validators";
 
@@ -75,6 +75,14 @@ export default {
       how_contact_id: { required },
     },
   },
+  created() {
+    this.getAllHowContact();
+    if (this.additional_information.customer_avatar) {
+      this.userImage = {
+        imageURL: this.additional_information.customer_avatar,
+      };
+    }
+  },
   computed: {
     ...mapState("customers", ["additional_information", "how_contact"]),
     social_networkErrors() {
@@ -91,6 +99,9 @@ export default {
         errors.push("El como nos conocio es requerido");
       return errors;
     },
+  },
+  methods: {
+    ...mapActions("customers", ["getAllHowContact"]),
   },
   watch: {
     userImage: function () {

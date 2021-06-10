@@ -10,7 +10,13 @@
       </div>
       <v-tooltip bottom>
         <template v-slot:activator="{ on, attrs }">
-          <v-btn color="secondary" icon v-bind="attrs" v-on="on">
+          <v-btn
+            @click="update()"
+            color="secondary"
+            icon
+            v-bind="attrs"
+            v-on="on"
+          >
             <v-icon>mdi-check-bold</v-icon>
           </v-btn>
         </template>
@@ -29,7 +35,9 @@
         <v-tab-item>
           <v-card>
             <v-container class="pa-7">
-              <customer-personal-information></customer-personal-information>
+              <customer-personal-information
+                v-model="aviable_personal_information"
+              ></customer-personal-information>
               <v-row justify="end"> </v-row>
             </v-container>
           </v-card>
@@ -38,7 +46,9 @@
         <v-tab-item>
           <v-card>
             <v-container class="pa-7">
-              <customer-contact-information></customer-contact-information>
+              <customer-contact-information
+                v-model="aviable_contact_information"
+              ></customer-contact-information>
             </v-container>
           </v-card>
         </v-tab-item>
@@ -46,7 +56,9 @@
         <v-tab-item>
           <v-card>
             <v-container class="pa-7">
-              <customer-additional-information></customer-additional-information>
+              <customer-additional-information
+                v-model="aviable_additional_information"
+              ></customer-additional-information>
             </v-container>
           </v-card>
         </v-tab-item>
@@ -65,6 +77,9 @@ export default {
   data() {
     return {
       tab: null,
+      aviable_personal_information: true,
+      aviable_contact_information: true,
+      aviable_additional_information: true,
     };
   },
   components: {
@@ -75,6 +90,21 @@ export default {
   methods: {
     // Pendiente colocar este metodo a funcionar
     ...mapActions(["goBack"]),
+    ...mapActions("customers", ["updateCustomer"]),
+    async update() {
+      if (
+        this.aviable_personal_information &&
+        this.aviable_contact_information &&
+        this.aviable_additional_information
+      ) {
+        //   // Guardar el cliente con su mascota
+        let response = await this.updateCustomer();
+
+        if (response) {
+          this.$router.push({ path: "/clientes" });
+        }
+      }
+    },
   },
 };
 </script>

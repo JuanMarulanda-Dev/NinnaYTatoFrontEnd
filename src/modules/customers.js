@@ -69,6 +69,11 @@ export default {
       state.contact_information = customer.contact_information;
       state.additional_information = customer.additional_information;
     },
+    SET_CUSTOMER_DEFAULT(state) {
+      state.personal_infomation = state.default_personal_infomation;
+      state.contact_information = state.default_contact_information;
+      state.additional_information = state.default_additional_information;
+    },
     SET_LOADING_DATATABLE(state, status) {
       state.loading = status;
     },
@@ -124,9 +129,34 @@ export default {
         if (result.status == 201) {
           // show message
           this._vm.$toast.success("Cliente registrado exitosamente");
-          // // Reload branch officess
+          // Reset object with default information
+          commit("SET_CUSTOMER_DEFAULT");
           return true;
-          // dispatch("getAllBranchOffices");
+        }
+      } catch (error) {
+        this._vm.$toast.error("Ocurrio un error");
+        return false;
+      } finally {
+        commit("SET_OVERLAY_LOADING", false, { root: true });
+      }
+    },
+    async updateCustomer({ state, commit }) {
+      try {
+        commit("SET_OVERLAY_LOADING", true, { root: true });
+        let result = await axios.put(
+          `/api/customers/${state.personal_infomation.id}`,
+          {
+            ...state.personal_infomation,
+            ...state.contact_information,
+            ...state.additional_information,
+          }
+        );
+        if (result.status == 201) {
+          // show message
+          this._vm.$toast.success("Cliente actualizado exitosamente");
+          // Reset object with default information
+          commit("SET_CUSTOMER_DEFAULT");
+          return true;
         }
       } catch (error) {
         this._vm.$toast.error("Ocurrio un error");

@@ -73,7 +73,7 @@
                       >
                       <!-- Icon Genero -->
                       <span>
-                        <v-icon v-if="personal_infomation.gender">
+                        <v-icon v-if="personal_infomation.gender == '1'">
                           mdi-gender-male
                         </v-icon>
                         <v-icon v-else>mdi-gender-female</v-icon>
