@@ -15,6 +15,24 @@
               <h3>
                 <v-icon>mdi-card-account-details-outline</v-icon>&nbsp;Perfil de
                 cliente
+                <v-chip
+                  v-if="personal_infomation.state"
+                  small
+                  class="ma-2"
+                  color="green"
+                  text-color="white"
+                >
+                  Activo
+                </v-chip>
+                <v-chip
+                  v-else
+                  small
+                  class="ma-2"
+                  color="red"
+                  text-color="white"
+                >
+                  Inactivo
+                </v-chip>
               </h3>
               <v-tooltip bottom>
                 <template v-slot:activator="{ on, attrs }">
@@ -39,15 +57,26 @@
                 <!-- Icon profile -->
                 <v-row justify="center" align="center">
                   <v-avatar size="160" color="grey lighten-1" class="my-2 mr-1">
-                    <v-icon dark x-large> mdi-account-circle </v-icon>
+                    <img
+                      v-if="additional_information.customer_avatar"
+                      :src="additional_information.customer_avatar"
+                      alt="avatar"
+                    />
+                    <v-icon v-else dark x-large> mdi-account-circle </v-icon>
                   </v-avatar>
                   <v-col cols="12">
                     <v-row justify="center">
                       <!-- Nombre completo -->
-                      <span>Juan David Marulanda</span>
+                      <span
+                        >{{ personal_infomation.first_name }}
+                        {{ personal_infomation.last_name }}</span
+                      >
                       <!-- Icon Genero -->
                       <span>
-                        <v-icon>mdi-gender-male</v-icon>
+                        <v-icon v-if="personal_infomation.gender">
+                          mdi-gender-male
+                        </v-icon>
+                        <v-icon v-else>mdi-gender-female</v-icon>
                       </span>
                     </v-row>
                   </v-col>
@@ -58,24 +87,40 @@
                   <!-- DNI -->
                   <v-col xs="12" sm="6" md="6" cols="12">
                     <small>DNI</small><br />
-                    <label> 1216727816 </label>
+                    <label> {{ personal_infomation.dni }} </label>
                   </v-col>
                   <!-- Email -->
                   <v-col xs="12" sm="6" md="6" cols="12">
                     <small>E-mail</small><br />
-                    <label> judama3012@gmail.com </label>
+                    <label> {{ contact_information.email }} </label>
                   </v-col>
                 </v-row>
                 <v-row>
                   <!-- Nombres -->
                   <v-col xs="12" sm="6" md="6" cols="12">
                     <small>Nombres</small><br />
-                    <label> Juan David </label>
+                    <label> {{ personal_infomation.first_name }} </label>
                   </v-col>
                   <!-- Apellidos -->
                   <v-col xs="12" sm="6" md="6" cols="12">
                     <small>Apellidos</small><br />
-                    <label> Marulanda Paniagua </label>
+                    <label> {{ personal_infomation.last_name }} </label>
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col xs="12" sm="6" md="4" cols="12">
+                    <small>Sucursal</small><br />
+                    <label> {{ personal_infomation.branch_office }} </label>
+                  </v-col>
+                  <!-- Creaco -->
+                  <v-col xs="12" sm="6" md="4" cols="12">
+                    <small>Creado</small><br />
+                    <label> {{ personal_infomation.created_at }} </label>
+                  </v-col>
+                  <!-- Eliminado -->
+                  <v-col xs="12" sm="6" md="4" cols="12">
+                    <small>Eliminado</small><br />
+                    <label> {{ personal_infomation.deleted_at }} </label>
                   </v-col>
                 </v-row>
                 <v-row>
@@ -84,23 +129,27 @@
                     <small>Personal</small><br />
                     <label>
                       <v-icon>mdi-phone</v-icon>
-                      2528099
+                      {{ contact_information.phone }}
                     </label>
                   </v-col>
                   <!-- Contacto de emergencia -->
                   <v-col xs="12" sm="6" md="4" cols="12">
-                    <small>Emergencia</small><br />
+                    <small>{{
+                      contact_information.emergency_contact_name
+                    }}</small
+                    ><br />
                     <label>
                       <v-icon>mdi-phone</v-icon>
-                      2528099
+                      {{ contact_information.emergency_contact_phone }}
                     </label>
                   </v-col>
                   <!-- Contacto de respaldo -->
                   <v-col xs="12" sm="6" md="4" cols="12">
-                    <small>Respaldo</small><br />
+                    <small>{{ contact_information.backup_contact_name }}</small
+                    ><br />
                     <label>
                       <v-icon>mdi-phone</v-icon>
-                      2528099
+                      {{ contact_information.backup_contact_phone }}
                     </label>
                   </v-col>
                 </v-row>
@@ -134,13 +183,20 @@
             </v-row>
             <v-row>
               <v-col cols="12">
-                <v-simple-table height="193px">
+                <v-simple-table height="265px">
                   <template v-slot:default>
                     <tbody>
                       <tr v-for="item in pets" :key="item.id">
                         <td class="pa-0 cursor" @click="goToShowPet(item.id)">
                           <div class="d-flex pa-1">
-                            <v-avatar class="mr-2" color="primary"></v-avatar>
+                            <v-avatar class="mr-2" color="primary">
+                              <img
+                                v-if="item.avatar"
+                                :src="item.avatar"
+                                alt="avatar"
+                              />
+                              <v-icon v-else dark> mdi-dog-side </v-icon>
+                            </v-avatar>
                             <div>
                               <label>
                                 {{ item.name }}&nbsp;
@@ -152,7 +208,7 @@
                                 >
                               </label>
                               <br />
-                              <small>{{ item.race }} - {{ item.age }}</small>
+                              <small>{{ item.breed }} - {{ item.age }}</small>
                             </div>
                           </div>
                         </td>
@@ -170,36 +226,30 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapState, mapActions } from "vuex";
 
 export default {
   data() {
     return {
       customerId: null,
-      pets: [
-        {
-          id: 1,
-          name: "Frozen Yogurt",
-          gender: 0,
-          race: "Jack Terrier",
-          age: "1 año/s y 7 mes/es",
-        },
-        {
-          id: 2,
-          name: "Frozen Yogurt",
-          gender: 1,
-          race: "Jack Terrier",
-          age: "1 año/s y 7 mes/es",
-        },
-      ],
     };
+  },
+  computed: {
+    ...mapState("customers", [
+      "personal_infomation",
+      "contact_information",
+      "additional_information",
+      "pets",
+    ]),
   },
   created() {
     //take id customer details
     this.customerId = this.$route.params.customer;
+    this.getDetailsCustomer(this.customerId);
   },
   methods: {
     ...mapActions(["goBack"]),
+    ...mapActions("customers", ["getDetailsCustomer"]),
     goToShowPet(petId) {
       this.$router.push({
         path: `${this.customerId}/mascota/${petId}`,

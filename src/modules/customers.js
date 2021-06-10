@@ -8,6 +8,7 @@ export default {
   state: {
     // Generals loading datatables
     loading: false,
+    pets: [],
     customers: [],
     how_contact: [],
     personal_infomation: {
@@ -60,6 +61,14 @@ export default {
     SET_CUSTOMERS(state, customers) {
       state.customers = customers;
     },
+    SET_CUSTOMER_PETS(state, pets) {
+      state.pets = pets;
+    },
+    SET_CUSTOMER_DETAILS(state, customer) {
+      state.personal_infomation = customer.personal_infomation;
+      state.contact_information = customer.contact_information;
+      state.additional_information = customer.additional_information;
+    },
     SET_LOADING_DATATABLE(state, status) {
       state.loading = status;
     },
@@ -80,6 +89,20 @@ export default {
         commit("SET_LOADING_DATATABLE", false);
       }
     },
+    async getDetailsCustomer({ commit }, customerId) {
+      try {
+        // Activar el loading del datatable
+        commit("SET_OVERLAY_LOADING", true, { root: true });
+        let result = await axios.get(`/api/customers/${customerId}`);
+        console.log(result.data);
+        commit("SET_CUSTOMER_DETAILS", result.data.customer);
+        commit("SET_CUSTOMER_PETS", result.data.pets);
+      } catch (error) {
+        this._vm.$toast.error("Ocurrior un error...");
+      } finally {
+        commit("SET_OVERLAY_LOADING", false, { root: true });
+      }
+    },
     async getAllHowContact({ commit }) {
       try {
         // Activar el loading del datatable
@@ -89,7 +112,6 @@ export default {
         this._vm.$toast.error("Ocurrior un error...");
       }
     },
-    // En proceso
     async storeCustomer({ state, commit }, pet) {
       try {
         commit("SET_OVERLAY_LOADING", true, { root: true });
