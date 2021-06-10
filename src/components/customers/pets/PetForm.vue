@@ -16,7 +16,13 @@
       </div>
       <v-tooltip bottom>
         <template v-slot:activator="{ on, attrs }">
-          <v-btn color="secondary" icon v-bind="attrs" v-on="on">
+          <v-btn
+            @click="save()"
+            color="secondary"
+            icon
+            v-bind="attrs"
+            v-on="on"
+          >
             <v-icon>mdi-check-bold</v-icon>
           </v-btn>
         </template>
@@ -35,7 +41,9 @@
         <v-tab-item>
           <v-card>
             <v-container class="pa-7">
-              <pet-general-information></pet-general-information>
+              <pet-general-information
+                v-model="aviable_pet"
+              ></pet-general-information>
               <v-row justify="end"> </v-row>
             </v-container>
           </v-card>
@@ -52,7 +60,9 @@
         <v-tab-item>
           <v-card>
             <v-container class="pa-7">
-              <pet-behavior-information></pet-behavior-information>
+              <pet-behavior-information
+                v-model="aviable_pet_behavior"
+              ></pet-behavior-information>
             </v-container>
           </v-card>
         </v-tab-item>
@@ -71,11 +81,16 @@ export default {
   data() {
     return {
       tab: null,
+      customerId: null,
       petId: null,
+      aviable_pet: false,
+      aviable_pet_behavior: false,
     };
   },
   created() {
+    this.customerId = this.$route.params.customer;
     this.petId = this.$route.params.pet;
+    this.SET_PET_DEFAULT();
   },
   components: {
     PetGeneralInformation,
@@ -85,6 +100,18 @@ export default {
   methods: {
     // Pendiente colocar este metodo a funcionar
     ...mapActions(["goBack"]),
+    ...mapActions("pets", ["storePet", "SET_PET_DEFAULT"]),
+    async save() {
+      console.log(this.aviable_pet);
+      if (this.aviable_pet && this.aviable_pet_behavior) {
+        // Guardar mascota del cliente
+        let response = await this.storePet(this.customerId);
+
+        if (response) {
+          this.$router.push({ path: `/clientes/detalles/${this.customerId}` });
+        }
+      }
+    },
   },
 };
 </script>

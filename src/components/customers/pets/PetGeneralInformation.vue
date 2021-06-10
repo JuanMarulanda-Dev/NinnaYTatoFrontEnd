@@ -198,7 +198,7 @@
 
 <script>
 import ImageInput from "@/components/imageUploader.vue";
-import { mapState } from "vuex";
+import { mapState, mapActions } from "vuex";
 import { validationMixin } from "vuelidate";
 import { required, maxLength } from "vuelidate/lib/validators";
 
@@ -292,6 +292,20 @@ export default {
         errors.push("La comida es requerida");
       return errors;
     },
+  },
+  methods: {
+    ...mapActions("pets", [
+      "getAllBreeds",
+      "getAllSizes",
+      "getAllFurs",
+      "getAllFood",
+    ]),
+  },
+  created() {
+    this.getAllBreeds();
+    this.getAllSizes();
+    this.getAllFurs();
+    this.getAllFood();
   },
   watch: {
     petImage: function () {

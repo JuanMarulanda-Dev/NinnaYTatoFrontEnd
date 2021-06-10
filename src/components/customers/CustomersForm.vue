@@ -171,7 +171,7 @@
 </template>
 
 <script>
-import { mapActions, mapState } from "vuex";
+import { mapActions, mapState, mapMutations } from "vuex";
 import CustomerPersonalInformation from "@/components/customers/CustomerPersonalInformation.vue";
 import CustomerContactInformation from "@/components/customers/CustomerContactInformation.vue";
 import CustomerAdditionalInformation from "@/components/customers/CustomerAdditionalInformation.vue";
@@ -197,12 +197,7 @@ export default {
     // Pendiente colocar este metodo a funcionar
     ...mapActions(["goBack"]),
     ...mapActions("customers", ["getAllHowContact", "storeCustomer"]),
-    ...mapActions("pets", [
-      "getAllBreeds",
-      "getAllSizes",
-      "getAllFurs",
-      "getAllFood",
-    ]),
+    ...mapMutations("customers", ["SET_CUSTOMER_DEFAULT"]),
     async save() {
       // Validar que la informacion se todos los modulos sea valida
       if (
@@ -226,11 +221,7 @@ export default {
     },
   },
   created() {
-    this.getAllHowContact();
-    this.getAllBreeds();
-    this.getAllSizes();
-    this.getAllFurs();
-    this.getAllFood();
+    this.SET_CUSTOMER_DEFAULT();
   },
   components: {
     CustomerPersonalInformation,

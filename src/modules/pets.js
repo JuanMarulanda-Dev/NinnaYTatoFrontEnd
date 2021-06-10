@@ -103,6 +103,11 @@ export default {
     SET_FOODS(state, foods) {
       state.foods = foods;
     },
+    SET_PET_DEFAULT(state) {
+      state.pet = state.default_pet;
+      state.vet_information = state.default_vet_information;
+      state.pet_behavior = state.default_pet_behavior;
+    },
   },
   actions: {
     async getAllBreeds({ commit }) {
@@ -139,6 +144,28 @@ export default {
         commit("SET_FOODS", result.data.food);
       } catch (error) {
         this._vm.$toast.error("Ocurrior un error...");
+      }
+    },
+    async storePet({ state, commit }, customerId) {
+      try {
+        commit("SET_OVERLAY_LOADING", true, { root: true });
+        let result = await axios.post(`/api/customers/${customerId}/pets`, {
+          ...state.pet,
+          ...state.vet_information,
+          ...state.pet_behavior,
+        });
+        if (result.status == 201) {
+          // show message
+          this._vm.$toast.success("Mascota registrado exitosamente");
+          // Reset object with default information
+          commit("SET_PET_DEFAULT");
+          return true;
+        }
+      } catch (error) {
+        this._vm.$toast.error("Ocurrio un error");
+        return false;
+      } finally {
+        commit("SET_OVERLAY_LOADING", false, { root: true });
       }
     },
   },
