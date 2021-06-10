@@ -5,6 +5,8 @@
     sort-by="name"
     class="elevation-3"
     :search="search"
+    :loading="loading"
+    :loading-text="loadingText"
   >
     <template v-slot:top>
       <v-toolbar flat color="white" class="rounded-xl">
@@ -47,8 +49,8 @@
     <!-- Avatar + nombre -->
     <template v-slot:[`item.name`]="{ item }">
       <!-- Image profile -->
-      <v-avatar v-if="item.image" class="my-2 mr-1">
-        <img :src="item.image" :alt="item.name" />
+      <v-avatar v-if="item.avatar" class="my-2 mr-1">
+        <img :src="item.avatar" :alt="item.name" />
       </v-avatar>
 
       <!-- Icon profile -->
@@ -94,7 +96,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapState, mapActions } from "vuex";
 
 export default {
   data() {
@@ -112,14 +114,22 @@ export default {
     };
   },
   computed: {
-    ...mapState(["detailsIcon", "loadingText"]),
-    ...mapState("customers", ["customers"]),
+    ...mapState(["detailsIcon", "loadingText", "loadingText"]),
+    ...mapState("customers", ["customers", "loading"]),
   },
   created() {
     // Obtener los permisos
     this.permissions = this.$route.meta.permissions;
+    // Acciones que debe realizar el componente una vez creado
+    if (this.permissions.read) {
+      this.initialize();
+    }
   },
   methods: {
+    ...mapActions("customers", ["getAllCustomers"]),
+    initialize() {
+      this.getAllCustomers();
+    },
     goToFormCreateCustomer() {
       this.$router.push({ path: "/clientes/registro" }).catch((error) => {
         console.log(error);

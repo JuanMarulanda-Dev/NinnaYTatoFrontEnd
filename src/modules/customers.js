@@ -8,26 +8,8 @@ export default {
   state: {
     // Generals loading datatables
     loading: false,
-    customers: [
-      {
-        id: 1,
-        image: "https://cdn.vuetifyjs.com/images/john.jpg",
-        dni: "1216727816",
-        name: "Camilo muñoz",
-        phone: "3004991084",
-        email: "judama3012@gmail.com",
-        state: true,
-      },
-      {
-        id: 2,
-        image: "",
-        dni: "1216727816",
-        name: "Juan David Marulanda",
-        phone: "3004991084",
-        email: "judama3012@gmail.com",
-        state: false,
-      },
-    ],
+    customers: [],
+    how_contact: [],
     personal_infomation: {
       id: 0,
       dni: "",
@@ -35,14 +17,15 @@ export default {
       last_name: "",
       gender: null,
       address: "",
+      branch_office_id: "",
     },
     contact_information: {
       email: "",
       phone: "",
-      emergency_conctact_name: "",
-      emergency_conctact_phone: "",
-      backup_conctact_name: "",
-      backup_conctact_phone: "",
+      emergency_contact_name: "",
+      emergency_contact_phone: "",
+      backup_contact_name: "",
+      backup_contact_phone: "",
     },
     additional_information: {
       customer_avatar: "",
@@ -57,6 +40,7 @@ export default {
       last_name: "",
       gender: null,
       address: "",
+      branch_office_id: "",
     },
     default_contact_information: {
       email: "",
@@ -72,7 +56,63 @@ export default {
       how_contact_id: 0,
     },
   },
-  mutations: {},
-  actions: {},
+  mutations: {
+    SET_CUSTOMERS(state, customers) {
+      state.customers = customers;
+    },
+    SET_LOADING_DATATABLE(state, status) {
+      state.loading = status;
+    },
+    SET_HOW_CONTACT(state, how_contact) {
+      state.how_contact = how_contact;
+    },
+  },
+  actions: {
+    async getAllCustomers({ commit }) {
+      try {
+        // Activar el loading del datatable
+        commit("SET_LOADING_DATATABLE", true);
+        let result = await axios.get("/api/customers");
+        commit("SET_CUSTOMERS", result.data.customers);
+      } catch (error) {
+        this._vm.$toast.error("Ocurrior un error...");
+      } finally {
+        commit("SET_LOADING_DATATABLE", false);
+      }
+    },
+    async getAllHowContact({ commit }) {
+      try {
+        // Activar el loading del datatable
+        let result = await axios.get("/api/how-contact");
+        commit("SET_HOW_CONTACT", result.data.how_contact);
+      } catch (error) {
+        this._vm.$toast.error("Ocurrior un error...");
+      }
+    },
+    // En proceso
+    async storeCustomer({ state, commit }, pet) {
+      try {
+        commit("SET_OVERLAY_LOADING", true, { root: true });
+        let result = await axios.post("/api/customers", {
+          ...state.personal_infomation,
+          ...state.contact_information,
+          ...state.additional_information,
+          ...pet,
+        });
+        if (result.status == 201) {
+          // show message
+          this._vm.$toast.success("Cliente registrado exitosamente");
+          // // Reload branch officess
+          return true;
+          // dispatch("getAllBranchOffices");
+        }
+      } catch (error) {
+        this._vm.$toast.error("Ocurrio un error");
+        return false;
+      } finally {
+        commit("SET_OVERLAY_LOADING", false, { root: true });
+      }
+    },
+  },
   getters: {},
 };

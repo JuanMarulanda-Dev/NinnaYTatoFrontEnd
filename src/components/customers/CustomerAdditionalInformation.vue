@@ -27,17 +27,23 @@
             required
             v-model="additional_information.social_network"
             prepend-inner-icon="mdi-instagram"
+            :error-messages="social_networkErrors"
+            @input="$v.additional_information.social_network.$touch()"
+            @blur="$v.additional_information.social_network.$touch()"
           ></v-text-field>
         </v-col>
         <v-col cols="12">
           <v-select
             v-model="additional_information.how_contact_id"
-            :items="meet"
+            :items="how_contact"
             item-text="name"
             item-value="id"
-            label="¿Como nos conoció?"
+            label="¿Como nos conoció?*"
             dense
             prepend-icon="mdi-account-supervisor-circle"
+            :error-messages="how_contact_idErrors"
+            @input="$v.additional_information.how_contact_id.$touch()"
+            @blur="$v.additional_information.how_contact_id.$touch()"
           ></v-select>
         </v-col>
       </v-row>
@@ -48,21 +54,54 @@
 <script>
 import ImageInput from "@/components/imageUploader.vue";
 import { mapState } from "vuex";
+import { validationMixin } from "vuelidate";
+import { required, maxLength } from "vuelidate/lib/validators";
 
 export default {
   name: "customer-additional-information",
   data() {
     return {
       userImage: null,
-      meet: [{ id: 1, name: "Redes sociales" }],
     };
   },
+  props: {
+    // Use "value" to enable using v-model
+    value: Boolean,
+  },
+  mixins: [validationMixin],
+  validations: {
+    additional_information: {
+      social_network: { maxLength: maxLength(255) },
+      how_contact_id: { required },
+    },
+  },
   computed: {
-    ...mapState("customers", ["additional_information"]),
+    ...mapState("customers", ["additional_information", "how_contact"]),
+    social_networkErrors() {
+      const errors = [];
+      if (!this.$v.additional_information.social_network.$dirty) return errors;
+      !this.$v.additional_information.social_network.maxLength &&
+        errors.push("Longitud no permitida");
+      return errors;
+    },
+    how_contact_idErrors() {
+      const errors = [];
+      if (!this.$v.additional_information.how_contact_id.$dirty) return errors;
+      !this.$v.additional_information.how_contact_id.required &&
+        errors.push("El como nos conocio es requerido");
+      return errors;
+    },
   },
   watch: {
     userImage: function () {
       this.additional_information.customer_avatar = this.userImage.formData;
+    },
+    additional_information: {
+      handler: function () {
+        // // Correct validations
+        this.$emit("input", !this.$v.$invalid);
+      },
+      deep: true,
     },
   },
   components: {

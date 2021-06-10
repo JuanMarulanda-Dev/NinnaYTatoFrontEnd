@@ -21,19 +21,28 @@
         <!-- Race -->
         <v-col cols="12">
           <v-select
-            :items="races"
+            :items="breeds"
             item-text="name"
             item-value="id"
-            label="Raza"
+            label="Raza*"
             dense
             v-model="pet.pet_breed_id"
             prepend-icon="mdi-dog"
+            :error-messages="pet_breed_idErrors"
+            @input="$v.pet.pet_breed_id.$touch()"
+            @blur="$v.pet.pet_breed_id.$touch()"
           ></v-select>
         </v-col>
         <!-- Gender -->
         <v-col cols="12">
           <v-row justify="center">
-            <v-radio-group row v-model="pet.pet_gender">
+            <v-radio-group
+              row
+              v-model="pet.pet_gender"
+              :error-messages="pet_genderErrors"
+              @input="$v.pet.pet_gender.$touch()"
+              @blur="$v.pet.pet_gender.$touch()"
+            >
               <v-radio
                 color="secondary"
                 on-icon="mdi-gender-female"
@@ -52,7 +61,7 @@
         <!-- Esterilización -->
         <v-switch
           v-model="pet.pet_sterilized"
-          label="Esterilización"
+          label="Esterilización*"
         ></v-switch>
       </v-row>
     </v-col>
@@ -63,10 +72,13 @@
             <v-col cols="12">
               <!-- Nombre de la mascota -->
               <v-text-field
-                label="Nombre"
+                label="Nombre*"
                 required
                 v-model="pet.pet_name"
                 prepend-inner-icon="mdi-alphabet-latin"
+                :error-messages="pet_nameErrors"
+                @input="$v.pet.pet_name.$touch()"
+                @blur="$v.pet.pet_name.$touch()"
               ></v-text-field>
             </v-col>
             <v-col xs="12" sm="12" md="6" cols="12">
@@ -81,7 +93,10 @@
                 <template v-slot:activator="{ on, attrs }">
                   <v-text-field
                     v-model="pet.pet_birth_date"
-                    label="Fecha de nacimiento"
+                    :error-messages="pet_birth_dateErrors"
+                    @input="$v.pet.pet_birth_date.$touch()"
+                    @blur="$v.pet.pet_birth_date.$touch()"
+                    label="Fecha de nacimiento*"
                     prepend-icon="mdi-calendar"
                     readonly
                     v-bind="attrs"
@@ -118,33 +133,45 @@
                 required
                 v-model="pet.pet_chip_number"
                 prepend-inner-icon="mdi-memory"
+                :error-messages="pet_chip_numberErrors"
+                @input="$v.pet.pet_chip_number.$touch()"
+                @blur="$v.pet.pet_chip_number.$touch()"
               ></v-text-field>
             </v-col>
             <v-col xs="12" sm="12" md="6" cols="12">
               <v-select
-                :items="races"
+                :items="furs"
                 v-model="pet.pet_fur_id"
                 item-text="name"
                 item-value="id"
-                label="Pelaje"
+                label="Pelaje*"
+                :error-messages="pet_fur_idErrors"
+                @input="$v.pet.pet_fur_id.$touch()"
+                @blur="$v.pet.pet_fur_id.$touch()"
               ></v-select>
             </v-col>
             <v-col xs="12" sm="12" md="6" cols="12">
               <v-select
-                :items="races"
+                :items="foods"
                 v-model="pet.pet_food_id"
                 item-text="name"
                 item-value="id"
-                label="Alimento"
+                label="Alimento*"
+                :error-messages="pet_food_idErrors"
+                @input="$v.pet.pet_food_id.$touch()"
+                @blur="$v.pet.pet_food_id.$touch()"
               ></v-select
             ></v-col>
             <v-col xs="12" sm="12" md="6" cols="12">
               <v-select
-                :items="races"
+                :items="sizes"
                 v-model="pet.pet_size_id"
                 item-text="name"
                 item-value="id"
-                label="Tamaño"
+                label="Tamaño*"
+                :error-messages="pet_size_idErrors"
+                @input="$v.pet.pet_size_id.$touch()"
+                @blur="$v.pet.pet_size_id.$touch()"
               ></v-select
             ></v-col>
           </v-row>
@@ -155,9 +182,13 @@
           <!-- Instrucciones generales -->
           <v-textarea
             outlined
+            counter="255"
             v-model="pet.pet_general_instructions"
             name="input-7-4"
             label="Instrucciones Generales"
+            :error-messages="pet_general_instructionsErrors"
+            @input="$v.pet.pet_general_instructions.$touch()"
+            @blur="$v.pet.pet_general_instructions.$touch()"
           ></v-textarea>
         </v-col>
       </v-row>
@@ -168,6 +199,8 @@
 <script>
 import ImageInput from "@/components/imageUploader.vue";
 import { mapState } from "vuex";
+import { validationMixin } from "vuelidate";
+import { required, maxLength } from "vuelidate/lib/validators";
 
 export default {
   name: "pet-general-information",
@@ -179,12 +212,97 @@ export default {
       date: new Date().toISOString().substr(0, 10),
     };
   },
+  props: {
+    // Use "value" to enable using v-model
+    value: Boolean,
+  },
+  mixins: [validationMixin],
+  validations: {
+    pet: {
+      pet_name: { required, maxLength: maxLength(255) },
+      pet_birth_date: { required },
+      pet_gender: { required },
+      pet_chip_number: { maxLength: maxLength(255) },
+      pet_general_instructions: { maxLength: maxLength(255) },
+      pet_breed_id: { required },
+      pet_size_id: { required },
+      pet_fur_id: { required },
+      pet_food_id: { required },
+    },
+  },
   computed: {
-    ...mapState("pets", ["pet"]),
+    ...mapState("pets", ["pet", "breeds", "sizes", "furs", "foods"]),
+    pet_nameErrors() {
+      const errors = [];
+      if (!this.$v.pet.pet_name.$dirty) return errors;
+      !this.$v.pet.pet_name.required && errors.push("El nombre es requerido");
+      !this.$v.pet.pet_name.maxLength && errors.push("Longitud no permitida");
+      return errors;
+    },
+    pet_birth_dateErrors() {
+      const errors = [];
+      if (!this.$v.pet.pet_birth_date.$dirty) return errors;
+      !this.$v.pet.pet_birth_date.required &&
+        errors.push("La fecha de nacimiento es requerida");
+      return errors;
+    },
+    pet_genderErrors() {
+      const errors = [];
+      if (!this.$v.pet.pet_gender.$dirty) return errors;
+      !this.$v.pet.pet_gender.required && errors.push("El genero es requerido");
+      return errors;
+    },
+    pet_chip_numberErrors() {
+      const errors = [];
+      if (!this.$v.pet.pet_chip_number.$dirty) return errors;
+      !this.$v.pet.pet_chip_number.maxLength &&
+        errors.push("Longitud no permitida");
+      return errors;
+    },
+    pet_general_instructionsErrors() {
+      const errors = [];
+      if (!this.$v.pet.pet_general_instructions.$dirty) return errors;
+      !this.$v.pet.pet_general_instructions.maxLength &&
+        errors.push("Longitud no permitida");
+      return errors;
+    },
+    pet_breed_idErrors() {
+      const errors = [];
+      if (!this.$v.pet.pet_breed_id.$dirty) return errors;
+      !this.$v.pet.pet_breed_id.required && errors.push("La raza es requerida");
+      return errors;
+    },
+    pet_size_idErrors() {
+      const errors = [];
+      if (!this.$v.pet.pet_size_id.$dirty) return errors;
+      !this.$v.pet.pet_size_id.required &&
+        errors.push("El tamaño es requerido");
+      return errors;
+    },
+    pet_fur_idErrors() {
+      const errors = [];
+      if (!this.$v.pet.pet_fur_id.$dirty) return errors;
+      !this.$v.pet.pet_fur_id.required && errors.push("El pelaje es requerido");
+      return errors;
+    },
+    pet_food_idErrors() {
+      const errors = [];
+      if (!this.$v.pet.pet_food_id.$dirty) return errors;
+      !this.$v.pet.pet_food_id.required &&
+        errors.push("La comida es requerida");
+      return errors;
+    },
   },
   watch: {
     petImage: function () {
       this.pet.pet_avatar = this.petImage.formData;
+    },
+    pet: {
+      handler: function () {
+        // // Correct validations
+        this.$emit("input", !this.$v.$invalid);
+      },
+      deep: true,
     },
   },
   components: {

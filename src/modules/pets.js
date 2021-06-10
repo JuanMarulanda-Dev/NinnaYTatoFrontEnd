@@ -6,6 +6,10 @@ axios.defaults.baseURL = process.env.VUE_APP_API_URL;
 export default {
   namespaced: true,
   state: {
+    breeds: [],
+    sizes: [],
+    furs: [],
+    foods: [],
     pet: {
       petId: 0,
       pet_avatar: "",
@@ -86,7 +90,57 @@ export default {
       ride: false,
     },
   },
-  mutations: {},
-  actions: {},
+  mutations: {
+    SET_BREEDS(state, breeds) {
+      state.breeds = breeds;
+    },
+    SET_SIZES(state, sizes) {
+      state.sizes = sizes;
+    },
+    SET_FURS(state, furs) {
+      state.furs = furs;
+    },
+    SET_FOODS(state, foods) {
+      state.foods = foods;
+    },
+  },
+  actions: {
+    async getAllBreeds({ commit }) {
+      try {
+        // Activar el loading del datatable
+        let result = await axios.get("/api/breeds");
+        commit("SET_BREEDS", result.data.breeds);
+      } catch (error) {
+        this._vm.$toast.error("Ocurrior un error...");
+      }
+    },
+    async getAllSizes({ commit }) {
+      try {
+        // Activar el loading del datatable
+        let result = await axios.get("/api/sizes");
+        commit("SET_SIZES", result.data.sizes);
+      } catch (error) {
+        this._vm.$toast.error("Ocurrior un error...");
+      }
+    },
+    async getAllFurs({ commit }) {
+      try {
+        // Activar el loading del datatable
+        let result = await axios.get("/api/furs");
+        commit("SET_FURS", result.data.furs);
+      } catch (error) {
+        this._vm.$toast.error("Ocurrior un error...");
+      }
+    },
+    async getAllFood({ commit }) {
+      try {
+        // Activar el loading del datatable
+        let result = await axios.get("/api/food");
+        commit("SET_FOODS", result.data.food);
+      } catch (error) {
+        this._vm.$toast.error("Ocurrior un error...");
+      }
+    },
+  },
   getters: {},
 };

@@ -56,7 +56,9 @@
               <v-divider></v-divider>
             </v-row>
             <!-- Formulario -->
-            <customer-personal-information></customer-personal-information>
+            <customer-personal-information
+              v-model="aviable_personal_information"
+            ></customer-personal-information>
             <v-row justify="end">
               <v-btn color="secondary" @click="step = 2"> Continue </v-btn>
             </v-row>
@@ -73,7 +75,9 @@
               <v-divider></v-divider>
             </v-row>
             <!-- Formulario -->
-            <customer-contact-information></customer-contact-information>
+            <customer-contact-information
+              v-model="aviable_contact_information"
+            ></customer-contact-information>
             <v-row justify="end">
               <v-btn class="mr-3" @click="step--"> volver </v-btn>
               <v-btn color="secondary" @click="step++"> Continue </v-btn>
@@ -91,7 +95,9 @@
               <v-divider></v-divider>
             </v-row>
             <!-- Formulario -->
-            <customer-additional-information></customer-additional-information>
+            <customer-additional-information
+              v-model="aviable_additional_information"
+            ></customer-additional-information>
             <v-row justify="end">
               <v-btn class="mr-3" @click="step--"> volver </v-btn>
               <v-btn color="secondary" @click="step++"> Continue </v-btn>
@@ -109,7 +115,9 @@
               <v-divider></v-divider>
             </v-row>
             <!-- Formulario -->
-            <pet-general-information></pet-general-information>
+            <pet-general-information
+              v-model="aviable_pet"
+            ></pet-general-information>
             <!-- back - next -->
             <v-row justify="end">
               <v-btn class="mr-3" @click="step--"> volver </v-btn>
@@ -147,11 +155,13 @@
               <v-divider></v-divider>
             </v-row>
             <!-- Formulario -->
-            <pet-behavior-information></pet-behavior-information>
+            <pet-behavior-information
+              v-model="aviable_pet_behavior"
+            ></pet-behavior-information>
             <!-- back - next -->
             <v-row justify="end">
               <v-btn class="mr-3" @click="step--"> volver </v-btn>
-              <v-btn color="secondary"> Finalizar </v-btn>
+              <v-btn color="secondary" @click="save"> Finalizar </v-btn>
             </v-row>
           </v-container>
         </v-stepper-content>
@@ -161,7 +171,7 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapActions, mapState } from "vuex";
 import CustomerPersonalInformation from "@/components/customers/CustomerPersonalInformation.vue";
 import CustomerContactInformation from "@/components/customers/CustomerContactInformation.vue";
 import CustomerAdditionalInformation from "@/components/customers/CustomerAdditionalInformation.vue";
@@ -173,7 +183,54 @@ export default {
   data() {
     return {
       step: 1,
+      aviable_personal_information: false,
+      aviable_contact_information: false,
+      aviable_additional_information: false,
+      aviable_pet: false,
+      aviable_pet_behavior: false,
     };
+  },
+  computed: {
+    ...mapState("pets", ["pet", "vet_information", "pet_behavior"]),
+  },
+  methods: {
+    // Pendiente colocar este metodo a funcionar
+    ...mapActions(["goBack"]),
+    ...mapActions("customers", ["getAllHowContact", "storeCustomer"]),
+    ...mapActions("pets", [
+      "getAllBreeds",
+      "getAllSizes",
+      "getAllFurs",
+      "getAllFood",
+    ]),
+    async save() {
+      // Validar que la informacion se todos los modulos sea valida
+      if (
+        this.aviable_personal_information &&
+        this.aviable_contact_information &&
+        this.aviable_additional_information &&
+        this.aviable_pet &&
+        this.aviable_pet_behavior
+      ) {
+        //   // Guardar el cliente con su mascota
+        let response = await this.storeCustomer({
+          ...this.pet,
+          ...this.vet_information,
+          ...this.pet_behavior,
+        });
+
+        if (response) {
+          this.$router.push({ path: "/clientes" });
+        }
+      }
+    },
+  },
+  created() {
+    this.getAllHowContact();
+    this.getAllBreeds();
+    this.getAllSizes();
+    this.getAllFurs();
+    this.getAllFood();
   },
   components: {
     CustomerPersonalInformation,
@@ -182,10 +239,6 @@ export default {
     PetGeneralInformation,
     PetVetInformation,
     PetBehaviorInformation,
-  },
-  methods: {
-    // Pendiente colocar este metodo a funcionar
-    ...mapActions(["goBack"]),
   },
 };
 </script>
