@@ -99,7 +99,6 @@ export default {
         // Activar el loading del datatable
         commit("SET_OVERLAY_LOADING", true, { root: true });
         let result = await axios.get(`/api/customers/${customerId}`);
-        console.log(result.data);
         commit("SET_CUSTOMER_DETAILS", result.data.customer);
         commit("SET_CUSTOMER_PETS", result.data.pets);
       } catch (error) {

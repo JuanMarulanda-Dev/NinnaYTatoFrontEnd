@@ -108,6 +108,11 @@ export default {
       state.vet_information = state.default_vet_information;
       state.pet_behavior = state.default_pet_behavior;
     },
+    SET_PET_DETAILS(state, details) {
+      state.pet = details.pet;
+      state.vet_information = details.vet_information;
+      state.pet_behavior = details.pet_behavior;
+    },
   },
   actions: {
     async getAllBreeds({ commit }) {
@@ -164,6 +169,18 @@ export default {
       } catch (error) {
         this._vm.$toast.error("Ocurrio un error");
         return false;
+      } finally {
+        commit("SET_OVERLAY_LOADING", false, { root: true });
+      }
+    },
+    async getDetailsPet({ commit }, petId) {
+      try {
+        // Activar el loading del datatable
+        commit("SET_OVERLAY_LOADING", true, { root: true });
+        let result = await axios.get(`/api/pets/${petId}`);
+        commit("SET_PET_DETAILS", result.data.pet);
+      } catch (error) {
+        this._vm.$toast.error("Ocurrior un error...");
       } finally {
         commit("SET_OVERLAY_LOADING", false, { root: true });
       }
