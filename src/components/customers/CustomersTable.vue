@@ -67,7 +67,7 @@
       <v-switch
         :input-value="item.state"
         v-model="item.state"
-        @change="changeStateSucursal(item)"
+        @change="changeCustomerState(item)"
         v-show="permissions.delete"
       ></v-switch>
     </template>
@@ -126,9 +126,33 @@ export default {
     }
   },
   methods: {
-    ...mapActions("customers", ["getAllCustomers"]),
+    ...mapActions("customers", ["getAllCustomers", "changeStatusCustomers"]),
     initialize() {
       this.getAllCustomers();
+    },
+    changeCustomerState(item) {
+      // Confirmation to change de status
+      this.$confirm("¿Quieres cambiar el estado de este cliente?", {
+        title: "Advertencia",
+      }).then((res) => {
+        if (res) {
+          // Make to change status to backend
+          this.changeStatusCustomers(item.id).then((result) => {
+            if (!result) {
+              // Rollback the state from branch office
+              this.rollbackCustomer(item);
+            }
+          });
+        } else {
+          // Rollback the state from branch office
+          this.rollbackCustomer(item);
+        }
+      });
+    },
+    rollbackCustomer(item) {
+      let customerIndex = this.customers.indexOf(item);
+      let state = !this.customers[customerIndex].state;
+      this.customers[customerIndex].state = state;
     },
     goToFormCreateCustomer() {
       this.$router.push({ path: "/clientes/registro" }).catch((error) => {

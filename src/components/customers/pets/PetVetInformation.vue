@@ -50,7 +50,11 @@
                 v-on="on"
               ></v-text-field>
             </template>
-            <v-date-picker v-model="vet_information.rabies_vaccine" scrollable>
+            <v-date-picker
+              :max="date"
+              v-model="vet_information.rabies_vaccine"
+              scrollable
+            >
               <v-spacer></v-spacer>
               <v-btn text color="primary" @click="modalDatePickerRabia = false">
                 Cancel
@@ -86,6 +90,7 @@
               ></v-text-field>
             </template>
             <v-date-picker
+              :max="date"
               v-model="vet_information.pentavalent_vaccine"
               scrollable
             >
@@ -123,7 +128,11 @@
                 v-on="on"
               ></v-text-field>
             </template>
-            <v-date-picker v-model="vet_information.cough_vaccine" scrollable>
+            <v-date-picker
+              :max="date"
+              v-model="vet_information.cough_vaccine"
+              scrollable
+            >
               <v-spacer></v-spacer>
               <v-btn text color="primary" @click="modalDatePickerTos = false">
                 Cancel

@@ -74,9 +74,17 @@
                       <!-- Nombre de la mascota -->
                       <span>{{ pet.pet_name }}</span>
                       <!-- Icon Genero -->
-                      <span>
-                        <v-icon>mdi-gender-male</v-icon>
-                      </span>
+                      <span> <v-icon>mdi-gender-male</v-icon> </span>
+                    </v-row>
+                  </v-col>
+                  <v-col cols="12">
+                    <v-row justify="center">
+                      <!-- State -->
+                      <v-switch
+                        :input-value="pet.state"
+                        v-model="pet.state"
+                        @change="changePetState()"
+                      ></v-switch>
                     </v-row>
                   </v-col>
                 </v-row>
@@ -143,6 +151,20 @@
                   <v-col xs="12" sm="4" md="4" cols="12">
                     <small>Eliminado </small><br />
                     <label> {{ pet.updated_at }} </label>
+                  </v-col>
+                  <!-- Dueño -->
+                  <v-col xs="12" sm="4" md="4" cols="12">
+                    <small>Dueño </small><br />
+                    <v-avatar color="grey lighten-1">
+                      <img
+                        v-if="additional_information.customer_avatar"
+                        :src="additional_information.customer_avatar"
+                        :alt="personal_infomation.first_name"
+                      />
+                      <v-icon v-else dark> mdi-account-circle </v-icon>
+                    </v-avatar>
+                    <br />
+                    <label> {{ personal_infomation.first_name }} </label>
                   </v-col>
                 </v-row>
                 <v-row>
@@ -338,15 +360,43 @@ export default {
   },
   computed: {
     ...mapState("pets", ["pet", "vet_information", "pet_behavior"]),
+    ...mapState("customers", ["personal_infomation", "additional_information"]),
   },
   methods: {
-    ...mapActions(["goBack"]),
-    ...mapActions("pets", ["getDetailsPet"]),
+    goBack() {
+      this.$router.push({
+        path: `/clientes/detalles/${this.$route.params.customer}`,
+      });
+    },
+    ...mapActions("pets", ["getDetailsPet", "changeStatusPet"]),
     ...mapMutations("pets", ["SET_PET_DEFAULT"]),
     goToEditPetForm() {
       this.$router.push({
         path: `${this.petId}/editar`,
       });
+    },
+    changePetState() {
+      // Confirmation to change de status
+      this.$confirm("¿Quieres cambiar el estado de esta mascota?", {
+        title: "Advertencia",
+      }).then((res) => {
+        if (res) {
+          // Make to change status to backend
+          this.changeStatusPet().then((result) => {
+            if (!result) {
+              // Rollback the state from branch office
+              this.rollbackPet();
+            }
+          });
+        } else {
+          // Rollback the state from branch office
+          this.rollbackPet();
+        }
+      });
+    },
+    rollbackPet() {
+      let state = !this.pet.state;
+      this.pet.state = state;
     },
   },
   created() {

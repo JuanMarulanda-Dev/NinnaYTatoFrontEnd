@@ -85,12 +85,12 @@
               <v-col xs="12" sm="12" md="8" cols="12">
                 <v-row>
                   <!-- DNI -->
-                  <v-col xs="12" sm="6" md="6" cols="12">
+                  <v-col xs="12" sm="6" md="4" cols="12">
                     <small>DNI</small><br />
                     <label> {{ personal_infomation.dni }} </label>
                   </v-col>
                   <!-- Email -->
-                  <v-col xs="12" sm="6" md="6" cols="12">
+                  <v-col xs="12" sm="6" md="8" cols="12">
                     <small>E-mail</small><br />
                     <label> {{ contact_information.email }} </label>
                   </v-col>
@@ -189,14 +189,24 @@
                       <tr v-for="item in pets" :key="item.id">
                         <td class="pa-0 cursor" @click="goToShowPet(item.id)">
                           <div class="d-flex pa-1">
-                            <v-avatar class="mr-2" color="primary">
-                              <img
-                                v-if="item.avatar"
-                                :src="item.avatar"
-                                alt="avatar"
-                              />
-                              <v-icon v-else dark> mdi-dog-side </v-icon>
-                            </v-avatar>
+                            <v-badge
+                              bordered
+                              bottom
+                              :color="item.state ? 'success' : 'error'"
+                              dot
+                              offset-x="20"
+                              offset-y="10"
+                            >
+                              <v-avatar class="mr-2" color="primary">
+                                <img
+                                  v-if="item.avatar"
+                                  :src="item.avatar"
+                                  alt="avatar"
+                                />
+                                <v-icon v-else dark> mdi-dog-side </v-icon>
+                              </v-avatar>
+                            </v-badge>
+
                             <div>
                               <label>
                                 {{ item.name }}&nbsp;
@@ -248,7 +258,11 @@ export default {
     this.getDetailsCustomer(this.customerId);
   },
   methods: {
-    ...mapActions(["goBack"]),
+    goBack() {
+      this.$router.push({
+        path: `/clientes`,
+      });
+    },
     ...mapActions("customers", ["getDetailsCustomer"]),
     goToShowPet(petId) {
       this.$router.push({

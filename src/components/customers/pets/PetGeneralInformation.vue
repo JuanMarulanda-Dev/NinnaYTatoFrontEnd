@@ -103,7 +103,11 @@
                     v-on="on"
                   ></v-text-field>
                 </template>
-                <v-date-picker v-model="pet.pet_birth_date" scrollable>
+                <v-date-picker
+                  :max="now"
+                  v-model="pet.pet_birth_date"
+                  scrollable
+                >
                   <v-spacer></v-spacer>
                   <v-btn text color="primary" @click="modalDatePicker = false">
                     Cancel
@@ -120,7 +124,7 @@
             </v-col>
             <v-col xs="12" sm="12" md="6" cols="12">
               <!-- Edad -->
-              <v-text-field label="Edad" disabled></v-text-field>
+              <v-text-field v-model="age" label="Edad" disabled></v-text-field>
             </v-col>
           </v-row>
         </v-col>
@@ -209,7 +213,7 @@ export default {
       petImage: null,
       races: [{ id: 1, name: "Chanda" }],
       modalDatePicker: false,
-      date: new Date().toISOString().substr(0, 10),
+      now: new Date().toISOString().substr(0, 10),
     };
   },
   props: {
@@ -232,6 +236,21 @@ export default {
   },
   computed: {
     ...mapState("pets", ["pet", "breeds", "sizes", "furs", "foods"]),
+    age() {
+      // format 1 año-s, 6 mes-es
+      if (this.pet.pet_birth_date != "") {
+        const diffTime = Math.floor(
+          Date.parse(this.now) - Date.parse(this.pet.pet_birth_date)
+        );
+        let day = 1000 * 60 * 60 * 24;
+        let days = Math.floor(diffTime / day);
+        let months = Math.floor(days / 31);
+        let years = Math.floor(months / 12);
+        return `${years} año-s, ${months - years * 12} mes-es`;
+      } else {
+        return "";
+      }
+    },
     pet_nameErrors() {
       const errors = [];
       if (!this.$v.pet.pet_name.$dirty) return errors;
