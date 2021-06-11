@@ -11,7 +11,7 @@ export default {
     furs: [],
     foods: [],
     pet: {
-      petId: 0,
+      id: 0,
       pet_avatar: "",
       pet_name: "",
       pet_sterilized: false,
@@ -162,6 +162,28 @@ export default {
         if (result.status == 201) {
           // show message
           this._vm.$toast.success("Mascota registrado exitosamente");
+          // Reset object with default information
+          commit("SET_PET_DEFAULT");
+          return true;
+        }
+      } catch (error) {
+        this._vm.$toast.error("Ocurrio un error");
+        return false;
+      } finally {
+        commit("SET_OVERLAY_LOADING", false, { root: true });
+      }
+    },
+    async updatePet({ state, commit }) {
+      try {
+        commit("SET_OVERLAY_LOADING", true, { root: true });
+        let result = await axios.put(`/api/pets/${state.pet.id}`, {
+          ...state.pet,
+          ...state.vet_information,
+          ...state.pet_behavior,
+        });
+        if (result.status == 201) {
+          // show message
+          this._vm.$toast.success("Mascota actualizado exitosamente");
           // Reset object with default information
           commit("SET_PET_DEFAULT");
           return true;

@@ -72,7 +72,7 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapActions, mapMutations } from "vuex";
 import PetGeneralInformation from "@/components/customers/pets/PetGeneralInformation.vue";
 import PetVetInformation from "@/components/customers/pets/PetVetInformation.vue";
 import PetBehaviorInformation from "@/components/customers/pets/PetBehaviorInformation.vue";
@@ -87,11 +87,6 @@ export default {
       aviable_pet_behavior: false,
     };
   },
-  created() {
-    this.customerId = this.$route.params.customer;
-    this.petId = this.$route.params.pet;
-    this.SET_PET_DEFAULT();
-  },
   components: {
     PetGeneralInformation,
     PetVetInformation,
@@ -100,18 +95,33 @@ export default {
   methods: {
     // Pendiente colocar este metodo a funcionar
     ...mapActions(["goBack"]),
-    ...mapActions("pets", ["storePet", "SET_PET_DEFAULT"]),
+    ...mapActions("pets", ["storePet", "updatePet"]),
+    ...mapMutations("pets", ["SET_PET_DEFAULT"]),
     async save() {
-      console.log(this.aviable_pet);
       if (this.aviable_pet && this.aviable_pet_behavior) {
-        // Guardar mascota del cliente
-        let response = await this.storePet(this.customerId);
+        let response = false;
+        if (this.petId == null) {
+          // Guardar mascota del cliente
+          response = await this.storePet(this.customerId);
+        } else {
+          response = await this.updatePet();
+        }
 
         if (response) {
           this.$router.push({ path: `/clientes/detalles/${this.customerId}` });
         }
       }
     },
+  },
+  created() {
+    this.customerId = this.$route.params.customer;
+    this.petId = this.$route.params.pet;
+    if (this.petId != null) {
+      this.aviable_pet = true;
+      this.aviable_pet_behavior = true;
+    } else {
+      this.SET_PET_DEFAULT();
+    }
   },
 };
 </script>

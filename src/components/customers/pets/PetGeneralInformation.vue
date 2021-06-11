@@ -306,6 +306,11 @@ export default {
     this.getAllSizes();
     this.getAllFurs();
     this.getAllFood();
+    if (this.pet.pet_avatar) {
+      this.petImage = {
+        imageURL: this.pet.pet_avatar,
+      };
+    }
   },
   watch: {
     petImage: function () {

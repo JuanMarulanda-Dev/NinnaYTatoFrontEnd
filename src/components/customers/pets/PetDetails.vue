@@ -134,6 +134,18 @@
                   </v-col>
                 </v-row>
                 <v-row>
+                  <!-- Creado -->
+                  <v-col xs="12" sm="4" md="4" cols="12">
+                    <small>Creado</small><br />
+                    <label> {{ pet.created_at }} </label>
+                  </v-col>
+                  <!-- Eliminado -->
+                  <v-col xs="12" sm="4" md="4" cols="12">
+                    <small>Eliminado </small><br />
+                    <label> {{ pet.updated_at }} </label>
+                  </v-col>
+                </v-row>
+                <v-row>
                   <!-- Instrucciones generales -->
                   <v-col cols="12">
                     <small>Instrucciones generales</small><br />
@@ -327,12 +339,6 @@ export default {
   computed: {
     ...mapState("pets", ["pet", "vet_information", "pet_behavior"]),
   },
-  created() {
-    //take id customer details
-    this.petId = this.$route.params.pet;
-    this.SET_PET_DEFAULT();
-    this.getDetailsPet(this.petId);
-  },
   methods: {
     ...mapActions(["goBack"]),
     ...mapActions("pets", ["getDetailsPet"]),
@@ -342,6 +348,11 @@ export default {
         path: `${this.petId}/editar`,
       });
     },
+  },
+  created() {
+    //take id customer details
+    this.petId = this.$route.params.pet;
+    this.getDetailsPet(this.petId);
   },
 };
 </script>
