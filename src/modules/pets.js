@@ -13,6 +13,7 @@ export default {
     pet: {
       id: 0,
       pet_avatar: "",
+      pet_image: null,
       pet_name: "",
       pet_sterilized: false,
       pet_birth_date: "",
@@ -53,6 +54,7 @@ export default {
     default_pet: {
       petId: 0,
       pet_avatar: "",
+      pet_image: null,
       pet_name: "",
       pet_sterilized: false,
       pet_birth_date: "",
@@ -104,9 +106,9 @@ export default {
       state.foods = foods;
     },
     SET_PET_DEFAULT(state) {
-      state.pet = state.default_pet;
-      state.vet_information = state.default_vet_information;
-      state.pet_behavior = state.default_pet_behavior;
+      state.pet = Object.assign({}, state.default_pet);
+      state.vet_information = Object.assign({}, state.default_vet_information);
+      state.pet_behavior = Object.assign({}, state.default_pet_behavior);
     },
     SET_PET_DETAILS(state, details) {
       state.pet = details.pet;
@@ -154,16 +156,31 @@ export default {
     async storePet({ state, commit }, customerId) {
       try {
         commit("SET_OVERLAY_LOADING", true, { root: true });
-        let result = await axios.post(`/api/customers/${customerId}/pets`, {
+
+        let data = {
           ...state.pet,
           ...state.vet_information,
           ...state.pet_behavior,
-        });
+        };
+
+        let formData = new FormData();
+        for (var key in data) {
+          if (data[key] == null) {
+            formData.append(key, "");
+          } else if (typeof data[key] === "boolean") {
+            formData.append(key, data[key] ? "1" : "0");
+          } else {
+            formData.append(key, data[key]);
+          }
+        }
+
+        let result = await axios.post(
+          `/api/customers/${customerId}/pets`,
+          formData
+        );
         if (result.status == 201) {
           // show message
           this._vm.$toast.success("Mascota registrado exitosamente");
-          // Reset object with default information
-          commit("SET_PET_DEFAULT");
           return true;
         }
       } catch (error) {

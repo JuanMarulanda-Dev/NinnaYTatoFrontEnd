@@ -45,11 +45,9 @@ export default {
           );
         } else {
           // Append file into FormData and turn file into image URL
-          let formData = new FormData();
           let imageURL = URL.createObjectURL(imageFile);
-          formData.append(fieldName, imageFile);
           // Emit the FormData and image URL to the parent component
-          this.$emit("input", { formData, imageURL });
+          this.$emit("input", { imageFile, imageURL });
         }
       }
     },

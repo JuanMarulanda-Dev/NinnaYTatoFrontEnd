@@ -105,7 +105,7 @@ export default {
   },
   watch: {
     userImage: function () {
-      this.additional_information.customer_avatar = this.userImage.formData;
+      this.additional_information.customer_image = this.userImage.imageFile;
     },
     additional_information: {
       handler: function () {

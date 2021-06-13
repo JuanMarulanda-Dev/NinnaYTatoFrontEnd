@@ -161,7 +161,7 @@
             <!-- back - next -->
             <v-row justify="end">
               <v-btn class="mr-3" @click="step--"> volver </v-btn>
-              <v-btn color="secondary" @click="save"> Finalizar </v-btn>
+              <v-btn color="secondary" @click="save()"> Finalizar </v-btn>
             </v-row>
           </v-container>
         </v-stepper-content>
@@ -198,6 +198,7 @@ export default {
     ...mapActions(["goBack"]),
     ...mapActions("customers", ["getAllHowContact", "storeCustomer"]),
     ...mapMutations("customers", ["SET_CUSTOMER_DEFAULT"]),
+    ...mapMutations("pets", ["SET_PET_DEFAULT"]),
     async save() {
       // Validar que la informacion se todos los modulos sea valida
       if (
@@ -222,6 +223,7 @@ export default {
   },
   created() {
     this.SET_CUSTOMER_DEFAULT();
+    this.SET_PET_DEFAULT();
   },
   components: {
     CustomerPersonalInformation,

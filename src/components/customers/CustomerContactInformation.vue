@@ -161,7 +161,7 @@ export default {
     },
     backup_contact_nameErrors() {
       const errors = [];
-      if (!this.$v.contact_information.backup_contact_phone.$dirty)
+      if (!this.$v.contact_information.backup_contact_name.$dirty)
         return errors;
       !this.$v.contact_information.backup_contact_name.required &&
         errors.push("El nombre es requerido");

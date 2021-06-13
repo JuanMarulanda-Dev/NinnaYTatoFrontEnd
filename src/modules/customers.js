@@ -30,8 +30,9 @@ export default {
     },
     additional_information: {
       customer_avatar: "",
+      customer_image: null,
       social_network: "",
-      how_contact_id: 0,
+      how_contact_id: null,
     },
     // Default format
     default_personal_infomation: {
@@ -46,15 +47,16 @@ export default {
     default_contact_information: {
       email: "",
       phone: "",
-      emergency_conctact_name: "",
-      emergency_conctact_phone: "",
-      backup_conctact_name: "",
-      backup_conctact_phone: "",
+      emergency_contact_name: "",
+      emergency_contact_phone: "",
+      backup_contact_name: "",
+      backup_contact_phone: "",
     },
     default_additional_information: {
       customer_avatar: "",
+      customer_image: null,
       social_network: "",
-      how_contact_id: 0,
+      how_contact_id: null,
     },
   },
   mutations: {
@@ -70,9 +72,18 @@ export default {
       state.additional_information = customer.additional_information;
     },
     SET_CUSTOMER_DEFAULT(state) {
-      state.personal_infomation = state.default_personal_infomation;
-      state.contact_information = state.default_contact_information;
-      state.additional_information = state.default_additional_information;
+      state.personal_infomation = Object.assign(
+        {},
+        state.default_personal_infomation
+      );
+      state.contact_information = Object.assign(
+        {},
+        state.default_contact_information
+      );
+      state.additional_information = Object.assign(
+        {},
+        state.default_additional_information
+      );
     },
     SET_LOADING_DATATABLE(state, status) {
       state.loading = status;
@@ -119,17 +130,29 @@ export default {
     async storeCustomer({ state, commit }, pet) {
       try {
         commit("SET_OVERLAY_LOADING", true, { root: true });
-        let result = await axios.post("/api/customers", {
+
+        let data = {
           ...state.personal_infomation,
           ...state.contact_information,
           ...state.additional_information,
           ...pet,
-        });
+        };
+
+        let formData = new FormData();
+        for (var key in data) {
+          if (data[key] == null) {
+            formData.append(key, "");
+          } else if (typeof data[key] === "boolean") {
+            formData.append(key, data[key] ? "1" : "0");
+          } else {
+            formData.append(key, data[key]);
+          }
+        }
+        let result = await axios.post("/api/customers", formData);
+
         if (result.status == 201) {
           // show message
           this._vm.$toast.success("Cliente registrado exitosamente");
-          // Reset object with default information
-          commit("SET_CUSTOMER_DEFAULT");
           return true;
         }
       } catch (error) {

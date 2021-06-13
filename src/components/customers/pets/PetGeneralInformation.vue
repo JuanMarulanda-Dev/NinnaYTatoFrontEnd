@@ -333,7 +333,7 @@ export default {
   },
   watch: {
     petImage: function () {
-      this.pet.pet_avatar = this.petImage.formData;
+      this.pet.pet_image = this.petImage.imageFile;
     },
     pet: {
       handler: function () {
