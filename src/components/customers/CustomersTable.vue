@@ -24,7 +24,7 @@
           hide-details
         ></v-text-field>
         <!-- Create Button -->
-        <v-tooltip bottom>
+        <v-tooltip bottom v-show="permissions.create">
           <template v-slot:activator="{ on, attrs }">
             <v-btn
               class="ml-3"
@@ -35,7 +35,6 @@
               dark
               v-bind="attrs"
               v-on="on"
-              v-show="permissions.create"
               @click="goToFormCreateCustomer()"
             >
               <v-icon>mdi-plus-thick</v-icon>
@@ -96,12 +95,11 @@
 </template>
 
 <script>
-import { mapState, mapActions } from "vuex";
+import { mapState, mapActions, mapMutations } from "vuex";
 
 export default {
   data() {
     return {
-      permissions: {},
       search: "",
       headers: [
         { text: "Cliente", value: "name" },
@@ -115,11 +113,11 @@ export default {
   },
   computed: {
     ...mapState(["detailsIcon", "loadingText", "loadingText"]),
-    ...mapState("customers", ["customers", "loading"]),
+    ...mapState("customers", ["customers", "loading", "permissions"]),
   },
   created() {
     // Obtener los permisos
-    this.permissions = this.$route.meta.permissions;
+    this.SET_PERMISSIONS(this.$route.meta.permissions);
     // Acciones que debe realizar el componente una vez creado
     if (this.permissions.read) {
       this.initialize();
@@ -127,6 +125,7 @@ export default {
   },
   methods: {
     ...mapActions("customers", ["getAllCustomers", "changeStatusCustomers"]),
+    ...mapMutations("customers", ["SET_PERMISSIONS"]),
     initialize() {
       this.getAllCustomers();
     },
@@ -137,7 +136,7 @@ export default {
       }).then((res) => {
         if (res) {
           // Make to change status to backend
-          this.changeStatusCustomers(item.id).then((result) => {
+          this.changeStatusCustomers(item.user_id).then((result) => {
             if (!result) {
               // Rollback the state from branch office
               this.rollbackCustomer(item);

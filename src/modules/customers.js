@@ -7,6 +7,7 @@ export default {
   namespaced: true,
   state: {
     // Generals loading datatables
+    permissions: {},
     loading: false,
     pets: [],
     customers: [],
@@ -60,6 +61,9 @@ export default {
     },
   },
   mutations: {
+    SET_PERMISSIONS(state, permissions) {
+      state.permissions = permissions;
+    },
     SET_CUSTOMERS(state, customers) {
       state.customers = customers;
     },
@@ -165,13 +169,27 @@ export default {
     async updateCustomer({ state, commit }) {
       try {
         commit("SET_OVERLAY_LOADING", true, { root: true });
-        let result = await axios.put(
-          `/api/customers/${state.personal_infomation.id}`,
-          {
-            ...state.personal_infomation,
-            ...state.contact_information,
-            ...state.additional_information,
+
+        let data = {
+          ...state.personal_infomation,
+          ...state.contact_information,
+          ...state.additional_information,
+        };
+
+        let formData = new FormData();
+        for (var key in data) {
+          if (data[key] == null) {
+            formData.append(key, "");
+          } else if (typeof data[key] === "boolean") {
+            formData.append(key, data[key] ? "1" : "0");
+          } else {
+            formData.append(key, data[key]);
           }
+        }
+        formData.append("_method", "put");
+        let result = await axios.post(
+          `/api/customers/${state.personal_infomation.id}`,
+          formData
         );
         if (result.status == 201) {
           // show message

@@ -11,6 +11,27 @@
     <noscript>
       <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>
+    <script>
+      var bPreguntar = true;
+    
+      window.onbeforeunload = preguntarAntesDeSalir;
+    
+      function preguntarAntesDeSalir () {
+        var respuesta;
+    
+        if ( bPreguntar ) {
+          respuesta = confirm ( '¿Seguro que quieres salir?' );
+    
+          if ( respuesta ) {
+            window.onunload = function () {
+              return true;
+            }
+          } else {
+            return false;
+          }
+        }
+      }
+    </script>
     <div id="app"></div>
     <!-- built files will be auto injected -->
   </body>

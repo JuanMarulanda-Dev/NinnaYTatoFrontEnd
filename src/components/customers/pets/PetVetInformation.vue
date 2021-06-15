@@ -150,9 +150,7 @@
         <v-col xs="12" sm="12" cols="12">
           <!-- Carnet -->
           <v-file-input
-            :rules="rules"
             v-model="vet_information.vaccination_card"
-            accept="image/png, image/jpeg, image/bmp"
             placeholder="Carnet"
             label="Carnet"
           ></v-file-input>
@@ -226,10 +224,6 @@ export default {
       modalDatePickerPenta: false,
       modalDatePickerTos: false,
       date: new Date().toISOString().substr(0, 10),
-      rules: [
-        (value) =>
-          !value || value.size < 2000000 || "El carnet debe ser menos de 2 mb",
-      ],
     };
   },
   computed: {

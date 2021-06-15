@@ -68,7 +68,7 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapActions, mapState } from "vuex";
 import CustomerPersonalInformation from "@/components/customers/CustomerPersonalInformation.vue";
 import CustomerContactInformation from "@/components/customers/CustomerContactInformation.vue";
 import CustomerAdditionalInformation from "@/components/customers/CustomerAdditionalInformation.vue";
@@ -81,6 +81,16 @@ export default {
       aviable_contact_information: true,
       aviable_additional_information: true,
     };
+  },
+  computed: {
+    ...mapState("customers", ["personal_infomation"]),
+  },
+  created() {
+    if (this.personal_infomation.id == 0) {
+      this.$router.push({
+        path: `/clientes/detalles/${this.$route.params.customer}`,
+      });
+    }
   },
   components: {
     CustomerPersonalInformation,

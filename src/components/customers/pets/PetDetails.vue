@@ -34,7 +34,7 @@
                   Inactivo
                 </v-chip>
               </h3>
-              <v-tooltip bottom>
+              <v-tooltip bottom v-show="permissions.update">
                 <template v-slot:activator="{ on, attrs }">
                   <v-btn
                     color="secondary"
@@ -84,6 +84,7 @@
                         :input-value="pet.state"
                         v-model="pet.state"
                         @change="changePetState()"
+                        v-show="permissions.delete"
                       ></v-switch>
                     </v-row>
                   </v-col>
@@ -336,6 +337,7 @@
                   v-show="vet_information.url_vaccination_card != null"
                   small
                   color="info"
+                  @click="showCarnet()"
                 >
                   ver
                   <v-icon>mdi-eye-outline</v-icon>
@@ -360,7 +362,11 @@ export default {
   },
   computed: {
     ...mapState("pets", ["pet", "vet_information", "pet_behavior"]),
-    ...mapState("customers", ["personal_infomation", "additional_information"]),
+    ...mapState("customers", [
+      "personal_infomation",
+      "additional_information",
+      "permissions",
+    ]),
   },
   methods: {
     goBack() {
@@ -398,11 +404,20 @@ export default {
       let state = !this.pet.state;
       this.pet.state = state;
     },
+    showCarnet() {
+      window.open(this.vet_information.url_vaccination_card, "_blank");
+    },
   },
   created() {
     //take id customer details
-    this.petId = this.$route.params.pet;
-    this.getDetailsPet(this.petId);
+    if (this.personal_infomation.id == 0) {
+      this.$router.push({
+        path: `/clientes/detalles/${this.$route.params.customer}`,
+      });
+    } else {
+      this.petId = this.$route.params.pet;
+      this.getDetailsPet(this.petId);
+    }
   },
 };
 </script>

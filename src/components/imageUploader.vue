@@ -9,7 +9,7 @@
       type="file"
       ref="file"
       :name="uploadFieldName"
-      @change="onFileChange($event.target.name, $event.target.files)"
+      @change="onFileChange($event.target.files)"
       style="display: none"
     />
   </div>
@@ -30,7 +30,7 @@ export default {
     launchFilePicker() {
       this.$refs.file.click();
     },
-    onFileChange(fieldName, file) {
+    onFileChange(file) {
       const { maxSize } = this;
       let imageFile = file[0];
       if (file.length > 0) {
@@ -38,7 +38,7 @@ export default {
         if (!imageFile.type.match("image.*")) {
           // check whether the upload is an image
           this.$toast.warning("Por favor selecciona una imagen.");
-        } else if (size > 1) {
+        } else if (size > 5) {
           // check whether the size is greater than the size limit
           this.$toast.warning(
             "Tu archivo es demasiado grande! Por favor selecciona una imagen de 1MB o inferior."

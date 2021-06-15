@@ -72,7 +72,7 @@
 </template>
 
 <script>
-import { mapActions, mapMutations } from "vuex";
+import { mapActions, mapMutations, mapState } from "vuex";
 import PetGeneralInformation from "@/components/customers/pets/PetGeneralInformation.vue";
 import PetVetInformation from "@/components/customers/pets/PetVetInformation.vue";
 import PetBehaviorInformation from "@/components/customers/pets/PetBehaviorInformation.vue";
@@ -86,6 +86,9 @@ export default {
       aviable_pet: false,
       aviable_pet_behavior: false,
     };
+  },
+  computed: {
+    ...mapState("pets", ["pet"]),
   },
   components: {
     PetGeneralInformation,
@@ -116,6 +119,12 @@ export default {
   created() {
     this.customerId = this.$route.params.customer;
     this.petId = this.$route.params.pet;
+    if (this.$route.path.includes("editar") && this.pet.id == 0) {
+      this.$router.push({
+        path: `/clientes/detalles/${this.$route.params.customer}`,
+      });
+    }
+
     if (this.petId != null) {
       this.aviable_pet = true;
       this.aviable_pet_behavior = true;

@@ -193,11 +193,25 @@ export default {
     async updatePet({ state, commit }) {
       try {
         commit("SET_OVERLAY_LOADING", true, { root: true });
-        let result = await axios.put(`/api/pets/${state.pet.id}`, {
+
+        let data = {
           ...state.pet,
           ...state.vet_information,
           ...state.pet_behavior,
-        });
+        };
+
+        let formData = new FormData();
+        for (var key in data) {
+          if (data[key] == null) {
+            formData.append(key, "");
+          } else if (typeof data[key] === "boolean") {
+            formData.append(key, data[key] ? "1" : "0");
+          } else {
+            formData.append(key, data[key]);
+          }
+        }
+        formData.append("_method", "put");
+        let result = await axios.post(`/api/pets/${state.pet.id}`, formData);
         if (result.status == 201) {
           // show message
           this._vm.$toast.success("Mascota actualizado exitosamente");

@@ -52,7 +52,7 @@ export default new Vuex.Store({
   },
   actions: {
     // Todas estas acciones pertenecen a las funcionalidades del login (Modular)
-    async login({ dispatch, commit }, credentials) {
+    async login({ state, dispatch, commit }, credentials) {
       try {
         commit("SET_OVERLAY_LOADING", true);
         // Activar el loading del boton ingresar
@@ -73,7 +73,7 @@ export default new Vuex.Store({
         await dispatch("getMenu");
         // Obtener la ruta principal a donde se va a redireccionar al usuario
         // Redirrecionar a la ruta pertiente para el usuario
-        router.push("sucursales");
+        router.push({ path: state.menu[0].to });
       } catch (error) {
         // Mostrar el mensaje al usuario que ocurrio algun inconveninte (Los mensajes deben venir del backend)
         this._vm.$toast.warning("El usuario o la contraseña son incorrectos.");

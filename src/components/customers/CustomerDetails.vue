@@ -34,7 +34,7 @@
                   Inactivo
                 </v-chip>
               </h3>
-              <v-tooltip bottom>
+              <v-tooltip bottom v-show="permissions.update">
                 <template v-slot:activator="{ on, attrs }">
                   <v-btn
                     color="secondary"
@@ -163,7 +163,7 @@
           <v-container class="pa-6">
             <v-row justify="space-between">
               <h3><v-icon>mdi-paw</v-icon>&nbsp;Mascotas</h3>
-              <v-tooltip bottom>
+              <v-tooltip bottom v-show="permissions.create">
                 <template v-slot:activator="{ on, attrs }">
                   <v-btn
                     color="secondary"
@@ -250,6 +250,7 @@ export default {
       "contact_information",
       "additional_information",
       "pets",
+      "permissions",
     ]),
   },
   created() {
