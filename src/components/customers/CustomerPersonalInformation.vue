@@ -97,6 +97,7 @@ export default {
   props: {
     // Use "value" to enable using v-model
     value: Boolean,
+    validation: Boolean,
   },
   mixins: [validationMixin],
   validations: {
@@ -176,6 +177,10 @@ export default {
         this.$emit("input", !this.$v.$invalid);
       },
       deep: true,
+    },
+    validation: function () {
+      // Active vue validate to this form.
+      this.$v.$touch();
     },
   },
 };

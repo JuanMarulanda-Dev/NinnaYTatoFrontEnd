@@ -25,7 +25,7 @@
     </v-col>
     <v-col xs="12" sm="12" md="6" cols="12">
       <v-text-field
-        label="Nombre contacto de emergencia*"
+        label="Nombre contacto de emergencia"
         required
         v-model="contact_information.emergency_contact_name"
         prepend-inner-icon="mdi-alphabet-latin"
@@ -36,7 +36,7 @@
     </v-col>
     <v-col xs="12" sm="12" md="6" cols="12">
       <v-text-field
-        label="Teléfono*"
+        label="Teléfono"
         required
         v-model="contact_information.emergency_contact_phone"
         prepend-inner-icon="mdi-phone"
@@ -48,7 +48,7 @@
     </v-col>
     <v-col xs="12" sm="12" md="6" cols="12">
       <v-text-field
-        label="Nombre contacto de respaldo*"
+        label="Nombre contacto de respaldo"
         required
         v-model="contact_information.backup_contact_name"
         prepend-inner-icon="mdi-alphabet-latin"
@@ -59,7 +59,7 @@
     </v-col>
     <v-col xs="12" sm="12" md="6" cols="12">
       <v-text-field
-        label="Teléfono*"
+        label="Teléfono"
         required
         v-model="contact_information.backup_contact_phone"
         prepend-inner-icon="mdi-phone"
@@ -85,20 +85,20 @@ export default {
   props: {
     // Use "value" to enable using v-model
     value: Boolean,
+    validation: Boolean,
   },
   mixins: [validationMixin],
   validations: {
     contact_information: {
       email: { required, maxLength: maxLength(255), email },
       phone: { required, maxLength: maxLength(255), numeric },
-      emergency_contact_name: { required, maxLength: maxLength(255) },
+      emergency_contact_name: { maxLength: maxLength(255) },
       emergency_contact_phone: {
-        required,
         maxLength: maxLength(255),
         numeric,
       },
-      backup_contact_name: { required, maxLength: maxLength(255) },
-      backup_contact_phone: { required, maxLength: maxLength(255), numeric },
+      backup_contact_name: { maxLength: maxLength(255) },
+      backup_contact_phone: { maxLength: maxLength(255), numeric },
     },
   },
   computed: {
@@ -129,8 +129,6 @@ export default {
       const errors = [];
       if (!this.$v.contact_information.emergency_contact_phone.$dirty)
         return errors;
-      !this.$v.contact_information.emergency_contact_phone.required &&
-        errors.push("El teléfono es requerido");
       !this.$v.contact_information.emergency_contact_phone.maxLength &&
         errors.push("Longitud no permitida");
       !this.$v.contact_information.emergency_contact_phone.numeric &&
@@ -141,8 +139,6 @@ export default {
       const errors = [];
       if (!this.$v.contact_information.emergency_contact_name.$dirty)
         return errors;
-      !this.$v.contact_information.emergency_contact_name.required &&
-        errors.push("El nombre es requerido");
       !this.$v.contact_information.emergency_contact_name.maxLength &&
         errors.push("Longitud no permitida");
       return errors;
@@ -151,8 +147,6 @@ export default {
       const errors = [];
       if (!this.$v.contact_information.backup_contact_phone.$dirty)
         return errors;
-      !this.$v.contact_information.backup_contact_phone.required &&
-        errors.push("El teléfono es requerido");
       !this.$v.contact_information.backup_contact_phone.maxLength &&
         errors.push("Longitud no permitida");
       !this.$v.contact_information.backup_contact_phone.numeric &&
@@ -163,8 +157,6 @@ export default {
       const errors = [];
       if (!this.$v.contact_information.backup_contact_name.$dirty)
         return errors;
-      !this.$v.contact_information.backup_contact_name.required &&
-        errors.push("El nombre es requerido");
       !this.$v.contact_information.backup_contact_name.maxLength &&
         errors.push("Longitud no permitida");
       return errors;
@@ -177,6 +169,10 @@ export default {
         this.$emit("input", !this.$v.$invalid);
       },
       deep: true,
+    },
+    validation: function () {
+      // Active vue validate to this form.
+      this.$v.$touch();
     },
   },
 };

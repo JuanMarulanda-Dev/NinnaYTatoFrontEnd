@@ -43,11 +43,14 @@
             <template v-slot:activator="{ on, attrs }">
               <v-text-field
                 v-model="vet_information.rabies_vaccine"
-                label="V. Rabia"
+                label="V. Rabia*"
                 prepend-icon="mdi-calendar"
                 readonly
                 v-bind="attrs"
                 v-on="on"
+                :error-messages="rabies_vaccineErrors"
+                @input="$v.vet_information.rabies_vaccine.$touch()"
+                @blur="$v.vet_information.rabies_vaccine.$touch()"
               ></v-text-field>
             </template>
             <v-date-picker
@@ -82,11 +85,14 @@
             <template v-slot:activator="{ on, attrs }">
               <v-text-field
                 v-model="vet_information.pentavalent_vaccine"
-                label="V. Penta"
+                label="V. Penta*"
                 prepend-icon="mdi-calendar"
                 readonly
                 v-bind="attrs"
                 v-on="on"
+                :error-messages="pentavalent_vaccineErrors"
+                @input="$v.vet_information.pentavalent_vaccine.$touch()"
+                @blur="$v.vet_information.pentavalent_vaccine.$touch()"
               ></v-text-field>
             </template>
             <v-date-picker
@@ -121,11 +127,14 @@
             <template v-slot:activator="{ on, attrs }">
               <v-text-field
                 v-model="vet_information.cough_vaccine"
-                label="V. Tos"
+                label="V. Tos*"
                 prepend-icon="mdi-calendar"
                 readonly
                 v-bind="attrs"
                 v-on="on"
+                :error-messages="cough_vaccineErrors"
+                @input="$v.vet_information.cough_vaccine.$touch()"
+                @blur="$v.vet_information.cough_vaccine.$touch()"
               ></v-text-field>
             </template>
             <v-date-picker
@@ -150,9 +159,13 @@
         <v-col xs="12" sm="12" cols="12">
           <!-- Carnet -->
           <v-file-input
+            required
             v-model="vet_information.vaccination_card"
             placeholder="Carnet"
             label="Carnet"
+            :error-messages="vaccination_cardErrors"
+            @input="$v.vet_information.vaccination_card.$touch()"
+            @blur="$v.vet_information.vaccination_card.$touch()"
           ></v-file-input>
         </v-col>
       </v-row>
@@ -215,6 +228,8 @@
 
 <script>
 import { mapState } from "vuex";
+import { validationMixin } from "vuelidate";
+import { required, requiredIf } from "vuelidate/lib/validators";
 
 export default {
   name: "pet-vet-information",
@@ -226,8 +241,70 @@ export default {
       date: new Date().toISOString().substr(0, 10),
     };
   },
+  props: {
+    // Use "value" to enable using v-model
+    value: Boolean,
+    validation: Boolean,
+  },
+  mixins: [validationMixin],
+  validations: {
+    vet_information: {
+      rabies_vaccine: { required },
+      pentavalent_vaccine: { required },
+      cough_vaccine: { required },
+      vaccination_card: {
+        required: requiredIf(function () {
+          return this.vet_information.vaccination_card == null; // New changes
+        }),
+      },
+    },
+  },
   computed: {
-    ...mapState("pets", ["vet_information"]),
+    ...mapState("pets", ["pet", "vet_information"]),
+    rabies_vaccineErrors() {
+      const errors = [];
+      if (!this.$v.vet_information.rabies_vaccine.$dirty) return errors;
+      !this.$v.vet_information.rabies_vaccine.required &&
+        errors.push("La fecha es requerida");
+      return errors;
+    },
+    pentavalent_vaccineErrors() {
+      const errors = [];
+      if (!this.$v.vet_information.pentavalent_vaccine.$dirty) return errors;
+      !this.$v.vet_information.pentavalent_vaccine.required &&
+        errors.push("La fecha es requerida");
+      return errors;
+    },
+    cough_vaccineErrors() {
+      const errors = [];
+      if (!this.$v.vet_information.cough_vaccine.$dirty) return errors;
+      !this.$v.vet_information.cough_vaccine.required &&
+        errors.push("La fecha es requerida");
+      return errors;
+    },
+    vaccination_cardErrors() {
+      const errors = [];
+      // Apply only for customer form when create a new customer.
+      if (this.pet.petId == 0) {
+        if (!this.$v.vet_information.vaccination_card.$dirty) return errors;
+        !this.$v.vet_information.vaccination_card.required &&
+          errors.push("El carnet es requerido");
+      }
+      return errors;
+    },
+  },
+  watch: {
+    vet_information: {
+      handler: function () {
+        // // Correct validations
+        this.$emit("input", !this.$v.$invalid);
+      },
+      deep: true,
+    },
+    validation: function () {
+      // Active vue validate to this form.
+      this.$v.$touch();
+    },
   },
 };
 </script>

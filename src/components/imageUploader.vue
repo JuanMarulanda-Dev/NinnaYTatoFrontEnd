@@ -20,7 +20,7 @@ export default {
   name: "image-input",
   data: () => ({
     uploadFieldName: "file",
-    maxSize: 1024,
+    maxSize: 3024,
   }),
   props: {
     // Use "value" to enable using v-model
@@ -41,7 +41,7 @@ export default {
         } else if (size > 5) {
           // check whether the size is greater than the size limit
           this.$toast.warning(
-            "Tu archivo es demasiado grande! Por favor selecciona una imagen de 1MB o inferior."
+            "Tu archivo es demasiado grande! Por favor selecciona una imagen de 3MB o inferior."
           );
         } else {
           // Append file into FormData and turn file into image URL

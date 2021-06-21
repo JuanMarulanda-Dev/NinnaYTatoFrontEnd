@@ -58,9 +58,19 @@
             <!-- Formulario -->
             <customer-personal-information
               v-model="aviable_personal_information"
+              :validation="approve_personal_information"
             ></customer-personal-information>
             <v-row justify="end">
-              <v-btn color="secondary" @click="step = 2"> Continue </v-btn>
+              <v-btn
+                color="secondary"
+                @click="
+                  aviable_personal_information
+                    ? (step = 2)
+                    : (approve_personal_information = false)
+                "
+              >
+                Continue
+              </v-btn>
             </v-row>
           </v-container>
         </v-stepper-content>
@@ -77,10 +87,20 @@
             <!-- Formulario -->
             <customer-contact-information
               v-model="aviable_contact_information"
+              :validation="approve_contact_information"
             ></customer-contact-information>
             <v-row justify="end">
               <v-btn class="mr-3" @click="step--"> volver </v-btn>
-              <v-btn color="secondary" @click="step++"> Continue </v-btn>
+              <v-btn
+                color="secondary"
+                @click="
+                  aviable_contact_information
+                    ? step++
+                    : (approve_contact_information = false)
+                "
+              >
+                Continue
+              </v-btn>
             </v-row>
           </v-container>
         </v-stepper-content>
@@ -97,10 +117,20 @@
             <!-- Formulario -->
             <customer-additional-information
               v-model="aviable_additional_information"
+              :validation="approve_additional_information"
             ></customer-additional-information>
             <v-row justify="end">
               <v-btn class="mr-3" @click="step--"> volver </v-btn>
-              <v-btn color="secondary" @click="step++"> Continue </v-btn>
+              <v-btn
+                color="secondary"
+                @click="
+                  aviable_additional_information
+                    ? step++
+                    : (approve_additional_information = false)
+                "
+              >
+                Continue
+              </v-btn>
             </v-row>
           </v-container>
         </v-stepper-content>
@@ -117,11 +147,17 @@
             <!-- Formulario -->
             <pet-general-information
               v-model="aviable_pet"
+              :validation="approve_pet"
             ></pet-general-information>
             <!-- back - next -->
             <v-row justify="end">
               <v-btn class="mr-3" @click="step--"> volver </v-btn>
-              <v-btn color="secondary" @click="step++"> Continue </v-btn>
+              <v-btn
+                color="secondary"
+                @click="aviable_pet ? step++ : (approve_pet = false)"
+              >
+                Continue
+              </v-btn>
             </v-row>
           </v-container>
         </v-stepper-content>
@@ -136,11 +172,23 @@
               <v-divider></v-divider>
             </v-row>
             <!-- Formulario -->
-            <pet-vet-information></pet-vet-information>
+            <pet-vet-information
+              v-model="aviable_pet_vet_information"
+              :validation="approve_pet_vet_information"
+            ></pet-vet-information>
             <!-- back - next -->
             <v-row justify="end">
               <v-btn class="mr-3" @click="step--"> volver </v-btn>
-              <v-btn color="secondary" @click="step++"> Continue </v-btn>
+              <v-btn
+                color="secondary"
+                @click="
+                  aviable_pet_vet_information
+                    ? step++
+                    : (approve_pet_vet_information = false)
+                "
+              >
+                Continue
+              </v-btn>
             </v-row>
           </v-container>
         </v-stepper-content>
@@ -157,11 +205,19 @@
             <!-- Formulario -->
             <pet-behavior-information
               v-model="aviable_pet_behavior"
+              :validation="approve_pet_behavior"
             ></pet-behavior-information>
             <!-- back - next -->
             <v-row justify="end">
               <v-btn class="mr-3" @click="step--"> volver </v-btn>
-              <v-btn color="secondary" @click="save()"> Finalizar </v-btn>
+              <v-btn
+                color="secondary"
+                @click="
+                  aviable_pet_behavior ? save() : (approve_pet_behavior = false)
+                "
+              >
+                Finalizar
+              </v-btn>
             </v-row>
           </v-container>
         </v-stepper-content>
@@ -182,11 +238,21 @@ import PetBehaviorInformation from "@/components/customers/pets/PetBehaviorInfor
 export default {
   data() {
     return {
-      step: 1,
+      step: 6,
+      validation: false,
+      // Approve Validations
+      approve_personal_information: true,
+      approve_contact_information: true,
+      approve_additional_information: true,
+      approve_pet: true,
+      approve_pet_vet_information: true,
+      approve_pet_behavior: true,
+      // Disponibilidad
       aviable_personal_information: false,
       aviable_contact_information: false,
       aviable_additional_information: false,
       aviable_pet: false,
+      aviable_pet_vet_information: false,
       aviable_pet_behavior: false,
     };
   },
@@ -204,7 +270,7 @@ export default {
       if (
         this.aviable_personal_information &&
         this.aviable_contact_information &&
-        this.aviable_additional_information &&
+        this.aviable_pet_vet_information &&
         this.aviable_pet &&
         this.aviable_pet_behavior
       ) {

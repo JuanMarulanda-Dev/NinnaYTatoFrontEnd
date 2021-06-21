@@ -134,7 +134,9 @@
                   <!-- Esterilización -->
                   <v-col xs="12" sm="4" md="4" cols="12">
                     <small>Esterilización </small><br />
-                    <label> {{ pet.pet_sterilized ? "SI" : "No" }} </label>
+                    <label>
+                      {{ pet.pet_sterilized == "1" ? "SI" : "No" }}
+                    </label>
                   </v-col>
                   <!-- ¿Monta? -->
                   <v-col xs="12" sm="4" md="4" cols="12">

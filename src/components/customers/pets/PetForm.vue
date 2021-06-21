@@ -52,7 +52,9 @@
         <v-tab-item>
           <v-card>
             <v-container class="pa-7">
-              <pet-vet-information></pet-vet-information>
+              <pet-vet-information
+                v-model="aviable_pet_vet_information"
+              ></pet-vet-information>
             </v-container>
           </v-card>
         </v-tab-item>
@@ -85,6 +87,7 @@ export default {
       petId: null,
       aviable_pet: false,
       aviable_pet_behavior: false,
+      aviable_pet_vet_information: false,
     };
   },
   computed: {
@@ -128,6 +131,7 @@ export default {
     if (this.petId != null) {
       this.aviable_pet = true;
       this.aviable_pet_behavior = true;
+      this.aviable_pet_vet_information = true;
     } else {
       this.SET_PET_DEFAULT();
     }

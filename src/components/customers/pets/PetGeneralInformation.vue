@@ -59,10 +59,13 @@
           </v-row>
         </v-col>
         <!-- Esterilización -->
-        <v-switch
-          v-model="pet.pet_sterilized"
-          label="Esterilización*"
-        ></v-switch>
+        <div class="text-center">
+          <label>Esterilización</label>
+          <v-radio-group row v-model="pet.pet_sterilized">
+            <v-radio color="secondary" label="No" value="0"></v-radio>
+            <v-radio color="secondary" label="Si" value="1"></v-radio>
+          </v-radio-group>
+        </div>
       </v-row>
     </v-col>
     <v-col xs="12" sm="12" md="9" cols="12">
@@ -219,6 +222,7 @@ export default {
   props: {
     // Use "value" to enable using v-model
     value: Boolean,
+    validation: Boolean,
   },
   mixins: [validationMixin],
   validations: {
@@ -341,6 +345,10 @@ export default {
         this.$emit("input", !this.$v.$invalid);
       },
       deep: true,
+    },
+    validation: function () {
+      // Active vue validate to this form.
+      this.$v.$touch();
     },
   },
   components: {
