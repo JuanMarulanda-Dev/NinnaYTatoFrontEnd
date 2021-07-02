@@ -63,19 +63,20 @@
                       v-model="editedItem.price"
                       label="Valor Unidad*"
                       :options="currencyOptions"
-                      :error-messages="priceErrors"
                     />
                   </v-col>
                   <v-col cols="12" sm="6" md="6">
-                    <v-text-field
-                      v-model="editedItem.supplier"
-                      label="Ref.Proveedor"
-                      prepend-inner-icon="mdi-format-letter-matches"
-                      counter="255"
+                    <v-select
+                      :items="suppliers"
+                      item-text="name"
+                      item-value="id"
+                      label="Proveedor"
+                      v-model="editedItem.supplier_id"
+                      append-icon="mdi-account-tie"
                       :error-messages="supplierErrors"
-                      @input="$v.editedItem.supplier.$touch()"
-                      @blur="$v.editedItem.supplier.$touch()"
-                    ></v-text-field>
+                      @input="$v.editedItem.supplier_id.$touch()"
+                      @blur="$v.editedItem.supplier_id.$touch()"
+                    ></v-select>
                   </v-col>
                 </v-row>
               </v-container>
@@ -84,7 +85,7 @@
             <v-card-actions>
               <v-spacer></v-spacer>
               <v-btn color="error darken-1" text @click="close">Cancel</v-btn>
-              <v-btn color="blue darken-1" text @click="save">Guardar</v-btn>
+              <v-btn color="blue darken-1" text @click="save()">Guardar</v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
@@ -127,7 +128,7 @@
 
 <script>
 import { validationMixin } from "vuelidate";
-import { required, maxLength, numeric } from "vuelidate/lib/validators";
+import { required, maxLength } from "vuelidate/lib/validators";
 import { mapState, mapActions, mapMutations } from "vuex";
 import VuetifyMoney from "@/components/vuetifyMoney.vue";
 
@@ -142,7 +143,7 @@ export default {
         value: "name",
       },
       { text: "Valor Unidad", value: "price" },
-      { text: "Cantidad", value: "stok" },
+      { text: "Cantidad", value: "stock" },
       { text: "Estado", value: "state" },
       { text: "Creado", value: "created_at" },
       { text: "Eliminado", value: "deleted_at" },
@@ -154,8 +155,7 @@ export default {
   validations: {
     editedItem: {
       name: { required, maxLength: maxLength(255) },
-      supplier: { maxLength: maxLength(255) },
-      price: { required, numeric, maxLength: maxLength(255) },
+      supplier_id: { required },
     },
   },
   components: {
@@ -169,6 +169,7 @@ export default {
       "editedItem",
       "defaultItem",
     ]),
+    ...mapState("suppliers", ["suppliers"]),
     formTitle() {
       return this.editedIndex === -1 ? "Nueva Producto" : "Editar Producto";
     },
@@ -183,9 +184,9 @@ export default {
     },
     supplierErrors() {
       const errors = [];
-      if (!this.$v.editedItem.supplier.$dirty) return errors;
-      !this.$v.editedItem.supplier.maxLength &&
-        errors.push("Longitud no permitida");
+      if (!this.$v.editedItem.supplier_id.$dirty) return errors;
+      !this.$v.editedItem.supplier_id.required &&
+        errors.push("El proveedor es requerido");
       return errors;
     },
   },
@@ -200,6 +201,9 @@ export default {
   created() {
     // Obtener los permisos
     this.permissions = this.$route.meta.permissions;
+
+    this.getAllSuppliers();
+
     // Acciones que debe realizar el componente una vez creado
     if (this.permissions.read) {
       this.initialize();
@@ -213,6 +217,7 @@ export default {
       "updateProduct",
       "changeStatusProduct",
     ]),
+    ...mapActions("suppliers", ["getAllSuppliers"]),
     ...mapMutations("products", ["SET_EDIT_ITEM"]),
     initialize() {
       this.getAllProducts();
@@ -244,6 +249,7 @@ export default {
     },
 
     editItem(item) {
+      console.log(item);
       this.editedIndex = this.products.indexOf(item);
       this.SET_EDIT_ITEM(Object.assign({}, item));
       // this.editedItem = ;

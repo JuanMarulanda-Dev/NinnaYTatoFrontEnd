@@ -12,16 +12,16 @@ export default {
       id: 0,
       name: "",
       price: "",
-      stok: "",
-      supplier: "",
+      stock: "",
+      supplier_id: "",
       state: false,
     },
     defaultItem: {
       id: 0,
       name: "",
       price: "",
-      stok: "",
-      supplier: "",
+      stock: "",
+      supplier_id: "",
       state: true,
     },
   },
@@ -41,7 +41,7 @@ export default {
       try {
         // Activar el loading del datatable
         commit("SET_LOADING_DATATABLE", true);
-        let result = await axios.get("/api/branch-offices");
+        let result = await axios.get("/api/products");
         commit("SET_PRODUCTS", result.data.products);
       } catch (error) {
         console.log(error);
@@ -53,11 +53,11 @@ export default {
     async storeProduct({ state, commit, dispatch }) {
       try {
         commit("SET_OVERLAY_LOADING", true, { root: true });
-        let result = await axios.post("/api/branch-offices", state.editedItem);
+        let result = await axios.post("/api/products", state.editedItem);
         if (result.status == 201) {
           // show message
           this._vm.$toast.success("Producto creado exitosamente");
-          // Reload branch officess
+          // Reload products
           dispatch("getAllProducts");
         }
       } catch (error) {
@@ -71,13 +71,13 @@ export default {
       try {
         commit("SET_OVERLAY_LOADING", true, { root: true });
         let result = await axios.put(
-          `/api/branch-offices/${state.editedItem.id}`,
+          `/api/products/${state.editedItem.id}`,
           state.editedItem
         );
         if (result.status == 201) {
           // show message
           this._vm.$toast.success("Producto actualizado exitosamente");
-          // Reload branch officess
+          // Reload products
           dispatch("getAllProducts");
         }
       } catch (error) {
@@ -90,11 +90,11 @@ export default {
     async changeStatusProduct({ commit, dispatch }, id) {
       try {
         commit("SET_OVERLAY_LOADING", true, { root: true });
-        let result = await axios.delete(`/api/branch-offices/${id}`);
+        let result = await axios.delete(`/api/products/${id}`);
         if (result.status == 204) {
           // show message
           this._vm.$toast.success("Estado cambiado exitosamente");
-          // Reload branch officess
+          // Reload products
           dispatch("getAllProducts");
           return true;
         } else {
