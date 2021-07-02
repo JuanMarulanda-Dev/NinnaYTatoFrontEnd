@@ -104,6 +104,15 @@ const routes = [
       },
     ],
   },
+  {
+    path: "/productos",
+    name: "Productos",
+    component: () =>
+      import(/* webpackChunkName: "Products" */ "@/views/Products.vue"),
+    meta: {
+      permissions: {},
+    },
+  },
 ];
 
 const router = new VueRouter({
