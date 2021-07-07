@@ -16,7 +16,7 @@ export default {
       name: "",
       price: "",
       equivalence: 0,
-      plan_type_id: "",
+      type_id: "",
       state: false,
     },
     defaultItem: {
@@ -24,7 +24,7 @@ export default {
       name: "",
       price: "",
       equivalence: 0,
-      plan_type_id: "",
+      type_id: "",
       state: false,
     },
   },

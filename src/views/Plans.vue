@@ -131,6 +131,9 @@
       @resetIndex="editedIndex = -1"
       :editedIndex="editedIndex"
     ></plans-details-form>
+
+    <!-- Modal Discounts form -->
+    <discounts-form></discounts-form>
   </div>
 </template>
 
@@ -140,6 +143,7 @@ import { required, maxLength } from "vuelidate/lib/validators";
 import { mapState, mapActions, mapMutations } from "vuex";
 import PlansForm from "@/components/plans/PlansForm.vue";
 import PlansDetailsForm from "@/components/plans/PlansDetailsForm.vue";
+import DiscountsForm from "@/components/plans/DiscountsForm.vue";
 
 export default {
   data: () => ({
@@ -225,6 +229,7 @@ export default {
       "SET_DIALOG_PLANS_DETAILS",
       "SET_EDIT_ITEM",
     ]),
+    ...mapMutations("discounts", ["SET_DIALOG_DISCOUNT"]),
     ...mapMutations("plans", ["SET_DIALOG_PLANS", "SET_PERMISSIONS"]),
     initialize() {
       this.getAllProducts();
@@ -237,12 +242,14 @@ export default {
     },
 
     showDiscountModule(item) {
+      this.SET_DIALOG_DISCOUNT(true);
       console.log(item);
     },
   },
   components: {
     PlansForm,
     PlansDetailsForm,
+    DiscountsForm,
   },
 };
 </script>

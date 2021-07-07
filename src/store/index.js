@@ -12,6 +12,7 @@ import products from "@/modules/products.js";
 import suppliers from "@/modules/suppliers.js";
 import plans from "@/modules/plans.js";
 import plans_details from "@/modules/plans_details.js";
+import discounts from "@/modules/discounts.js";
 
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL = process.env.VUE_APP_API_URL;
@@ -178,5 +179,6 @@ export default new Vuex.Store({
     suppliers,
     plans,
     plans_details,
+    discounts,
   },
 });

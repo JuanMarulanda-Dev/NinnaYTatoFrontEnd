@@ -102,14 +102,14 @@
                           </v-col>
                           <v-col cols="12" sm="6" md="6">
                             <v-select
-                              v-model="editedItem.plan_type_id"
+                              v-model="editedItem.type_id"
                               item-text="name"
                               item-value="id"
                               label="Tipo de plan"
                               append-icon="mdi-format-list-bulleted-type"
-                              :error-messages="planTypeErrors"
-                              @input="$v.editedItem.plan_type_id.$touch()"
-                              @blur="$v.editedItem.plan_type_id.$touch()"
+                              :error-messages="typeErrors"
+                              @input="$v.editedItem.type_id.$touch()"
+                              @blur="$v.editedItem.type_id.$touch()"
                             ></v-select>
                           </v-col>
                         </v-row>
@@ -199,7 +199,7 @@ export default {
     editedItem: {
       name: { required, maxLength: maxLength(255) },
       equivalence: { required, maxLength: maxLength(255), numeric },
-      plan_type_id: { required },
+      type_id: { required },
     },
   },
   computed: {
@@ -225,10 +225,10 @@ export default {
         errors.push("Longitud no permitida");
       return errors;
     },
-    planTypeErrors() {
+    typeErrors() {
       const errors = [];
-      if (!this.$v.editedItem.plan_type_id.$dirty) return errors;
-      !this.$v.editedItem.plan_type_id.required &&
+      if (!this.$v.editedItem.type_id.$dirty) return errors;
+      !this.$v.editedItem.type_id.required &&
         errors.push("El tipo es requerido");
       return errors;
     },
