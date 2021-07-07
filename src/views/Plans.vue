@@ -1,0 +1,248 @@
+<template>
+  <div>
+    <v-data-table
+      fixed-header
+      :headers="headers"
+      :items="products"
+      sort-by="name"
+      class="elevation-3"
+      :search="search"
+      :loading="loading"
+      :loading-text="loadingText"
+    >
+      <!-- Header content datatable -->
+      <template v-slot:top>
+        <v-toolbar flat color="white" class="rounded-xl">
+          <!-- Title Module -->
+          <v-toolbar-title>
+            <v-icon large>mdi-note-outline</v-icon> Planes y Servicios
+          </v-toolbar-title>
+          <v-divider class="mx-4" inset vertical></v-divider>
+          <v-spacer></v-spacer>
+          <!-- Search Field -->
+          <v-text-field
+            v-model="search"
+            append-icon="mdi-magnify"
+            label="Buscar"
+            single-line
+            hide-details
+          ></v-text-field>
+
+          <!-- Modal New/edit Plans details-->
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                fab
+                small
+                color="secondary"
+                elevation="3"
+                dark
+                v-bind="attrs"
+                v-on="on"
+                @click="SET_DIALOG_PLANS(true)"
+                class="mr-1 ml-3"
+                v-show="permissions.create"
+              >
+                <v-icon>mdi-alpha-p-circle-outline</v-icon>
+              </v-btn>
+            </template>
+            <span>Planes</span>
+          </v-tooltip>
+
+          <!-- Modal New/edit Plans-->
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                fab
+                small
+                color="secondary"
+                elevation="3"
+                dark
+                v-bind="attrs"
+                v-on="on"
+                @click="SET_DIALOG_PLANS_DETAILS(true)"
+                class="mr-1"
+                v-show="permissions.create"
+              >
+                <v-icon>mdi-alpha-d-circle-outline</v-icon>
+              </v-btn>
+            </template>
+            <span>Detalle de Planes</span>
+          </v-tooltip>
+        </v-toolbar>
+      </template>
+
+      <!-- State -->
+      <template v-slot:[`item.state`]="{ item }">
+        <v-switch
+          :input-value="item.state"
+          v-model="item.state"
+          @change="changeStateProduct(item)"
+          v-show="permissions.delete"
+        ></v-switch>
+      </template>
+
+      <!-- Actions -->
+      <template v-slot:[`item.actions`]="{ item }">
+        <!-- Descuentos -->
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              fab
+              x-small
+              dark
+              color="orange accent-2 mr-1"
+              v-bind="attrs"
+              v-on="on"
+              @click="showDiscountModule(item)"
+              v-show="permissions.update"
+            >
+              <v-icon> mdi-sale </v-icon>
+            </v-btn>
+          </template>
+          <span>Descuentos</span>
+        </v-tooltip>
+        <!-- Editar -->
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              fab
+              x-small
+              dark
+              color="secondary mr-1"
+              v-bind="attrs"
+              v-on="on"
+              @click="editItem(item)"
+              v-show="permissions.update"
+            >
+              <v-icon> {{ editIcon }} </v-icon>
+            </v-btn>
+          </template>
+          <span>Editar</span>
+        </v-tooltip>
+      </template>
+    </v-data-table>
+
+    <!-- Modal New/edit Plans form-->
+    <plans-form></plans-form>
+
+    <!-- Modal New/edit Plans details form-->
+    <plans-details-form
+      @resetIndex="editedIndex = -1"
+      :editedIndex="editedIndex"
+    ></plans-details-form>
+  </div>
+</template>
+
+<script>
+import { validationMixin } from "vuelidate";
+import { required, maxLength } from "vuelidate/lib/validators";
+import { mapState, mapActions, mapMutations } from "vuex";
+import PlansForm from "@/components/plans/PlansForm.vue";
+import PlansDetailsForm from "@/components/plans/PlansDetailsForm.vue";
+
+export default {
+  data: () => ({
+    search: "",
+    headers: [
+      {
+        text: "ID",
+        align: "start",
+        value: "id",
+      },
+      { text: "Nombre", value: "name" },
+      { text: "Cantidad", value: "quantity" },
+      { text: "Descuento", value: "descount" },
+      { text: "Valor", value: "price" },
+      { text: "Vigencia", value: "validity" },
+      { text: "Estado", value: "state" },
+      { text: "Acciones", value: "actions", sortable: false },
+    ],
+    editedIndex: -1,
+  }),
+  mixins: [validationMixin],
+  validations: {
+    editedItem: {
+      name: { required, maxLength: maxLength(255) },
+      supplier_id: { required },
+    },
+  },
+  computed: {
+    ...mapState("plans", ["dialogPlans", "permissions"]),
+    ...mapState(["editIcon", "loadingText"]),
+    ...mapState("products", ["products"]),
+    ...mapState("plans_details", [
+      "plans_details",
+      "loading",
+      "editedItem",
+      "defaultItem",
+      "dialogPlansDetails",
+    ]),
+
+    nameErrors() {
+      const errors = [];
+      if (!this.$v.editedItem.name.$dirty) return errors;
+      !this.$v.editedItem.name.required &&
+        errors.push("El nombre es requerido");
+      !this.$v.editedItem.name.maxLength &&
+        errors.push("Longitud no permitida");
+      return errors;
+    },
+    supplierErrors() {
+      const errors = [];
+      if (!this.$v.editedItem.supplier_id.$dirty) return errors;
+      !this.$v.editedItem.supplier_id.required &&
+        errors.push("El proveedor es requerido");
+      return errors;
+    },
+  },
+
+  watch: {
+    dialog(val) {
+      val || this.close();
+      this.$v.$reset();
+    },
+  },
+
+  created() {
+    // Obtener los permisos
+    this.SET_PERMISSIONS(this.$route.meta.permissions);
+
+    // Acciones que debe realizar el componente una vez creado
+    if (this.permissions.read) {
+      this.initialize();
+    }
+  },
+
+  methods: {
+    ...mapActions("products", [
+      "getAllProducts",
+      "storeProduct",
+      "updateProduct",
+      "changeStatusProduct",
+    ]),
+    ...mapMutations("plans_details", [
+      "SET_DIALOG_PLANS_DETAILS",
+      "SET_EDIT_ITEM",
+    ]),
+    ...mapMutations("plans", ["SET_DIALOG_PLANS", "SET_PERMISSIONS"]),
+    initialize() {
+      this.getAllProducts();
+    },
+
+    editItem(item) {
+      this.editedIndex = this.products.indexOf(item);
+      this.SET_EDIT_ITEM(Object.assign({}, item));
+      this.SET_DIALOG_PLANS_DETAILS(true);
+    },
+
+    showDiscountModule(item) {
+      console.log(item);
+    },
+  },
+  components: {
+    PlansForm,
+    PlansDetailsForm,
+  },
+};
+</script>

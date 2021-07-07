@@ -10,6 +10,8 @@ import customers from "@/modules/customers.js";
 import pets from "@/modules/pets.js";
 import products from "@/modules/products.js";
 import suppliers from "@/modules/suppliers.js";
+import plans from "@/modules/plans.js";
+import plans_details from "@/modules/plans_details.js";
 
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL = process.env.VUE_APP_API_URL;
@@ -174,5 +176,7 @@ export default new Vuex.Store({
     pets,
     products,
     suppliers,
+    plans,
+    plans_details,
   },
 });

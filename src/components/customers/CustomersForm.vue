@@ -238,7 +238,7 @@ import PetBehaviorInformation from "@/components/customers/pets/PetBehaviorInfor
 export default {
   data() {
     return {
-      step: 6,
+      step: 1,
       validation: false,
       // Approve Validations
       approve_personal_information: true,

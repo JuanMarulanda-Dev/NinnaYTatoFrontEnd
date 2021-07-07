@@ -249,7 +249,6 @@ export default {
     },
 
     editItem(item) {
-      console.log(item);
       this.editedIndex = this.products.indexOf(item);
       this.SET_EDIT_ITEM(Object.assign({}, item));
       // this.editedItem = ;
