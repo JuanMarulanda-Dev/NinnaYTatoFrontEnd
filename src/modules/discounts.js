@@ -7,21 +7,24 @@ export default {
   state: {
     // Generals loading datatables
     loading: false,
-    discounts: [],
+    discounts: [
+      {
+        quantity: 4,
+        discount: 50,
+      },
+      {
+        quantity: 4,
+        discount: 50,
+      },
+    ],
     dialogDiscount: false,
     editedItem: {
-      name: "",
-      price: "",
-      stock: "",
-      supplier_id: "",
-      state: false,
+      quantity: null,
+      discount: null,
     },
     defaultItem: {
-      name: "",
-      price: "",
-      stock: "",
-      supplier_id: "",
-      state: true,
+      quantity: null,
+      discount: null,
     },
   },
   mutations: {
@@ -36,6 +39,12 @@ export default {
     },
     SET_DIALOG_DISCOUNT(state, dialogDiscount) {
       state.dialogDiscount = dialogDiscount;
+    },
+    PUSH_NEW_DESCOUNT(state, objectDiscount) {
+      state.discounts.push(objectDiscount);
+    },
+    DELETE_DESCOUNT(state, index) {
+      state.discounts.splice(index, 1);
     },
   },
   actions: {

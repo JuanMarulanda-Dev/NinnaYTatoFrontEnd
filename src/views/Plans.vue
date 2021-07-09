@@ -3,7 +3,7 @@
     <v-data-table
       fixed-header
       :headers="headers"
-      :items="products"
+      :items="plans_details"
       sort-by="name"
       class="elevation-3"
       :search="search"
@@ -94,7 +94,7 @@
               color="orange accent-2 mr-1"
               v-bind="attrs"
               v-on="on"
-              @click="showDiscountModule(item)"
+              @click="showDiscountModule(item.id)"
               v-show="permissions.update"
             >
               <v-icon> mdi-sale </v-icon>
@@ -174,7 +174,6 @@ export default {
   computed: {
     ...mapState("plans", ["dialogPlans", "permissions"]),
     ...mapState(["editIcon", "loadingText"]),
-    ...mapState("products", ["products"]),
     ...mapState("plans_details", [
       "plans_details",
       "loading",
@@ -219,8 +218,8 @@ export default {
   },
 
   methods: {
-    ...mapActions("products", [
-      "getAllProducts",
+    ...mapActions("plans_details", [
+      "getAllPlansDetails",
       "storeProduct",
       "updateProduct",
       "changeStatusProduct",
@@ -232,18 +231,19 @@ export default {
     ...mapMutations("discounts", ["SET_DIALOG_DISCOUNT"]),
     ...mapMutations("plans", ["SET_DIALOG_PLANS", "SET_PERMISSIONS"]),
     initialize() {
-      this.getAllProducts();
+      this.getAllPlansDetails();
     },
 
     editItem(item) {
-      this.editedIndex = this.products.indexOf(item);
+      this.editedIndex = this.plans_details.indexOf(item);
       this.SET_EDIT_ITEM(Object.assign({}, item));
       this.SET_DIALOG_PLANS_DETAILS(true);
     },
 
-    showDiscountModule(item) {
+    showDiscountModule(id) {
       this.SET_DIALOG_DISCOUNT(true);
-      console.log(item);
+      // Consultar el descuento antes de editarlo
+      console.log(id);
     },
   },
   components: {

@@ -41,7 +41,7 @@ export default {
     },
   },
   actions: {
-    async getAllProducts({ commit }) {
+    async getAllPlansDetails({ commit }) {
       try {
         // Activar el loading del datatable
         commit("SET_LOADING_DATATABLE", true);

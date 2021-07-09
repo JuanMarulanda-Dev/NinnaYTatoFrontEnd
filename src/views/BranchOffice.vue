@@ -270,9 +270,8 @@ export default {
 
     rollbackStateBranchOffice(item) {
       let branchOfficeIndex = this.sucursales.indexOf(item);
-      this.sucursales[branchOfficeIndex].state = !this.sucursales[
-        branchOfficeIndex
-      ].state;
+      this.sucursales[branchOfficeIndex].state =
+        !this.sucursales[branchOfficeIndex].state;
     },
 
     editItem(item) {
@@ -287,7 +286,6 @@ export default {
       // Ir a monstrar los detalles de esta sucursal (Caja, stocks, trabajadores, clientes registrados en esa sucursal, mascotas en esa sucursal, sus habitaciones, etc)
       this.editedIndex = this.sucursales.indexOf(item);
       // let itemObject = Object.assign({}, item); // Convertir a un objeto json
-      console.log(item);
     },
 
     close() {

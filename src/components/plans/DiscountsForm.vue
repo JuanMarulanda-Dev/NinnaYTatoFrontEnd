@@ -18,16 +18,26 @@
           <v-row>
             <v-col cols="12" sm="6" md="5">
               <v-text-field
+                v-model="editedItem.quantity"
                 label="Cantidad*"
                 type="number"
                 min="0"
                 required
+                :error-messages="quantityErrors"
+                @input="$v.editedItem.quantity.$touch()"
+                @blur="$v.editedItem.quantity.$touch()"
               ></v-text-field>
             </v-col>
             <v-col cols="12" sm="6" md="5">
               <v-text-field
+                v-model="editedItem.discount"
                 label="Descuento x Defecto*"
+                type="number"
+                min="0"
                 required
+                :error-messages="discountErrors"
+                @input="$v.editedItem.discount.$touch()"
+                @blur="$v.editedItem.discount.$touch()"
               ></v-text-field>
             </v-col>
             <v-col
@@ -45,11 +55,12 @@
                     color="secondary"
                     v-bind="attrs"
                     v-on="on"
+                    @click="addDiscont()"
                   >
                     <v-icon> mdi-check-bold </v-icon>
                   </v-btn>
                 </template>
-                <span>Guardar descuento</span>
+                <span>Agregar descuento</span>
               </v-tooltip>
             </v-col>
           </v-row>
@@ -70,7 +81,7 @@
 
                 <!-- Actions -->
                 <template v-slot:[`item.actions`]="{ item }">
-                  <!-- Editar -->
+                  <!-- update -->
                   <v-tooltip bottom>
                     <template v-slot:activator="{ on, attrs }">
                       <v-btn
@@ -88,7 +99,7 @@
                     <span>Editar</span>
                   </v-tooltip>
 
-                  <!-- Detalles sucursal -->
+                  <!-- delete -->
                   <v-tooltip bottom>
                     <template v-slot:activator="{ on, attrs }">
                       <v-btn
@@ -98,6 +109,7 @@
                         color="error"
                         v-bind="attrs"
                         v-on="on"
+                        @click="deleteItem()"
                       >
                         <v-icon> {{ deleteIcon }} </v-icon>
                       </v-btn>
@@ -121,12 +133,22 @@
 </template>
 
 <script>
+import { validationMixin } from "vuelidate";
+import { required } from "vuelidate/lib/validators";
 import { mapState, mapMutations } from "vuex";
+// Validation rule
+function onlyQuantity(value) {
+  let globalIndex = this.editedIndex;
+  return !this.discounts.find(
+    (item, index) => item.quantity == value && globalIndex != index
+  );
+}
 
 export default {
   name: "discounts-form",
   data() {
     return {
+      editedIndex: -1,
       headers: [
         {
           text: "Cantidad",
@@ -136,31 +158,99 @@ export default {
         { text: "Descuento %", align: "center", value: "discount" },
         { text: "Acciones", align: "center", value: "actions" },
       ],
-      discounts: [
-        {
-          quantity: 4,
-          discount: 50,
-        },
-        {
-          quantity: 4,
-          discount: 50,
-        },
-      ],
     };
+  },
+  mixins: [validationMixin],
+  validations: {
+    editedItem: {
+      quantity: { required, onlyQuantity },
+      discount: { required },
+    },
   },
   computed: {
     ...mapState(["editIcon", "deleteIcon"]),
-    ...mapState("discounts", ["dialogDiscount", "discounts"]),
+    ...mapState("discounts", [
+      "dialogDiscount",
+      "discounts",
+      "editedItem",
+      "defaultItem",
+    ]),
+    quantityErrors() {
+      const errors = [];
+      if (!this.$v.editedItem.quantity.$dirty) return errors;
+      !this.$v.editedItem.quantity.required &&
+        errors.push("La cantidad es requerido");
+      !this.$v.editedItem.quantity.onlyQuantity &&
+        errors.push("Esta cantidad ya existe");
+      return errors;
+    },
+    discountErrors() {
+      const errors = [];
+      if (!this.$v.editedItem.discount.$dirty) return errors;
+      !this.$v.editedItem.discount.required &&
+        errors.push("El descuento es requerido");
+      return errors;
+    },
   },
+
   created() {},
   methods: {
-    ...mapMutations("discounts", ["SET_DIALOG_DISCOUNT"]),
+    ...mapMutations("discounts", [
+      "SET_DIALOG_DISCOUNT",
+      "SET_EDIT_ITEM",
+      "PUSH_NEW_DESCOUNT",
+      "DELETE_DESCOUNT",
+    ]),
+
+    addDiscont() {
+      // Active vuelidate rules to fields
+      this.$v.$touch();
+      // All validation are valid?
+      if (!this.$v.$invalid) {
+        if (this.editedIndex > -1) {
+          // Updated quantity descount
+          Object.assign(this.discounts[this.editedIndex], this.editedItem);
+          // Reset index
+          this.editedIndex = -1;
+        } else {
+          // Add new quantity descount
+          this.PUSH_NEW_DESCOUNT(this.editedItem);
+        }
+        // Reset edititem by default
+        this.SET_EDIT_ITEM(Object.assign({}, this.defaultItem));
+        // Reset vuelidate rules
+        this.$v.$reset();
+      }
+    },
+
+    editItem(item) {
+      this.editedIndex = this.discounts.indexOf(item);
+      this.SET_EDIT_ITEM(Object.assign({}, item));
+    },
+
+    deleteItem(item) {
+      this.editedIndex = this.discounts.indexOf(item);
+      this.SET_EDIT_ITEM(Object.assign({}, item));
+      // Confirmation to change de status
+      this.$confirm("¿Seguro quieres eliminar este descuento?", {
+        title: "Advertencia",
+      }).then((res) => {
+        if (res) {
+          // Delete descount
+          this.DELETE_DESCOUNT(this.editedIndex);
+        }
+      });
+    },
 
     close() {
+      // Close dialog
       this.SET_DIALOG_DISCOUNT(false);
-      // this.$nextTick(() => {
-      //   this.SET_EDIT_ITEM(Object.assign({}, this.defaultItem));
-      // });
+      // Reset vuelidate rules
+      this.$v.$reset();
+      // Reset edititem by default
+      this.$nextTick(() => {
+        this.SET_EDIT_ITEM(Object.assign({}, this.defaultItem));
+      });
     },
 
     save() {
