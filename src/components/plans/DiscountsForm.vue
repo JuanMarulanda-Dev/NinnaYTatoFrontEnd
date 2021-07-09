@@ -135,7 +135,7 @@
 <script>
 import { validationMixin } from "vuelidate";
 import { required } from "vuelidate/lib/validators";
-import { mapState, mapMutations } from "vuex";
+import { mapState, mapMutations, mapActions } from "vuex";
 // Validation rule
 function onlyQuantity(value) {
   let globalIndex = this.editedIndex;
@@ -193,13 +193,13 @@ export default {
     },
   },
 
-  created() {},
   methods: {
+    ...mapActions("discounts", ["storeDiscountToPlanDetail"]),
     ...mapMutations("discounts", [
       "SET_DIALOG_DISCOUNT",
       "SET_EDIT_ITEM",
-      "PUSH_NEW_DESCOUNT",
-      "DELETE_DESCOUNT",
+      "PUSH_NEW_DISCOUNT",
+      "DELETE_DISCOUNT",
     ]),
 
     addDiscont() {
@@ -208,13 +208,13 @@ export default {
       // All validation are valid?
       if (!this.$v.$invalid) {
         if (this.editedIndex > -1) {
-          // Updated quantity descount
+          // Updated quantity discount
           Object.assign(this.discounts[this.editedIndex], this.editedItem);
           // Reset index
           this.editedIndex = -1;
         } else {
-          // Add new quantity descount
-          this.PUSH_NEW_DESCOUNT(this.editedItem);
+          // Add new quantity discount
+          this.PUSH_NEW_DISCOUNT(this.editedItem);
         }
         // Reset edititem by default
         this.SET_EDIT_ITEM(Object.assign({}, this.defaultItem));
@@ -236,8 +236,8 @@ export default {
         title: "Advertencia",
       }).then((res) => {
         if (res) {
-          // Delete descount
-          this.DELETE_DESCOUNT(this.editedIndex);
+          // Delete discount
+          this.DELETE_DISCOUNT(this.editedIndex);
         }
       });
     },
@@ -254,20 +254,11 @@ export default {
     },
 
     save() {
-      // activate validations form
-      // this.$v.$touch();
-      // // Correct validations
-      // if (!this.$v.$invalid) {
-      //   if (this.editedIndex > -1) {
-      //     // Do update
-      //     this.updateProduct();
-      //   } else {
-      //     // Do store
-      //     this.storeProduct();
-      //   }
-      //   // Close modal
-      this.close();
-      // }
+      this.storeDiscountToPlanDetail().then((result) => {
+        if (result) {
+          this.close();
+        }
+      });
     },
   },
 };

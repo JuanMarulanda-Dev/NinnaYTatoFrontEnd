@@ -49,11 +49,11 @@ export default {
     },
   },
   actions: {
-    async getAllPlans({ commit }) {
+    async getAllPlans({ commit }, status = 0) {
       try {
         // Activar el loading del datatable
         commit("SET_LOADING_DATATABLE", true);
-        let result = await axios.get("/api/plans");
+        let result = await axios.get(`/api/plans/${status}`);
         commit("SET_PLANS", result.data.plans);
       } catch (error) {
         this._vm.$toast.error("Ocurrio un error");
@@ -64,8 +64,8 @@ export default {
 
     async getAllPlansType({ commit }) {
       try {
-        let result = await axios.get("/api/plans");
-        commit("SET_TYPES", result.data.types);
+        let result = await axios.get("/api/plan-types");
+        commit("SET_TYPES", result.data.planTypes);
       } catch (error) {
         console.log(error);
       }
@@ -77,7 +77,7 @@ export default {
         let result = await axios.post("/api/plans", state.editedItem);
         if (result.status == 201) {
           // show message
-          this._vm.$toast.success("Producto creado exitosamente");
+          this._vm.$toast.success("Plan creado exitosamente");
           // Reload plans
           dispatch("getAllPlans");
         }
@@ -97,7 +97,7 @@ export default {
         );
         if (result.status == 201) {
           // show message
-          this._vm.$toast.success("Producto actualizado exitosamente");
+          this._vm.$toast.success("Plan actualizado exitosamente");
           // Reload plans
           dispatch("getAllPlans");
         }
@@ -108,25 +108,25 @@ export default {
       }
     },
 
-    // async changeStatusProduct({ commit, dispatch }, id) {
-    //   try {
-    //     commit("SET_OVERLAY_LOADING", true, { root: true });
-    //     let result = await axios.delete(`/api/products/${id}`);
-    //     if (result.status == 204) {
-    //       // show message
-    //       this._vm.$toast.success("Estado cambiado exitosamente");
-    //       // Reload products
-    //       dispatch("getAllPlans");
-    //       return true;
-    //     } else {
-    //       return false;
-    //     }
-    //   } catch (error) {
-    //     this._vm.$toast.error("Ocurrio un error");
-    //     return false;
-    //   } finally {
-    //     commit("SET_OVERLAY_LOADING", false, { root: true });
-    //   }
-    // },
+    async changeStatusPlan({ commit, dispatch }, id) {
+      try {
+        commit("SET_OVERLAY_LOADING", true, { root: true });
+        let result = await axios.delete(`/api/plans/${id}`);
+        if (result.status == 204) {
+          // show message
+          this._vm.$toast.success("Estado cambiado exitosamente");
+          // Reload products
+          dispatch("getAllPlans");
+          return true;
+        } else {
+          return false;
+        }
+      } catch (error) {
+        this._vm.$toast.error("Ocurrio un error");
+        return false;
+      } finally {
+        commit("SET_OVERLAY_LOADING", false, { root: true });
+      }
+    },
   },
 };

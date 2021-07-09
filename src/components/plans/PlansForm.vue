@@ -12,7 +12,7 @@
         <v-toolbar-title
           ><span class="headline">
             <v-icon large>mdi-alpha-p-circle-outline</v-icon>
-            Planes
+            Unidad de planes
           </span></v-toolbar-title
         >
         <v-spacer></v-spacer>
@@ -103,6 +103,7 @@
                           <v-col cols="12" sm="6" md="6">
                             <v-select
                               v-model="editedItem.type_id"
+                              :items="types"
                               item-text="name"
                               item-value="id"
                               label="Tipo de plan"
@@ -135,7 +136,7 @@
               <v-switch
                 :input-value="item.state"
                 v-model="item.state"
-                @change="changeStateProduct(item)"
+                @change="changeStatePlan(item)"
                 v-show="permissions.delete"
               ></v-switch>
             </template>
@@ -188,8 +189,10 @@ export default {
         },
         { text: "Equivalencia", value: "equivalence" },
         { text: "Valor unidad", value: "price" },
-        { text: "Tipo", value: "type" },
+        { text: "Tipo", value: "type_name" },
+        { text: "Estado", value: "state" },
         { text: "Creado", value: "created_at" },
+        { text: "Eliminado", value: "deleted_at" },
         { text: "Acciones", value: "actions", sortable: false },
       ],
     };
@@ -203,7 +206,7 @@ export default {
     },
   },
   computed: {
-    ...mapState(["currencyOptions", "loadingText"]),
+    ...mapState(["editIcon", "currencyOptions", "loadingText"]),
     ...mapState("plans", [
       "dialogPlans",
       "plans",
@@ -236,7 +239,7 @@ export default {
       const errors = [];
       if (!this.$v.editedItem.equivalence.$dirty) return errors;
       !this.$v.editedItem.equivalence.required &&
-        errors.push("LA equivalencia es requerido");
+        errors.push("La equivalencia es requerida");
       !this.$v.editedItem.equivalence.numeric &&
         errors.push("La equivalencia debe ser un numero");
       !this.$v.editedItem.equivalence.maxLength &&
@@ -263,11 +266,37 @@ export default {
       "getAllPlans",
       "storePlan",
       "updatePlan",
+      "changeStatusPlan",
       "getAllPlansType",
     ]),
     ...mapMutations("plans", ["SET_DIALOG_PLANS", "SET_EDIT_ITEM"]),
     initialize() {
       this.getAllPlans();
+    },
+
+    changeStatePlan(item) {
+      // Confirmation to change de status
+      this.$confirm("¿Quieres cambiar el estado de esta unidad de plan?", {
+        title: "Advertencia",
+      }).then((res) => {
+        if (res) {
+          // Make to change status to backend
+          this.changeStatusPlan(item.id).then((result) => {
+            if (!result) {
+              // Rollback the state from branch office
+              this.rollbackStatePlan(item);
+            }
+          });
+        } else {
+          // Rollback the state from branch office
+          this.rollbackStatePlan(item);
+        }
+      });
+    },
+
+    rollbackStatePlan(item) {
+      let plansIndex = this.plans.indexOf(item);
+      this.plans[plansIndex].state = !this.plans[plansIndex].state;
     },
 
     editItem(item) {
@@ -291,10 +320,10 @@ export default {
       if (!this.$v.$invalid) {
         if (this.editedIndex > -1) {
           // Do update
-          this.updateProduct();
+          this.updatePlan();
         } else {
           // Do store
-          this.storeProduct();
+          this.storePlan();
         }
         // Close modal
         this.close();

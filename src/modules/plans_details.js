@@ -11,24 +11,24 @@ export default {
     dialogPlansDetails: false,
     editedItem: {
       id: 0,
-      name: "",
-      price: "",
-      stock: "",
-      supplier_id: "",
+      quantity: 0,
+      validity: 0,
+      discount: 0,
+      plan_id: "",
       state: false,
     },
     defaultItem: {
       id: 0,
-      name: "",
-      price: "",
-      stock: "",
-      supplier_id: "",
-      state: true,
+      quantity: 0,
+      validity: 0,
+      discount: 0,
+      plan_id: "",
+      state: false,
     },
   },
   mutations: {
-    SET_PRODUCTS(state, products) {
-      state.products = products;
+    SET_PLAN_DETAILS(state, details) {
+      state.plans_details = details;
     },
     SET_LOADING_DATATABLE(state, status) {
       state.loading = status;
@@ -45,8 +45,8 @@ export default {
       try {
         // Activar el loading del datatable
         commit("SET_LOADING_DATATABLE", true);
-        let result = await axios.get("/api/products");
-        commit("SET_PRODUCTS", result.data.products);
+        let result = await axios.get("/api/plan-details");
+        commit("SET_PLAN_DETAILS", result.data.planDetails);
       } catch (error) {
         console.log(error);
       } finally {
@@ -54,15 +54,15 @@ export default {
       }
     },
 
-    async storeProduct({ state, commit, dispatch }) {
+    async storePlanDetail({ state, commit, dispatch }) {
       try {
         commit("SET_OVERLAY_LOADING", true, { root: true });
-        let result = await axios.post("/api/products", state.editedItem);
+        let result = await axios.post("/api/plan-details", state.editedItem);
         if (result.status == 201) {
           // show message
-          this._vm.$toast.success("Producto creado exitosamente");
-          // Reload products
-          dispatch("getAllProducts");
+          this._vm.$toast.success("Plan creado exitosamente");
+          // Reload plan detail
+          dispatch("getAllPlansDetails");
         }
       } catch (error) {
         this._vm.$toast.error("Ocurrio un error");
@@ -71,18 +71,18 @@ export default {
       }
     },
 
-    async updateProduct({ state, commit, dispatch }) {
+    async updatePlanDetail({ state, commit, dispatch }) {
       try {
         commit("SET_OVERLAY_LOADING", true, { root: true });
         let result = await axios.put(
-          `/api/products/${state.editedItem.id}`,
+          `/api/plan-details/${state.editedItem.id}`,
           state.editedItem
         );
         if (result.status == 201) {
           // show message
-          this._vm.$toast.success("Producto actualizado exitosamente");
-          // Reload products
-          dispatch("getAllProducts");
+          this._vm.$toast.success("Plan actualizado exitosamente");
+          // Reload plan detail
+          dispatch("getAllPlansDetails");
         }
       } catch (error) {
         this._vm.$toast.error("Ocurrio un error");
@@ -91,15 +91,15 @@ export default {
       }
     },
 
-    async changeStatusProduct({ commit, dispatch }, id) {
+    async changeStatusPlanDetail({ commit, dispatch }, id) {
       try {
         commit("SET_OVERLAY_LOADING", true, { root: true });
-        let result = await axios.delete(`/api/products/${id}`);
+        let result = await axios.delete(`/api/plan-details/${id}`);
         if (result.status == 204) {
           // show message
           this._vm.$toast.success("Estado cambiado exitosamente");
-          // Reload products
-          dispatch("getAllProducts");
+          // Reload plan detail
+          dispatch("getAllPlansDetails");
           return true;
         } else {
           return false;

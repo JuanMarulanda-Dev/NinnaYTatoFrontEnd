@@ -1,5 +1,6 @@
 <template>
   <div>
+    <!-- Plans details -->
     <v-data-table
       fixed-header
       :headers="headers"
@@ -46,7 +47,7 @@
                 <v-icon>mdi-alpha-p-circle-outline</v-icon>
               </v-btn>
             </template>
-            <span>Planes</span>
+            <span>Unidad de planes</span>
           </v-tooltip>
 
           <!-- Modal New/edit Plans-->
@@ -77,7 +78,7 @@
         <v-switch
           :input-value="item.state"
           v-model="item.state"
-          @change="changeStateProduct(item)"
+          @change="changeStatePlanDetail(item)"
           v-show="permissions.delete"
         ></v-switch>
       </template>
@@ -149,17 +150,14 @@ export default {
   data: () => ({
     search: "",
     headers: [
-      {
-        text: "ID",
-        align: "start",
-        value: "id",
-      },
       { text: "Nombre", value: "name" },
-      { text: "Cantidad", value: "quantity" },
-      { text: "Descuento", value: "descount" },
-      { text: "Valor", value: "price" },
-      { text: "Vigencia", value: "validity" },
+      { text: "Cantidad", value: "quantity", align: "center" },
+      { text: "Descuento (%)", value: "discount", align: "center" },
+      { text: "Valor bruto", value: "full_value", align: "center" },
+      { text: "Vigencia (Días)", value: "validity", align: "center" },
       { text: "Estado", value: "state" },
+      { text: "Creado", value: "created_at" },
+      { text: "Eliminado", value: "deleted_at" },
       { text: "Acciones", value: "actions", sortable: false },
     ],
     editedIndex: -1,
@@ -218,20 +216,52 @@ export default {
   },
 
   methods: {
+    ...mapActions("plans", ["getAllPlans"]),
+    ...mapActions("discounts", ["getAllDiscountByPlanDetail"]),
     ...mapActions("plans_details", [
       "getAllPlansDetails",
-      "storeProduct",
-      "updateProduct",
-      "changeStatusProduct",
+      "changeStatusPlanDetail",
     ]),
     ...mapMutations("plans_details", [
       "SET_DIALOG_PLANS_DETAILS",
       "SET_EDIT_ITEM",
     ]),
-    ...mapMutations("discounts", ["SET_DIALOG_DISCOUNT"]),
+    ...mapMutations("discounts", [
+      "SET_DIALOG_DISCOUNT",
+      "SET_ID_PLAN_DETAILS",
+    ]),
     ...mapMutations("plans", ["SET_DIALOG_PLANS", "SET_PERMISSIONS"]),
     initialize() {
+      // Traer solo los planes activos
+      this.getAllPlans(1);
+      //
       this.getAllPlansDetails();
+    },
+
+    changeStatePlanDetail(item) {
+      // Confirmation to change de status
+      this.$confirm("¿Quieres cambiar el estado de este producto?", {
+        title: "Advertencia",
+      }).then((res) => {
+        if (res) {
+          // Make to change status to backend
+          this.changeStatusPlanDetail(item.id).then((result) => {
+            if (!result) {
+              // Rollback the state from branch office
+              this.rollbackStatePlanDetail(item);
+            }
+          });
+        } else {
+          // Rollback the state from branch office
+          this.rollbackStatePlanDetail(item);
+        }
+      });
+    },
+
+    rollbackStatePlanDetail(item) {
+      let plansDetailsIndex = this.plans_details.indexOf(item);
+      this.plans_details[plansDetailsIndex].state =
+        !this.plans_details[plansDetailsIndex].state;
     },
 
     editItem(item) {
@@ -241,9 +271,13 @@ export default {
     },
 
     showDiscountModule(id) {
-      this.SET_DIALOG_DISCOUNT(true);
-      // Consultar el descuento antes de editarlo
-      console.log(id);
+      this.SET_ID_PLAN_DETAILS(id);
+      this.getAllDiscountByPlanDetail(id).then((result) => {
+        if (result) {
+          // Show Dialog discounts
+          this.SET_DIALOG_DISCOUNT(true);
+        }
+      });
     },
   },
   components: {
