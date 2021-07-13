@@ -5,12 +5,21 @@
       <v-card-title>
         <span class="headline">
           <v-icon large>mdi-alpha-d-circle-outline</v-icon>
-          Descuentos <small>(Plan - 4 Horas)</small>
+          Descuentos <small>(Plan {{ discount_name }})</small>
         </span>
         <v-spacer></v-spacer>
-        <!-- A este icono se le va agregar un tooltip para que informe 
-        como se debe utilizar correctamente este modulo -->
-        <v-icon>mdi-alert-circle-outline</v-icon>
+        <!-- Info about module -->
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-icon color="primary" dark v-bind="attrs" v-on="on">
+              mdi-alert-circle-outline
+            </v-icon>
+          </template>
+          <span>
+            * Acá se podran gestionar los descuentos que aplicaran por la compra
+            de cierta cantidad de planes.
+          </span>
+        </v-tooltip>
       </v-card-title>
 
       <v-card-text>
@@ -159,6 +168,9 @@ export default {
         { text: "Acciones", align: "center", value: "actions" },
       ],
     };
+  },
+  props: {
+    discount_name: String,
   },
   mixins: [validationMixin],
   validations: {

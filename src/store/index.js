@@ -39,15 +39,6 @@ export default new Vuex.Store({
     editIcon: process.env.VUE_APP_ICON_EDIT ?? "mdi-pencil",
     deleteIcon: process.env.VUE_APP_ICON_DELETE ?? "mdi-delete",
     detailsIcon: process.env.VUE_APP_ICON_DETAILS ?? "mdi-book-open-variant",
-
-    // Formatt currency
-    currencyOptions: {
-      locale: process.env.VUE_APP_LOCALE, // Locale to format number
-      prefix: process.env.VUE_APP_PREFIX, // Currency symbol
-      suffix: process.env.VUE_APP_SUFFIX, // % or others
-      length: process.env.VUE_APP_LENGTH, // Number length
-      precision: process.env.VUE_APP_PRECISION, //Decimal precision
-    },
   },
   mutations: {
     SET_USER(state, user) {

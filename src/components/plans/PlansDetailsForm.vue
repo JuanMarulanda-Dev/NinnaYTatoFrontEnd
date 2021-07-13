@@ -8,9 +8,18 @@
           {{ formTitle }}
         </span>
         <v-spacer></v-spacer>
-        <!-- A este icono se le va agregar un tooltip para que informe 
-        como se debe utilizar correctamente este modulo -->
-        <v-icon>mdi-alert-circle-outline</v-icon>
+        <!-- Info about module -->
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-icon color="primary" dark v-bind="attrs" v-on="on">
+              mdi-alert-circle-outline
+            </v-icon>
+          </template>
+          <span>
+            * Si la vigencia x dias es igual a 0 el detalle registrano no tendra
+            una vigencia establecida.
+          </span>
+        </v-tooltip>
       </v-card-title>
 
       <v-card-text>
@@ -58,7 +67,7 @@
                 :items="active_plans"
                 item-text="name"
                 item-value="id"
-                label="Tipo de plan*"
+                label="Unidad del plan*"
                 append-icon="mdi-format-list-bulleted-type"
                 :error-messages="plan_idErrors"
                 @input="$v.editedItem.plan_id.$touch()"
@@ -70,7 +79,6 @@
                 v-model="valorBruto"
                 label="Valor Bruto*"
                 :readonly="true"
-                :options="currencyOptions"
               />
             </v-col>
             <v-col cols="12">
@@ -78,7 +86,6 @@
                 v-model="valorNeto"
                 label="Valor neto"
                 :readonly="true"
-                :options="currencyOptions"
               />
             </v-col>
           </v-row>
@@ -136,7 +143,6 @@ export default {
     active_plans() {
       return this.plans.filter((item) => item.state == true);
     },
-    ...mapState(["currencyOptions"]),
     ...mapState("plans", ["plans"]),
     ...mapState("plans_details", [
       "editedItem",

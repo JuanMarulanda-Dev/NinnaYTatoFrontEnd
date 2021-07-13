@@ -27,6 +27,7 @@
 <script>
 // creador: https://github.com/juareznasato/vuetify-money
 import { validationMixin } from "vuelidate";
+import { moneyFormatMixin } from "@/mixins/moneyFormatMixin.js";
 import { required, maxLength } from "vuelidate/lib/validators";
 export default {
   name: "vuetify-money",
@@ -81,27 +82,8 @@ export default {
       type: String,
       default: "white",
     },
-    valueWhenIsEmpty: {
-      type: String,
-      default: "", // "0" or "" or null
-    },
-    options: {
-      type: Object,
-      default: function () {
-        return {
-          locale: "pt-BR",
-          prefix: "",
-          suffix: "",
-          length: 11,
-          precision: 2,
-        };
-      },
-    },
   },
-  data: () => ({
-    moneyIcon: process.env.VUE_APP_ICON_MONEY ?? "mdi-currency-usd",
-  }),
-  mixins: [validationMixin],
+  mixins: [validationMixin, moneyFormatMixin],
   validations: {
     cmpValue: { required, maxLength: maxLength(255) },
   },
@@ -125,45 +107,6 @@ export default {
     },
   },
   methods: {
-    humanFormat: function (number) {
-      if (isNaN(number)) {
-        number = "";
-      } else {
-        // number = Number(number).toLocaleString(this.options.locale, {maximumFractionDigits: 2, minimumFractionDigits: 2, style: 'currency', currency: 'BRL'});
-        number = Number(number).toLocaleString(this.options.locale, {
-          maximumFractionDigits: this.options.precision,
-          minimumFractionDigits: this.options.precision,
-        });
-      }
-      return number;
-    },
-    machineFormat(number) {
-      if (number) {
-        number = this.cleanNumber(number);
-        // Ajustar quantidade de zeros esquerda
-        number = number.padStart(parseInt(this.options.precision) + 1, "0");
-        // Incluir ponto na casa correta, conforme a precisÃ£o configurada
-        number =
-          number.substring(
-            0,
-            number.length - parseInt(this.options.precision)
-          ) +
-          "." +
-          number.substring(
-            number.length - parseInt(this.options.precision),
-            number.length
-          );
-        if (isNaN(number)) {
-          number = this.valueWhenIsEmpty;
-        }
-      } else {
-        number = this.valueWhenIsEmpty;
-      }
-      if (this.options.precision === 0) {
-        number = this.cleanNumber(number);
-      }
-      return number;
-    },
     keyPress($event) {
       // console.log($event.keyCode); //keyCodes value
       let keyCode = $event.keyCode ? $event.keyCode : $event.which;
@@ -178,35 +121,6 @@ export default {
     },
     onInput() {
       this.input.$touch();
-    },
-    // Retira todos os caracteres nÃ£o numÃ©ricos e zeros esquerda
-    cleanNumber: function (value) {
-      let result = "";
-      if (value) {
-        let flag = false;
-        let arrayValue = value.toString().split("");
-        for (var i = 0; i < arrayValue.length; i++) {
-          if (this.isInteger(arrayValue[i])) {
-            if (!flag) {
-              // Retirar zeros esquerda
-              if (arrayValue[i] !== "0") {
-                result = result + arrayValue[i];
-                flag = true;
-              }
-            } else {
-              result = result + arrayValue[i];
-            }
-          }
-        }
-      }
-      return result;
-    },
-    isInteger(value) {
-      let result = false;
-      if (Number.isInteger(parseInt(value))) {
-        result = true;
-      }
-      return result;
     },
     targetLength() {
       if (

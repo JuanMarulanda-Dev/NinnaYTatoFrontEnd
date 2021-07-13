@@ -73,6 +73,12 @@
         </v-toolbar>
       </template>
 
+      <!-- Full value -->
+      <template v-slot:[`item.full_value`]="{ item }">
+        <v-icon small>{{ moneyIcon }}</v-icon>
+        {{ currencyFormat(item.full_value) }}
+      </template>
+
       <!-- State -->
       <template v-slot:[`item.state`]="{ item }">
         <v-switch
@@ -95,7 +101,7 @@
               color="orange accent-2 mr-1"
               v-bind="attrs"
               v-on="on"
-              @click="showDiscountModule(item.id)"
+              @click="showDiscountModule(item.id, item.name)"
               v-show="permissions.update"
             >
               <v-icon> mdi-sale </v-icon>
@@ -134,12 +140,13 @@
     ></plans-details-form>
 
     <!-- Modal Discounts form -->
-    <discounts-form></discounts-form>
+    <discounts-form :discount_name="discount_name"></discounts-form>
   </div>
 </template>
 
 <script>
 import { validationMixin } from "vuelidate";
+import { moneyFormatMixin } from "@/mixins/moneyFormatMixin.js";
 import { required, maxLength } from "vuelidate/lib/validators";
 import { mapState, mapActions, mapMutations } from "vuex";
 import PlansForm from "@/components/plans/PlansForm.vue";
@@ -161,8 +168,9 @@ export default {
       { text: "Acciones", value: "actions", sortable: false },
     ],
     editedIndex: -1,
+    discount_name: "",
   }),
-  mixins: [validationMixin],
+  mixins: [validationMixin, moneyFormatMixin],
   validations: {
     editedItem: {
       name: { required, maxLength: maxLength(255) },
@@ -270,8 +278,9 @@ export default {
       this.SET_DIALOG_PLANS_DETAILS(true);
     },
 
-    showDiscountModule(id) {
+    showDiscountModule(id, name) {
       this.SET_ID_PLAN_DETAILS(id);
+      this.discount_name = name;
       this.getAllDiscountByPlanDetail(id).then((result) => {
         if (result) {
           // Show Dialog discounts

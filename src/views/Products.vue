@@ -62,7 +62,6 @@
                     <vuetify-money
                       v-model="editedItem.price"
                       label="Valor Unidad*"
-                      :options="currencyOptions"
                     />
                   </v-col>
                   <v-col cols="12" sm="6" md="6">
@@ -90,6 +89,12 @@
           </v-card>
         </v-dialog>
       </v-toolbar>
+    </template>
+
+    <!-- price -->
+    <template v-slot:[`item.price`]="{ item }">
+      <v-icon small>{{ moneyIcon }}</v-icon>
+      {{ currencyFormat(item.price) }}
     </template>
 
     <!-- State -->
@@ -128,6 +133,7 @@
 
 <script>
 import { validationMixin } from "vuelidate";
+import { moneyFormatMixin } from "@/mixins/moneyFormatMixin.js";
 import { required, maxLength } from "vuelidate/lib/validators";
 import { mapState, mapActions, mapMutations } from "vuex";
 import VuetifyMoney from "@/components/vuetifyMoney.vue";
@@ -151,7 +157,7 @@ export default {
     ],
     editedIndex: -1,
   }),
-  mixins: [validationMixin],
+  mixins: [validationMixin, moneyFormatMixin],
   validations: {
     editedItem: {
       name: { required, maxLength: maxLength(255) },
@@ -162,7 +168,7 @@ export default {
     VuetifyMoney,
   },
   computed: {
-    ...mapState(["editIcon", "loadingText", "currencyOptions"]),
+    ...mapState(["editIcon", "loadingText"]),
     ...mapState("products", [
       "products",
       "loading",

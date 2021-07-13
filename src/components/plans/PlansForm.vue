@@ -39,7 +39,7 @@
                 <v-toolbar-title> </v-toolbar-title>
                 <v-spacer></v-spacer>
                 <!-- Modal New/edit-->
-                <v-dialog v-model="dialog" persistent max-width="500px">
+                <v-dialog v-model="dialog" persistent max-width="600px">
                   <!-- Button active modal -->
                   <template v-slot:activator="{ on, attrs }">
                     <v-btn
@@ -62,6 +62,20 @@
                         <v-icon large>mdi-alpha-p-circle-outline</v-icon>
                         {{ formTitle }}
                       </span>
+                      <v-spacer></v-spacer>
+                      <!-- Info about module -->
+                      <v-tooltip bottom>
+                        <template v-slot:activator="{ on, attrs }">
+                          <v-icon color="primary" dark v-bind="attrs" v-on="on">
+                            mdi-alert-circle-outline
+                          </v-icon>
+                        </template>
+                        <span>
+                          * Si el tipo de plan seleccionado es un servicio la
+                          equivalencia en horas no se tomara en cuenta como
+                          horas si no como servicios.
+                        </span>
+                      </v-tooltip>
                     </v-card-title>
 
                     <v-card-text>
@@ -82,7 +96,7 @@
                           <v-col cols="12" sm="6" md="6">
                             <v-text-field
                               v-model="editedItem.equivalence"
-                              label="Equivalencia en horas"
+                              label="Equivalencia en horas/servicios"
                               type="number"
                               min="0"
                               required
@@ -97,7 +111,6 @@
                             <vuetify-money
                               v-model="editedItem.price"
                               label="Valor*"
-                              :options="currencyOptions"
                             />
                           </v-col>
                           <v-col cols="12" sm="6" md="6">
@@ -129,6 +142,12 @@
                   </v-card>
                 </v-dialog>
               </v-toolbar>
+            </template>
+
+            <!-- price -->
+            <template v-slot:[`item.price`]="{ item }">
+              <v-icon small>{{ moneyIcon }}</v-icon>
+              {{ currencyFormat(item.price) }}
             </template>
 
             <!-- State -->
@@ -171,6 +190,7 @@
 
 <script>
 import { validationMixin } from "vuelidate";
+import { moneyFormatMixin } from "@/mixins/moneyFormatMixin.js";
 import { required, maxLength, numeric } from "vuelidate/lib/validators";
 import { mapState, mapMutations, mapActions } from "vuex";
 import VuetifyMoney from "@/components/vuetifyMoney.vue";
@@ -197,7 +217,7 @@ export default {
       ],
     };
   },
-  mixins: [validationMixin],
+  mixins: [validationMixin, moneyFormatMixin],
   validations: {
     editedItem: {
       name: { required, maxLength: maxLength(255) },
@@ -206,7 +226,7 @@ export default {
     },
   },
   computed: {
-    ...mapState(["editIcon", "currencyOptions", "loadingText"]),
+    ...mapState(["editIcon", "loadingText"]),
     ...mapState("plans", [
       "dialogPlans",
       "plans",
