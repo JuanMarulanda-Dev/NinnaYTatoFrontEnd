@@ -40,7 +40,7 @@
             <v-col cols="12" sm="6" md="5">
               <v-text-field
                 v-model="editedItem.discount"
-                label="Descuento x Defecto*"
+                label="Descuento*"
                 type="number"
                 min="0"
                 required

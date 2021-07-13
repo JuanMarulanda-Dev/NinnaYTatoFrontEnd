@@ -25,7 +25,7 @@ export const moneyFormatMixin = {
   },
   methods: {
     currencyFormat(value) {
-      return this.humanFormat(this.machineFormat(value));
+      return this.humanFormat(value);
     },
     humanFormat: function (number) {
       if (isNaN(number)) {
@@ -38,56 +38,6 @@ export const moneyFormatMixin = {
         });
       }
       return number;
-    },
-    machineFormat(number) {
-      if (number) {
-        number = this.cleanNumber(number);
-
-        // Ajustar quantidade de zeros esquerda
-        number = number.padStart(parseInt(this.options.precision) + 1, "0");
-        // Incluir ponto na casa correta, conforme a precisÃ£o configurada
-        number =
-          number.substring(
-            0,
-            number.length - parseInt(this.options.precision)
-          ) +
-          "." +
-          number.substring(
-            number.length - parseInt(this.options.precision),
-            number.length
-          );
-        if (isNaN(number)) {
-          number = this.valueWhenIsEmpty;
-        }
-      } else {
-        number = this.valueWhenIsEmpty;
-      }
-      if (this.options.precision === 0) {
-        number = this.cleanNumber(number);
-      }
-      return number;
-    },
-    // Retira todos os caracteres nÃ£o numÃ©ricos e zeros esquerda
-    cleanNumber: function (value) {
-      let result = "";
-      if (value) {
-        let flag = false;
-        let arrayValue = value.toString().split("");
-        for (var i = 0; i < arrayValue.length; i++) {
-          if (Number.isInteger(parseInt(arrayValue[i]))) {
-            if (!flag) {
-              // Retirar zeros esquerda
-              if (arrayValue[i] !== "0") {
-                result = result + arrayValue[i];
-                flag = true;
-              }
-            } else {
-              result = result + arrayValue[i];
-            }
-          }
-        }
-      }
-      return result;
     },
   },
 };

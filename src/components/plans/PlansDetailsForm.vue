@@ -16,7 +16,7 @@
             </v-icon>
           </template>
           <span>
-            * Si la vigencia x dias es igual a 0 el detalle registrano no tendra
+            * Si la vigencia x dias es igual a 0 el detalle registrado no tendra
             una vigencia establecida.
           </span>
         </v-tooltip>
