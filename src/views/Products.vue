@@ -161,7 +161,6 @@ export default {
       "editedItem",
       "defaultItem",
     ]),
-    ...mapState("suppliers", ["suppliers"]),
     formTitle() {
       return this.editedIndex === -1 ? "Nueva Producto" : "Editar Producto";
     },

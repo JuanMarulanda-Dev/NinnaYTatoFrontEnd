@@ -19,6 +19,8 @@ axios.defaults.baseURL = process.env.VUE_APP_API_URL;
 
 export default new Vuex.Store({
   state: {
+    mainBranchOffice: 0,
+
     // Login
     loadingLogin: false,
 
@@ -44,6 +46,7 @@ export default new Vuex.Store({
     SET_USER(state, user) {
       state.user = user;
       state.isAuthenticated = Boolean(user);
+      state.mainBranchOffice = state.user.branch_office_id;
     },
     SET_MENU(state, menu) {
       state.menu = menu;

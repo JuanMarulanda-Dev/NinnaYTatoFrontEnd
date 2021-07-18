@@ -10,7 +10,8 @@
         <!-- Menu navigation -->
         <v-navigation-drawer v-model="drawer" app>
           <!-- Header Sidebar -->
-          <v-list class="text-center">
+          <v-list class="text-center pb-0">
+            <!-- Logo -->
             <v-list-item>
               <v-img src="@/assets/logo.png">
                 <template v-slot:placeholder>
@@ -26,13 +27,31 @@
                   </v-row> </template
               ></v-img>
             </v-list-item>
+            <!-- User logging -->
             <v-list-item link>
               <v-list-item-content>
                 <v-list-item-title class="title">
                   {{ user.first_name }} {{ user.last_name }}
                 </v-list-item-title>
                 <v-list-item-subtitle>{{ user.email }} </v-list-item-subtitle>
+                <!-- Role is different to Admin?-->
+                <v-list-item-subtitle v-if="user.role_id != 1">
+                  <v-icon>mdi-home-circle-outline</v-icon> Sucursal principal
+                </v-list-item-subtitle>
               </v-list-item-content>
+            </v-list-item>
+            <!-- Select branch offices -->
+            <v-list-item dense v-if="user.role_id == 1">
+              <v-select
+                class="text-center"
+                v-model="mainBranchOffice"
+                :items="sucursales"
+                prepend-inner-icon="mdi-home-circle-outline"
+                item-text="name"
+                item-value="id"
+                label="Sucursal"
+                dense
+              ></v-select>
             </v-list-item>
           </v-list>
           <v-divider></v-divider>
@@ -201,6 +220,7 @@
 <script>
 import { mapState, mapActions } from "vuex";
 import pawLoading from "@/components/pawLoading.vue";
+
 export default {
   name: "App",
   data: () => ({
@@ -213,13 +233,24 @@ export default {
     if (this.user == null) {
       this.getUserLocalStorage();
     }
+    // Validar si existe la info del menu
     if (this.menu.length == 0) {
       this.getMenuLocalStorage();
     }
-    // Validar si existe la info del menu
+    // Consultar las sucursales para cambiar entre sucursales solo si es administrador
+    if (this.user.role_id == 1) {
+      this.getAllBranchOffices();
+    }
   },
   computed: {
-    ...mapState(["user", "menu", "notifications", "loadingOverlay"]),
+    ...mapState([
+      "user",
+      "menu",
+      "notifications",
+      "loadingOverlay",
+      "mainBranchOffice",
+    ]),
+    ...mapState("sucursales", ["sucursales"]),
   },
   methods: {
     ...mapActions([
@@ -229,6 +260,7 @@ export default {
       "getMenu",
       "logout",
     ]),
+    ...mapActions("sucursales", ["getAllBranchOffices"]),
     setCookie(name, value, expirydays) {
       var d = new Date();
       d.setTime(d.getTime() + expirydays * 24 * 60 * 60 * 1000);

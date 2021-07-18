@@ -122,6 +122,15 @@ const routes = [
       permissions: {},
     },
   },
+  {
+    path: "/cajas",
+    name: "Cajas",
+    component: () =>
+      import(/* webpackChunkName: "CashRegister" */ "@/views/CashRegister.vue"),
+    meta: {
+      permissions: {},
+    },
+  },
 ];
 
 const router = new VueRouter({
