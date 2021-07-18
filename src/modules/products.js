@@ -13,7 +13,6 @@ export default {
       name: "",
       price: "",
       stock: "",
-      supplier_id: "",
       state: false,
     },
     defaultItem: {
@@ -21,7 +20,6 @@ export default {
       name: "",
       price: "",
       stock: "",
-      supplier_id: "",
       state: true,
     },
   },

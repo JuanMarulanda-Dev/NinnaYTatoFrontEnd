@@ -58,24 +58,11 @@
                       @blur="$v.editedItem.name.$touch()"
                     ></v-text-field>
                   </v-col>
-                  <v-col cols="12" sm="6" md="6">
+                  <v-col cols="12">
                     <vuetify-money
                       v-model="editedItem.price"
                       label="Valor Unidad*"
                     />
-                  </v-col>
-                  <v-col cols="12" sm="6" md="6">
-                    <v-select
-                      :items="suppliers"
-                      item-text="name"
-                      item-value="id"
-                      label="Proveedor"
-                      v-model="editedItem.supplier_id"
-                      append-icon="mdi-account-tie"
-                      :error-messages="supplierErrors"
-                      @input="$v.editedItem.supplier_id.$touch()"
-                      @blur="$v.editedItem.supplier_id.$touch()"
-                    ></v-select>
                   </v-col>
                 </v-row>
               </v-container>
@@ -161,7 +148,6 @@ export default {
   validations: {
     editedItem: {
       name: { required, maxLength: maxLength(255) },
-      supplier_id: { required },
     },
   },
   components: {
@@ -188,13 +174,6 @@ export default {
         errors.push("Longitud no permitida");
       return errors;
     },
-    supplierErrors() {
-      const errors = [];
-      if (!this.$v.editedItem.supplier_id.$dirty) return errors;
-      !this.$v.editedItem.supplier_id.required &&
-        errors.push("El proveedor es requerido");
-      return errors;
-    },
   },
 
   watch: {
@@ -207,8 +186,6 @@ export default {
   created() {
     // Obtener los permisos
     this.permissions = this.$route.meta.permissions;
-
-    this.getAllSuppliers();
 
     // Acciones que debe realizar el componente una vez creado
     if (this.permissions.read) {
@@ -223,7 +200,6 @@ export default {
       "updateProduct",
       "changeStatusProduct",
     ]),
-    ...mapActions("suppliers", ["getAllSuppliers"]),
     ...mapMutations("products", ["SET_EDIT_ITEM"]),
     initialize() {
       this.getAllProducts();

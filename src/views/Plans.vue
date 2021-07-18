@@ -268,8 +268,9 @@ export default {
 
     rollbackStatePlanDetail(item) {
       let plansDetailsIndex = this.plans_details.indexOf(item);
-      this.plans_details[plansDetailsIndex].state =
-        !this.plans_details[plansDetailsIndex].state;
+      this.plans_details[plansDetailsIndex].state = !this.plans_details[
+        plansDetailsIndex
+      ].state;
     },
 
     editItem(item) {

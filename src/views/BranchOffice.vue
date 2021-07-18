@@ -270,8 +270,9 @@ export default {
 
     rollbackStateBranchOffice(item) {
       let branchOfficeIndex = this.sucursales.indexOf(item);
-      this.sucursales[branchOfficeIndex].state =
-        !this.sucursales[branchOfficeIndex].state;
+      this.sucursales[branchOfficeIndex].state = !this.sucursales[
+        branchOfficeIndex
+      ].state;
     },
 
     editItem(item) {
