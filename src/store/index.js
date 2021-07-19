@@ -13,6 +13,7 @@ import suppliers from "@/modules/suppliers.js";
 import plans from "@/modules/plans.js";
 import plans_details from "@/modules/plans_details.js";
 import discounts from "@/modules/discounts.js";
+import cash_registers from "@/modules/cash_registers.js";
 
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL = process.env.VUE_APP_API_URL;
@@ -51,6 +52,9 @@ export default new Vuex.Store({
     SET_MENU(state, menu) {
       state.menu = menu;
     },
+    SET_MAIN_BRANCH_OFFICE(state, mainBranchOffice) {
+      state.mainBranchOffice = mainBranchOffice;
+    },
     SET_LOADER_LOGIN(state, loader = false) {
       state.loadingLogin = loader;
     },
@@ -77,6 +81,13 @@ export default new Vuex.Store({
         }
         // Obtener el usuario
         await dispatch("getUser");
+
+        // Consultar las sucursales para cambiar entre sucursales solo si es administrador
+        if (this.user) {
+          if (this.user.is_admin) {
+            dispatch("sucursales/getAllBranchOffices");
+          }
+        }
         // Obtener los permisos del usuario
         await dispatch("getMenu");
         // Obtener la ruta principal a donde se va a redireccionar al usuario
@@ -174,5 +185,6 @@ export default new Vuex.Store({
     plans,
     plans_details,
     discounts,
+    cash_registers,
   },
 });

@@ -126,7 +126,9 @@ const routes = [
     path: "/cajas",
     name: "Cajas",
     component: () =>
-      import(/* webpackChunkName: "CashRegister" */ "@/views/CashRegister.vue"),
+      import(
+        /* webpackChunkName: "CashRegisters" */ "@/views/CashRegisters.vue"
+      ),
     meta: {
       permissions: {},
     },

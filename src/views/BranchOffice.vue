@@ -245,7 +245,7 @@ export default {
     ]),
     ...mapMutations("sucursales", ["SET_EDIT_ITEM"]),
     initialize() {
-      if (this.sucursales == []) {
+      if (this.sucursales.length == 0) {
         this.getAllBranchOffices();
       }
     },

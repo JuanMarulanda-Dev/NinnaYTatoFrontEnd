@@ -35,13 +35,13 @@
                 </v-list-item-title>
                 <v-list-item-subtitle>{{ user.email }} </v-list-item-subtitle>
                 <!-- Role is different to Admin?-->
-                <v-list-item-subtitle v-if="user.role_id != 1">
+                <v-list-item-subtitle v-if="!user.is_admin">
                   <v-icon>mdi-home-circle-outline</v-icon> Sucursal principal
                 </v-list-item-subtitle>
               </v-list-item-content>
             </v-list-item>
             <!-- Select branch offices -->
-            <v-list-item dense v-if="user.role_id == 1">
+            <v-list-item dense v-if="user.is_admin">
               <v-select
                 class="text-center"
                 v-model="mainBranchOffice"
@@ -237,20 +237,19 @@ export default {
     if (this.menu.length == 0) {
       this.getMenuLocalStorage();
     }
-    // Consultar las sucursales para cambiar entre sucursales solo si es administrador
-    if (this.user.role_id == 1) {
-      this.getAllBranchOffices();
-    }
   },
   computed: {
-    ...mapState([
-      "user",
-      "menu",
-      "notifications",
-      "loadingOverlay",
-      "mainBranchOffice",
-    ]),
+    ...mapState(["user", "menu", "notifications", "loadingOverlay"]),
     ...mapState("sucursales", ["sucursales"]),
+
+    mainBranchOffice: {
+      get() {
+        return this.$store.state.mainBranchOffice;
+      },
+      set(value) {
+        this.$store.commit("SET_MAIN_BRANCH_OFFICE", value);
+      },
+    },
   },
   methods: {
     ...mapActions([

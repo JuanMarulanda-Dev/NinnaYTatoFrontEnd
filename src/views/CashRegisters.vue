@@ -2,7 +2,7 @@
   <v-data-table
     fixed-header
     :headers="headers"
-    :items="products"
+    :items="cash_registers"
     sort-by="name"
     class="elevation-3"
     :loading="loading"
@@ -72,10 +72,10 @@
       </v-toolbar>
     </template>
 
-    <!-- price -->
-    <template v-slot:[`item.price`]="{ item }">
+    <!-- amount -->
+    <template v-slot:[`item.amount`]="{ item }">
       <v-icon small>{{ moneyIcon }}</v-icon>
-      {{ currencyFormat(item.price) }}
+      {{ currencyFormat(item.amount) }}
     </template>
 
     <!-- State -->
@@ -83,7 +83,7 @@
       <v-switch
         :input-value="item.state"
         v-model="item.state"
-        @change="changeStateProduct(item)"
+        @change="changeStateCashRegister(item)"
         v-show="permissions.delete"
       ></v-switch>
     </template>
@@ -128,7 +128,7 @@ export default {
         align: "start",
         value: "name",
       },
-      { text: "Monto", value: "price" },
+      { text: "Monto", value: "amount" },
       { text: "Estado", value: "state" },
       { text: "Creado", value: "created_at" },
       { text: "Eliminado", value: "deleted_at" },
@@ -143,9 +143,9 @@ export default {
     },
   },
   computed: {
-    ...mapState(["editIcon", "loadingText"]),
-    ...mapState("products", [
-      "products",
+    ...mapState(["editIcon", "loadingText", "mainBranchOffice"]),
+    ...mapState("cash_registers", [
+      "cash_registers",
       "loading",
       "editedItem",
       "defaultItem",
@@ -169,6 +169,11 @@ export default {
       val || this.close();
       this.$v.$reset();
     },
+    mainBranchOffice() {
+      if (this.permissions.read) {
+        this.initialize();
+      }
+    },
   },
 
   created() {
@@ -182,44 +187,45 @@ export default {
   },
 
   methods: {
-    ...mapActions("products", [
-      "getAllProducts",
-      "storeProduct",
-      "updateProduct",
-      "changeStatusProduct",
+    ...mapActions("cash_registers", [
+      "getAllCashRegisters",
+      "storeCahsRegister",
+      "updateCahsRegister",
+      "changeStatusCahsRegister",
     ]),
-    ...mapMutations("products", ["SET_EDIT_ITEM"]),
+    ...mapMutations("cash_registers", ["SET_EDIT_ITEM"]),
     initialize() {
-      this.getAllProducts();
+      this.getAllCashRegisters();
     },
 
-    changeStateProduct(item) {
+    changeStateCashRegister(item) {
       // Confirmation to change de status
-      this.$confirm("¿Quieres cambiar el estado de este producto?", {
+      this.$confirm("¿Quieres cambiar el estado de esta caja?", {
         title: "Advertencia",
       }).then((res) => {
         if (res) {
           // Make to change status to backend
-          this.changeStatusProduct(item.id).then((result) => {
+          this.changeStatusCahsRegister(item.id).then((result) => {
             if (!result) {
               // Rollback the state from branch office
-              this.rollbackStateProduct(item);
+              this.rollbackStateCahsRegister(item);
             }
           });
         } else {
           // Rollback the state from branch office
-          this.rollbackStateProduct(item);
+          this.rollbackStateCahsRegister(item);
         }
       });
     },
 
-    rollbackStateProduct(item) {
-      let productsIndex = this.products.indexOf(item);
-      this.products[productsIndex].state = !this.products[productsIndex].state;
+    rollbackStateCahsRegister(item) {
+      let cashRegisterIndex = this.cash_registers.indexOf(item);
+      this.cash_registers[cashRegisterIndex].state =
+        !this.cash_registers[cashRegisterIndex].state;
     },
 
     editItem(item) {
-      this.editedIndex = this.products.indexOf(item);
+      this.editedIndex = this.cash_registers.indexOf(item);
       this.SET_EDIT_ITEM(Object.assign({}, item));
       // this.editedItem = ;
       this.dialog = true;
@@ -240,10 +246,10 @@ export default {
       if (!this.$v.$invalid) {
         if (this.editedIndex > -1) {
           // Do update
-          this.updateProduct();
+          this.updateCahsRegister();
         } else {
           // Do store
-          this.storeProduct();
+          this.storeCahsRegister();
         }
         // Close modal
         this.close();

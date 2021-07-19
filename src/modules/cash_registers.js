@@ -7,23 +7,21 @@ export default {
   state: {
     // Generals loading datatables
     loading: false,
-    products: [],
+    cash_registers: [],
     editedItem: {
       id: 0,
       name: "",
-      monto: "",
       state: false,
     },
     defaultItem: {
       id: 0,
       name: "",
-      monto: "",
       state: false,
     },
   },
   mutations: {
-    SET_PRODUCTS(state, products) {
-      state.products = products;
+    SET_CASH_REGISTER(state, cash_registers) {
+      state.cash_registers = cash_registers;
     },
     SET_LOADING_DATATABLE(state, status) {
       state.loading = status;
@@ -33,12 +31,14 @@ export default {
     },
   },
   actions: {
-    async getAllProducts({ commit }) {
+    async getAllCashRegisters({ commit, rootState }, status = 0) {
       try {
         // Activar el loading del datatable
         commit("SET_LOADING_DATATABLE", true);
-        let result = await axios.get("/api/products");
-        commit("SET_PRODUCTS", result.data.products);
+        let result = await axios.get(
+          `/api/cash-registers/${rootState.mainBranchOffice}/${status}`
+        );
+        commit("SET_CASH_REGISTER", result.data.cashRegisters);
       } catch (error) {
         console.log(error);
       } finally {
@@ -46,15 +46,16 @@ export default {
       }
     },
 
-    async storeProduct({ state, commit, dispatch }) {
+    async storeCahsRegister({ state, commit, dispatch, rootState }) {
       try {
         commit("SET_OVERLAY_LOADING", true, { root: true });
-        let result = await axios.post("/api/products", state.editedItem);
+        state.editedItem.branch_office_id = rootState.mainBranchOffice;
+        let result = await axios.post("/api/cash-registers", state.editedItem);
         if (result.status == 201) {
           // show message
-          this._vm.$toast.success("Producto creado exitosamente");
-          // Reload products
-          dispatch("getAllProducts");
+          this._vm.$toast.success("Caja creada exitosamente");
+          // Reload cash registers
+          dispatch("getAllCashRegisters");
         }
       } catch (error) {
         this._vm.$toast.error("Ocurrio un error");
@@ -63,18 +64,18 @@ export default {
       }
     },
 
-    async updateProduct({ state, commit, dispatch }) {
+    async updateCahsRegister({ state, commit, dispatch }) {
       try {
         commit("SET_OVERLAY_LOADING", true, { root: true });
         let result = await axios.put(
-          `/api/products/${state.editedItem.id}`,
+          `/api/cash-registers/${state.editedItem.id}`,
           state.editedItem
         );
         if (result.status == 201) {
           // show message
-          this._vm.$toast.success("Producto actualizado exitosamente");
-          // Reload products
-          dispatch("getAllProducts");
+          this._vm.$toast.success("Caja actualizada exitosamente");
+          // Reload cash registers
+          dispatch("getAllCashRegisters");
         }
       } catch (error) {
         this._vm.$toast.error("Ocurrio un error");
@@ -83,15 +84,15 @@ export default {
       }
     },
 
-    async changeStatusProduct({ commit, dispatch }, id) {
+    async changeStatusCahsRegister({ commit, dispatch }, id) {
       try {
         commit("SET_OVERLAY_LOADING", true, { root: true });
-        let result = await axios.delete(`/api/products/${id}`);
+        let result = await axios.delete(`/api/cash-registers/${id}`);
         if (result.status == 204) {
           // show message
           this._vm.$toast.success("Estado cambiado exitosamente");
-          // Reload products
-          dispatch("getAllProducts");
+          // Reload cash registers
+          dispatch("getAllCashRegisters");
           return true;
         } else {
           return false;
