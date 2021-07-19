@@ -237,6 +237,12 @@ export default {
     if (this.menu.length == 0) {
       this.getMenuLocalStorage();
     }
+
+    if (this.user) {
+      if (this.user.is_admin) {
+        this.getAllBranchOffices();
+      }
+    }
   },
   computed: {
     ...mapState(["user", "menu", "notifications", "loadingOverlay"]),

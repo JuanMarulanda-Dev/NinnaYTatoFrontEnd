@@ -35,11 +35,13 @@ export default {
     },
   },
   actions: {
-    async getAllProducts({ commit }) {
+    async getAllProducts({ commit, rootState }) {
       try {
         // Activar el loading del datatable
         commit("SET_LOADING_DATATABLE", true);
-        let result = await axios.get("/api/products");
+        let result = await axios.get(
+          `/api/products/${rootState.mainBranchOffice}`
+        );
         commit("SET_PRODUCTS", result.data.products);
       } catch (error) {
         console.log(error);

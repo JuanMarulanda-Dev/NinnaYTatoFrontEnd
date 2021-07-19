@@ -154,7 +154,7 @@ export default {
     VuetifyMoney,
   },
   computed: {
-    ...mapState(["editIcon", "loadingText"]),
+    ...mapState(["editIcon", "loadingText", "mainBranchOffice"]),
     ...mapState("products", [
       "products",
       "loading",
@@ -179,6 +179,11 @@ export default {
     dialog(val) {
       val || this.close();
       this.$v.$reset();
+    },
+    mainBranchOffice() {
+      if (this.permissions.read) {
+        this.initialize();
+      }
     },
   },
 
