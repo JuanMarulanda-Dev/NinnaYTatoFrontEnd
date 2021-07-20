@@ -4,7 +4,7 @@ import router from "@/router";
 
 Vue.use(Vuex);
 import axios from "axios";
-import sucursales from "@/modules/sucursales.js";
+import branch_offices from "@/modules/branch_offices.js";
 import users from "@/modules/users.js";
 import customers from "@/modules/customers.js";
 import pets from "@/modules/pets.js";
@@ -86,7 +86,7 @@ export default new Vuex.Store({
         // Consultar las sucursales para cambiar entre sucursales solo si es administrador
         if (this.user) {
           if (this.user.is_admin) {
-            dispatch("sucursales/getAllBranchOffices");
+            dispatch("branch_offices/getAllBranchOffices");
           }
         }
         // Obtener los permisos del usuario
@@ -177,7 +177,7 @@ export default new Vuex.Store({
     },
   },
   modules: {
-    sucursales,
+    branch_offices,
     users,
     customers,
     pets,

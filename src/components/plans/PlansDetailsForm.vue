@@ -218,13 +218,19 @@ export default {
       if (!this.$v.$invalid) {
         if (this.editedIndex > -1) {
           // Do update
-          this.updatePlanDetail();
+          this.updatePlanDetail().then((result) => {
+            if (result) {
+              this.close();
+            }
+          });
         } else {
           // Do store
-          this.storePlanDetail();
+          this.storePlanDetail().then((result) => {
+            if (result) {
+              this.close();
+            }
+          });
         }
-        //   // Close modal
-        this.close();
       }
     },
   },

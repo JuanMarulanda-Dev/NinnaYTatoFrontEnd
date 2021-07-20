@@ -246,13 +246,19 @@ export default {
       if (!this.$v.$invalid) {
         if (this.editedIndex > -1) {
           // Do update
-          this.updateCahsRegister();
+          this.updateCahsRegister().then((result) => {
+            if (result) {
+              this.close();
+            }
+          });
         } else {
           // Do store
-          this.storeCahsRegister();
+          this.storeCahsRegister().then((result) => {
+            if (result) {
+              this.close();
+            }
+          });
         }
-        // Close modal
-        this.close();
       }
     },
   },

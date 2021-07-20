@@ -45,7 +45,7 @@
               <v-select
                 class="text-center"
                 v-model="mainBranchOffice"
-                :items="sucursales"
+                :items="branch_offices"
                 prepend-inner-icon="mdi-home-circle-outline"
                 item-text="name"
                 item-value="id"
@@ -246,7 +246,7 @@ export default {
   },
   computed: {
     ...mapState(["user", "menu", "notifications", "loadingOverlay"]),
-    ...mapState("sucursales", ["sucursales"]),
+    ...mapState("branch_offices", ["branch_offices"]),
 
     mainBranchOffice: {
       get() {
@@ -265,7 +265,7 @@ export default {
       "getMenu",
       "logout",
     ]),
-    ...mapActions("sucursales", ["getAllBranchOffices"]),
+    ...mapActions("branch_offices", ["getAllBranchOffices"]),
     setCookie(name, value, expirydays) {
       var d = new Date();
       d.setTime(d.getTime() + expirydays * 24 * 60 * 60 * 1000);

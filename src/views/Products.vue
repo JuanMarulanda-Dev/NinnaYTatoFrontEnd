@@ -256,13 +256,19 @@ export default {
       if (!this.$v.$invalid) {
         if (this.editedIndex > -1) {
           // Do update
-          this.updateProduct();
+          this.updateProduct().then((result) => {
+            if (result) {
+              this.close();
+            }
+          });
         } else {
           // Do store
-          this.storeProduct();
+          this.storeProduct().then((result) => {
+            if (result) {
+              this.close();
+            }
+          });
         }
-        // Close modal
-        this.close();
       }
     },
   },

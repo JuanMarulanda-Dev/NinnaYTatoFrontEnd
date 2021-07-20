@@ -2,7 +2,7 @@
   <v-data-table
     fixed-header
     :headers="headers"
-    :items="sucursales"
+    :items="branch_offices"
     sort-by="name"
     class="elevation-3"
     :loading="loading"
@@ -180,8 +180,8 @@ export default {
   },
   computed: {
     ...mapState(["editIcon", "deleteIcon", "detailsIcon", "loadingText"]),
-    ...mapState("sucursales", [
-      "sucursales",
+    ...mapState("branch_offices", [
+      "branch_offices",
       "loading",
       "editedItem",
       "defaultItem",
@@ -237,15 +237,15 @@ export default {
   },
 
   methods: {
-    ...mapActions("sucursales", [
+    ...mapActions("branch_offices", [
       "getAllBranchOffices",
       "storeBranchOffice",
       "updateBranchOffice",
       "changeStatusBranchOffices",
     ]),
-    ...mapMutations("sucursales", ["SET_EDIT_ITEM"]),
+    ...mapMutations("branch_offices", ["SET_EDIT_ITEM"]),
     initialize() {
-      if (this.sucursales.length == 0) {
+      if (this.branch_offices.length == 0) {
         this.getAllBranchOffices();
       }
     },
@@ -271,13 +271,13 @@ export default {
     },
 
     rollbackStateBranchOffice(item) {
-      let branchOfficeIndex = this.sucursales.indexOf(item);
-      this.sucursales[branchOfficeIndex].state =
-        !this.sucursales[branchOfficeIndex].state;
+      let branchOfficeIndex = this.branch_offices.indexOf(item);
+      this.branch_offices[branchOfficeIndex].state =
+        !this.branch_offices[branchOfficeIndex].state;
     },
 
     editItem(item) {
-      this.editedIndex = this.sucursales.indexOf(item);
+      this.editedIndex = this.branch_offices.indexOf(item);
       this.SET_EDIT_ITEM(Object.assign({}, item));
       // this.editedItem = ;
       this.dialog = true;
@@ -286,7 +286,7 @@ export default {
     goToShowDetailSucursal(item) {
       // Esto de desarrollara más adelante
       // Ir a monstrar los detalles de esta sucursal (Caja, stocks, trabajadores, clientes registrados en esa sucursal, mascotas en esa sucursal, sus habitaciones, etc)
-      this.editedIndex = this.sucursales.indexOf(item);
+      this.editedIndex = this.branch_offices.indexOf(item);
       // let itemObject = Object.assign({}, item); // Convertir a un objeto json
     },
 
@@ -305,13 +305,19 @@ export default {
       if (!this.$v.$invalid) {
         if (this.editedIndex > -1) {
           // Do update
-          this.updateBranchOffice();
+          this.updateBranchOffice().then((result) => {
+            if (result) {
+              this.close();
+            }
+          });
         } else {
           // Do store
-          this.storeBranchOffice();
+          this.storeBranchOffice().then((result) => {
+            if (result) {
+              this.close();
+            }
+          });
         }
-        // Close modal
-        this.close();
       }
     },
   },

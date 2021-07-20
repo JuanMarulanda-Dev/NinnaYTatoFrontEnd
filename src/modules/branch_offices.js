@@ -7,43 +7,25 @@ export default {
   state: {
     // Generals loading datatables
     loading: false,
-    users: [],
-    roles: [],
-    branchOffices: [],
+    branch_offices: [],
     editedItem: {
       id: 0,
-      first_name: "",
-      last_name: "",
+      name: "",
+      address: "",
       phone: "",
-      email: "",
-      role_id: "",
-      branch_office_id: "",
-      password: "",
-      password_confirmation: 0,
       state: false,
     },
     defaultItem: {
       id: 0,
-      first_name: "",
-      last_name: "",
+      name: "",
+      address: "",
       phone: "",
-      email: "",
-      role_id: "",
-      branch_office_id: "",
-      password: "",
-      password_confirmation: "",
-      state: false,
+      state: true,
     },
   },
   mutations: {
-    SET_USERS(state, users) {
-      state.users = users;
-    },
-    SET_ROLES(state, roles) {
-      state.roles = roles;
-    },
-    SET_BRANCH_OFFICES_AVAILABLES(state, branchOffices) {
-      state.branchOffices = branchOffices;
+    SET_BRANCH_OFFICES(state, branch_offices) {
+      state.branch_offices = branch_offices;
     },
     SET_LOADING_DATATABLE(state, status) {
       state.loading = status;
@@ -53,30 +35,13 @@ export default {
     },
   },
   actions: {
-    getAllRoles({ commit }) {
-      axios
-        .get("/api/roles")
-        .then((result) => {
-          commit("SET_ROLES", result.data.roles);
-        })
-        .catch(() => {});
-    },
-    getBranchOfficesAvailable({ commit }) {
-      // If status is 1 will get only availables branch offices and the status is 0 will get all branch offices
-      axios
-        .get("/api/branch-offices/1")
-        .then((result) => {
-          commit("SET_BRANCH_OFFICES_AVAILABLES", result.data.branch_offices);
-        })
-        .catch(() => {});
-    },
-    getAllUsers({ commit }) {
+    getAllBranchOffices({ commit }) {
       commit("SET_LOADING_DATATABLE", true);
       axios
-        .get("/api/users")
+        .get("/api/branch-offices")
         .then((result) => {
           // save all
-          commit("SET_USERS", result.data.users);
+          commit("SET_BRANCH_OFFICES", result.data.branch_offices);
         })
         .catch((errors) => {
           // show error message
@@ -91,19 +56,19 @@ export default {
         });
     },
 
-    storeUser({ state, commit, dispatch }) {
+    storeBranchOffice({ state, commit, dispatch }) {
       commit("SET_OVERLAY_LOADING", true, { root: true });
       return axios
-        .post("/api/users", state.editedItem)
+        .post("/api/branch-offices", state.editedItem)
         .then((result) => {
           if (result.status == 201) {
             // show message
             this._vm.showToastMessage(
               result.status,
-              "Usuario creado exitosamente"
+              "Sucursal creada exitosamente"
             );
-            // Reload users
-            dispatch("getAllUsers");
+            // Reload branch officess
+            dispatch("getAllBranchOffices");
             // Result
             return true;
           }
@@ -121,19 +86,19 @@ export default {
         });
     },
 
-    updateUser({ state, commit, dispatch }) {
+    updateBranchOffice({ state, commit, dispatch }) {
       commit("SET_OVERLAY_LOADING", true, { root: true });
       return axios
-        .put(`/api/users/${state.editedItem.id}`, state.editedItem)
+        .put(`/api/branch-offices/${state.editedItem.id}`, state.editedItem)
         .then((result) => {
           if (result.status == 201) {
             // show message
             this._vm.showToastMessage(
               result.status,
-              "Usuario actualizado exitosamente"
+              "Sucursal actualizada exitosamente"
             );
-            // Reload users
-            dispatch("getAllUsers");
+            // Reload branch officess
+            dispatch("getAllBranchOffices");
             // Result
             return true;
           }
@@ -151,16 +116,16 @@ export default {
         });
     },
 
-    changeStatusUser({ commit, dispatch }, id) {
+    changeStatusBranchOffices({ commit, dispatch }, id) {
       commit("SET_OVERLAY_LOADING", true, { root: true });
       return axios
-        .delete(`/api/users/${id}`)
+        .delete(`/api/branch-offices/${id}`)
         .then((result) => {
           if (result.status == 204) {
             // show message
             this._vm.showToastMessage(result.status);
-            // Reload branch officess
-            dispatch("getAllUsers");
+            // Reload cash registers
+            dispatch("getAllCashRegisters");
             return true;
           } else {
             return false;

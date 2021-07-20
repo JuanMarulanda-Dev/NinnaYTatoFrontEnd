@@ -13,13 +13,13 @@ export default {
     },
   },
   actions: {
-    async getAllSuppliers({ commit }) {
-      try {
-        let result = await axios.get("/api/suppliers");
-        commit("SET_SUPPLIERS", result.data.suppliers);
-      } catch (error) {
-        console.log(error);
-      }
+    getAllSuppliers({ commit }) {
+      axios
+        .get("/api/suppliers")
+        .then((result) => {
+          commit("SET_SUPPLIERS", result.data.suppliers);
+        })
+        .catch(() => {});
     },
   },
 };

@@ -43,46 +43,62 @@ export default {
     },
   },
   actions: {
-    async getAllDiscountByPlanDetail({ commit }, id) {
-      try {
-        // Activar el loading del datatable
-        commit("SET_OVERLAY_LOADING", true, { root: true });
-        let result = await axios.get(`/api/discounts/${id}`);
-        if (result.status == 200) {
-          commit("SET_DISCOUNTS", result.data.discounts);
-          return true;
-        } else {
+    getAllDiscountByPlanDetail({ commit }, id) {
+      commit("SET_OVERLAY_LOADING", true, { root: true });
+      return axios
+        .get(`/api/discounts/${id}`)
+        .then((result) => {
+          if (result.status == 200) {
+            commit("SET_DISCOUNTS", result.data.discounts);
+            return true;
+          } else {
+            return false;
+          }
+        })
+        .catch((errors) => {
+          // show error message
+          this._vm.showToastMessage(
+            errors.response.status,
+            this._vm.createMessageError(errors.response.data.errors)
+          );
           return false;
-        }
-      } catch (error) {
-        this._vm.$toast.error("Ocurrio un error");
-        return false;
-      } finally {
-        commit("SET_OVERLAY_LOADING", false, { root: true });
-      }
+        })
+        .finally(() => {
+          commit("SET_OVERLAY_LOADING", false, { root: true });
+        });
     },
 
-    async storeDiscountToPlanDetail({ state, commit }) {
-      try {
-        commit("SET_OVERLAY_LOADING", true, { root: true });
-        let result = await axios.post(
-          `/api/discounts/${state.id_plan_details}`,
-          { discounts: state.discounts }
-        );
-        if (result.status == 201) {
-          // show message
-          this._vm.$toast.success("Descuentos guardados exitosamente");
-          commit("SET_ID_PLAN_DETAILS", 0);
-          return true;
-        } else {
+    storeDiscountToPlanDetail({ state, commit }) {
+      commit("SET_OVERLAY_LOADING", true, { root: true });
+      return axios
+        .post(`/api/discounts/${state.id_plan_details}`, {
+          discounts: state.discounts,
+        })
+        .then((result) => {
+          if (result.status == 201) {
+            // show message
+            this._vm.showToastMessage(
+              result.status,
+              "Descuentos guardados exitosamente"
+            );
+            commit("SET_ID_PLAN_DETAILS", 0);
+            // Result
+            return true;
+          } else {
+            return false;
+          }
+        })
+        .catch((errors) => {
+          // show error message
+          this._vm.showToastMessage(
+            errors.response.status,
+            this._vm.createMessageError(errors.response.data.errors)
+          );
           return false;
-        }
-      } catch (error) {
-        this._vm.$toast.error("Ocurrio un error");
-        return false;
-      } finally {
-        commit("SET_OVERLAY_LOADING", false, { root: true });
-      }
+        })
+        .finally(() => {
+          commit("SET_OVERLAY_LOADING", false, { root: true });
+        });
     },
   },
 };

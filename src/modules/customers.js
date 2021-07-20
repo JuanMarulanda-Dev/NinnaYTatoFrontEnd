@@ -97,133 +97,175 @@ export default {
     },
   },
   actions: {
-    async getAllCustomers({ commit }) {
-      try {
-        // Activar el loading del datatable
-        commit("SET_LOADING_DATATABLE", true);
-        let result = await axios.get("/api/customers");
-        commit("SET_CUSTOMERS", result.data.customers);
-      } catch (error) {
-        this._vm.$toast.error("Ocurrior un error...");
-      } finally {
-        commit("SET_LOADING_DATATABLE", false);
-      }
+    getAllCustomers({ commit }) {
+      commit("SET_LOADING_DATATABLE", true);
+      axios
+        .get("/api/customers")
+        .then((result) => {
+          // save all
+          commit("SET_CUSTOMERS", result.data.customers);
+        })
+        .catch((errors) => {
+          // show error message
+          this._vm.showToastMessage(
+            errors.response.status,
+            this._vm.createMessageError(errors.response.data.errors)
+          );
+          return false;
+        })
+        .finally(() => {
+          commit("SET_LOADING_DATATABLE", false);
+        });
     },
     async getDetailsCustomer({ commit }, customerId) {
-      try {
-        // Activar el loading del datatable
-        commit("SET_OVERLAY_LOADING", true, { root: true });
-        let result = await axios.get(`/api/customers/${customerId}`);
-        commit("SET_CUSTOMER_DETAILS", result.data.customer);
-        commit("SET_CUSTOMER_PETS", result.data.pets);
-      } catch (error) {
-        this._vm.$toast.error("Ocurrior un error...");
-      } finally {
-        commit("SET_OVERLAY_LOADING", false, { root: true });
-      }
-    },
-    async getAllHowContact({ commit }) {
-      try {
-        // Activar el loading del datatable
-        let result = await axios.get("/api/how-contact");
-        commit("SET_HOW_CONTACT", result.data.how_contact);
-      } catch (error) {
-        this._vm.$toast.error("Ocurrior un error...");
-      }
-    },
-    async storeCustomer({ state, commit }, pet) {
-      try {
-        commit("SET_OVERLAY_LOADING", true, { root: true });
-
-        let data = {
-          ...state.personal_infomation,
-          ...state.contact_information,
-          ...state.additional_information,
-          ...pet,
-        };
-
-        let formData = new FormData();
-        for (var key in data) {
-          if (data[key] == null) {
-            formData.append(key, "");
-          } else if (typeof data[key] === "boolean") {
-            formData.append(key, data[key] ? "1" : "0");
-          } else {
-            formData.append(key, data[key]);
-          }
-        }
-        let result = await axios.post("/api/customers", formData);
-
-        if (result.status == 201) {
-          // show message
-          this._vm.$toast.success("Cliente registrado exitosamente");
-          return true;
-        }
-      } catch (error) {
-        this._vm.$toast.error("Ocurrio un error");
-        return false;
-      } finally {
-        commit("SET_OVERLAY_LOADING", false, { root: true });
-      }
-    },
-    async updateCustomer({ state, commit }) {
-      try {
-        commit("SET_OVERLAY_LOADING", true, { root: true });
-
-        let data = {
-          ...state.personal_infomation,
-          ...state.contact_information,
-          ...state.additional_information,
-        };
-
-        let formData = new FormData();
-        for (var key in data) {
-          if (data[key] == null) {
-            formData.append(key, "");
-          } else if (typeof data[key] === "boolean") {
-            formData.append(key, data[key] ? "1" : "0");
-          } else {
-            formData.append(key, data[key]);
-          }
-        }
-        formData.append("_method", "put");
-        let result = await axios.post(
-          `/api/customers/${state.personal_infomation.id}`,
-          formData
-        );
-        if (result.status == 201) {
-          // show message
-          this._vm.$toast.success("Cliente actualizado exitosamente");
-          // Reset object with default information
-          commit("SET_CUSTOMER_DEFAULT");
-          return true;
-        }
-      } catch (error) {
-        this._vm.$toast.error("Ocurrio un error");
-        return false;
-      } finally {
-        commit("SET_OVERLAY_LOADING", false, { root: true });
-      }
-    },
-    async changeStatusCustomers({ commit, dispatch }, id) {
-      try {
-        commit("SET_OVERLAY_LOADING", true, { root: true });
-        let result = await axios.delete(`/api/users/${id}`);
-        if (result.status == 204) {
-          // show message
-          this._vm.$toast.success("Estado cambiado exitosamente");
-          // Reload branch officess
-          dispatch("getAllCustomers");
-          return true;
-        } else {
+      commit("SET_LOADING_DATATABLE", true);
+      axios
+        .get(`/api/customers/${customerId}`)
+        .then((result) => {
+          // save all
+          commit("SET_CUSTOMER_DETAILS", result.data.customer);
+          commit("SET_CUSTOMER_PETS", result.data.pets);
+        })
+        .catch((errors) => {
+          // show error message
+          this._vm.showToastMessage(
+            errors.response.status,
+            this._vm.createMessageError(errors.response.data.errors)
+          );
           return false;
+        })
+        .finally(() => {
+          commit("SET_LOADING_DATATABLE", false);
+        });
+    },
+    getAllHowContact({ commit }) {
+      axios
+        .get("/api/how-contact")
+        .then((result) => {
+          commit("SET_HOW_CONTACT", result.data.how_contact);
+        })
+        .catch(() => {});
+    },
+    storeCustomer({ state, commit }, pet) {
+      commit("SET_OVERLAY_LOADING", true, { root: true });
+
+      let data = {
+        ...state.personal_infomation,
+        ...state.contact_information,
+        ...state.additional_information,
+        ...pet,
+      };
+
+      let formData = new FormData();
+      for (var key in data) {
+        if (data[key] == null) {
+          formData.append(key, "");
+        } else if (typeof data[key] === "boolean") {
+          formData.append(key, data[key] ? "1" : "0");
+        } else {
+          formData.append(key, data[key]);
         }
-      } catch (error) {
-        this._vm.$toast.error("Ocurrio un error");
-        return false;
-      } finally {
-        commit("SET_OVERLAY_LOADING", false, { root: true });
       }
+
+      return axios
+        .post("/api/customers", formData)
+        .then((result) => {
+          if (result.status == 201) {
+            // show message
+            this._vm.showToastMessage(
+              result.status,
+              "Cliente registrado exitosamente"
+            );
+            // Result
+            return true;
+          }
+        })
+        .catch((errors) => {
+          // show error message
+          this._vm.showToastMessage(
+            errors.response.status,
+            this._vm.createMessageError(errors.response.data.errors)
+          );
+          return false;
+        })
+        .finally(() => {
+          commit("SET_OVERLAY_LOADING", false, { root: true });
+        });
+    },
+    updateCustomer({ state, commit }) {
+      commit("SET_OVERLAY_LOADING", true, { root: true });
+
+      let data = {
+        ...state.personal_infomation,
+        ...state.contact_information,
+        ...state.additional_information,
+      };
+
+      let formData = new FormData();
+      for (var key in data) {
+        if (data[key] == null) {
+          formData.append(key, "");
+        } else if (typeof data[key] === "boolean") {
+          formData.append(key, data[key] ? "1" : "0");
+        } else {
+          formData.append(key, data[key]);
+        }
+      }
+      formData.append("_method", "put");
+
+      return axios
+        .post(`/api/customers/${state.personal_infomation.id}`, formData)
+        .then((result) => {
+          if (result.status == 201) {
+            // show message
+            this._vm.showToastMessage(
+              result.status,
+              "Cliente actualizado exitosamente"
+            );
+            // Reset object with default information
+            commit("SET_CUSTOMER_DEFAULT");
+            // Result
+            return true;
+          }
+        })
+        .catch((errors) => {
+          // show error message
+          this._vm.showToastMessage(
+            errors.response.status,
+            this._vm.createMessageError(errors.response.data.errors)
+          );
+          return false;
+        })
+        .finally(() => {
+          commit("SET_OVERLAY_LOADING", false, { root: true });
+        });
+    },
+    changeStatusCustomers({ commit, dispatch }, id) {
+      commit("SET_OVERLAY_LOADING", true, { root: true });
+      return axios
+        .delete(`/api/users/${id}`)
+        .then((result) => {
+          if (result.status == 204) {
+            // show message
+            this._vm.showToastMessage(result.status);
+            // Reload branch officess
+            dispatch("getAllCustomers");
+            return true;
+          } else {
+            return false;
+          }
+        })
+        .catch((errors) => {
+          // show error message
+          this._vm.showToastMessage(
+            errors.response.status,
+            this._vm.createMessageError(errors.response.data.errors)
+          );
+          return false;
+        })
+        .finally(() => {
+          commit("SET_OVERLAY_LOADING", false, { root: true });
+        });
     },
   },
   getters: {},

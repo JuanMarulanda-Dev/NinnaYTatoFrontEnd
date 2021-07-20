@@ -340,13 +340,19 @@ export default {
       if (!this.$v.$invalid) {
         if (this.editedIndex > -1) {
           // Do update
-          this.updatePlan();
+          this.updatePlan().then((result) => {
+            if (result) {
+              this.close();
+            }
+          });
         } else {
           // Do store
-          this.storePlan();
+          this.storePlan().then((result) => {
+            if (result) {
+              this.close();
+            }
+          });
         }
-        // Close modal
-        this.close();
       }
     },
   },

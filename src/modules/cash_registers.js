@@ -31,78 +31,113 @@ export default {
     },
   },
   actions: {
-    async getAllCashRegisters({ commit, rootState }, status = 0) {
-      try {
-        // Activar el loading del datatable
-        commit("SET_LOADING_DATATABLE", true);
-        let result = await axios.get(
-          `/api/cash-registers/${rootState.mainBranchOffice}/${status}`
-        );
-        commit("SET_CASH_REGISTER", result.data.cashRegisters);
-      } catch (error) {
-        console.log(error);
-      } finally {
-        commit("SET_LOADING_DATATABLE", false);
-      }
-    },
-
-    async storeCahsRegister({ state, commit, dispatch, rootState }) {
-      try {
-        commit("SET_OVERLAY_LOADING", true, { root: true });
-        state.editedItem.branch_office_id = rootState.mainBranchOffice;
-        let result = await axios.post("/api/cash-registers", state.editedItem);
-        if (result.status == 201) {
-          // show message
-          this._vm.$toast.success("Caja creada exitosamente");
-          // Reload cash registers
-          dispatch("getAllCashRegisters");
-        }
-      } catch (error) {
-        this._vm.$toast.error("Ocurrio un error");
-      } finally {
-        commit("SET_OVERLAY_LOADING", false, { root: true });
-      }
-    },
-
-    async updateCahsRegister({ state, commit, dispatch }) {
-      try {
-        commit("SET_OVERLAY_LOADING", true, { root: true });
-        let result = await axios.put(
-          `/api/cash-registers/${state.editedItem.id}`,
-          state.editedItem
-        );
-        if (result.status == 201) {
-          // show message
-          this._vm.$toast.success("Caja actualizada exitosamente");
-          // Reload cash registers
-          dispatch("getAllCashRegisters");
-        }
-      } catch (error) {
-        this._vm.$toast.error("Ocurrio un error");
-      } finally {
-        commit("SET_OVERLAY_LOADING", false, { root: true });
-      }
-    },
-
-    async changeStatusCahsRegister({ commit, dispatch }, id) {
-      try {
-        commit("SET_OVERLAY_LOADING", true, { root: true });
-        let result = await axios.delete(`/api/cash-registers/${id}`);
-        if (result.status == 204) {
-          // show message
-          this._vm.$toast.success("Estado cambiado exitosamente");
-          // Reload cash registers
-          dispatch("getAllCashRegisters");
-          return true;
-        } else {
+    getAllCashRegisters({ commit, rootState }, status = 0) {
+      commit("SET_LOADING_DATATABLE", true);
+      axios
+        .get(`/api/cash-registers/${rootState.mainBranchOffice}/${status}`)
+        .then((result) => {
+          // save all
+          commit("SET_CASH_REGISTER", result.data.cashRegisters);
+        })
+        .catch((errors) => {
+          // show error message
+          this._vm.showToastMessage(
+            errors.response.status,
+            this._vm.createMessageError(errors.response.data.errors)
+          );
           return false;
-        }
-      } catch (error) {
-        this._vm.$toast.error("Ocurrio un error");
-        return false;
-      } finally {
-        commit("SET_OVERLAY_LOADING", false, { root: true });
-      }
+        })
+        .finally(() => {
+          commit("SET_LOADING_DATATABLE", false);
+        });
+    },
+
+    storeCahsRegister({ state, commit, dispatch, rootState }) {
+      commit("SET_OVERLAY_LOADING", true, { root: true });
+      state.editedItem.branch_office_id = rootState.mainBranchOffice;
+      return axios
+        .post("/api/cash-registers", state.editedItem)
+        .then((result) => {
+          if (result.status == 201) {
+            // show message
+            this._vm.showToastMessage(
+              result.status,
+              "Caja creada exitosamente"
+            );
+            // Reload cash registers
+            dispatch("getAllCashRegisters");
+            // Result
+            return true;
+          }
+        })
+        .catch((errors) => {
+          // show error message
+          this._vm.showToastMessage(
+            errors.response.status,
+            this._vm.createMessageError(errors.response.data.errors)
+          );
+          return false;
+        })
+        .finally(() => {
+          commit("SET_OVERLAY_LOADING", false, { root: true });
+        });
+    },
+
+    updateCahsRegister({ state, commit, dispatch }) {
+      return axios
+        .put(`/api/cash-registers/${state.editedItem.id}`, state.editedItem)
+        .then((result) => {
+          if (result.status == 201) {
+            // show message
+            this._vm.showToastMessage(
+              result.status,
+              "Caja actualizada exitosamente"
+            );
+            // Reload cash registers
+            dispatch("getAllCashRegisters");
+            // Result
+            return true;
+          }
+        })
+        .catch((errors) => {
+          // show error message
+          this._vm.showToastMessage(
+            errors.response.status,
+            this._vm.createMessageError(errors.response.data.errors)
+          );
+          return false;
+        })
+        .finally(() => {
+          commit("SET_OVERLAY_LOADING", false, { root: true });
+        });
+    },
+
+    changeStatusCahsRegister({ commit, dispatch }, id) {
+      commit("SET_OVERLAY_LOADING", true, { root: true });
+      return axios
+        .delete(`/api/cash-registers/${id}`)
+        .then((result) => {
+          if (result.status == 204) {
+            // show message
+            this._vm.showToastMessage(result.status);
+            // Reload cash registers
+            dispatch("getAllCashRegisters");
+            return true;
+          } else {
+            return false;
+          }
+        })
+        .catch((errors) => {
+          // show error message
+          this._vm.showToastMessage(
+            errors.response.status,
+            this._vm.createMessageError(errors.response.data.errors)
+          );
+          return false;
+        })
+        .finally(() => {
+          commit("SET_OVERLAY_LOADING", false, { root: true });
+        });
     },
   },
 };

@@ -41,75 +41,113 @@ export default {
     },
   },
   actions: {
-    async getAllPlansDetails({ commit }) {
-      try {
-        // Activar el loading del datatable
-        commit("SET_LOADING_DATATABLE", true);
-        let result = await axios.get("/api/plan-details");
-        commit("SET_PLAN_DETAILS", result.data.planDetails);
-      } catch (error) {
-        console.log(error);
-      } finally {
-        commit("SET_LOADING_DATATABLE", false);
-      }
-    },
-
-    async storePlanDetail({ state, commit, dispatch }) {
-      try {
-        commit("SET_OVERLAY_LOADING", true, { root: true });
-        let result = await axios.post("/api/plan-details", state.editedItem);
-        if (result.status == 201) {
-          // show message
-          this._vm.$toast.success("Plan creado exitosamente");
-          // Reload plan detail
-          dispatch("getAllPlansDetails");
-        }
-      } catch (error) {
-        this._vm.$toast.error("Ocurrio un error");
-      } finally {
-        commit("SET_OVERLAY_LOADING", false, { root: true });
-      }
-    },
-
-    async updatePlanDetail({ state, commit, dispatch }) {
-      try {
-        commit("SET_OVERLAY_LOADING", true, { root: true });
-        let result = await axios.put(
-          `/api/plan-details/${state.editedItem.id}`,
-          state.editedItem
-        );
-        if (result.status == 201) {
-          // show message
-          this._vm.$toast.success("Plan actualizado exitosamente");
-          // Reload plan detail
-          dispatch("getAllPlansDetails");
-        }
-      } catch (error) {
-        this._vm.$toast.error("Ocurrio un error");
-      } finally {
-        commit("SET_OVERLAY_LOADING", false, { root: true });
-      }
-    },
-
-    async changeStatusPlanDetail({ commit, dispatch }, id) {
-      try {
-        commit("SET_OVERLAY_LOADING", true, { root: true });
-        let result = await axios.delete(`/api/plan-details/${id}`);
-        if (result.status == 204) {
-          // show message
-          this._vm.$toast.success("Estado cambiado exitosamente");
-          // Reload plan detail
-          dispatch("getAllPlansDetails");
-          return true;
-        } else {
+    getAllPlansDetails({ commit }) {
+      commit("SET_LOADING_DATATABLE", true);
+      axios
+        .get("/api/plan-details")
+        .then((result) => {
+          // save all
+          commit("SET_PLAN_DETAILS", result.data.planDetails);
+        })
+        .catch((errors) => {
+          // show error message
+          this._vm.showToastMessage(
+            errors.response.status,
+            this._vm.createMessageError(errors.response.data.errors)
+          );
           return false;
-        }
-      } catch (error) {
-        this._vm.$toast.error("Ocurrio un error");
-        return false;
-      } finally {
-        commit("SET_OVERLAY_LOADING", false, { root: true });
-      }
+        })
+        .finally(() => {
+          commit("SET_LOADING_DATATABLE", false);
+        });
+    },
+
+    storePlanDetail({ state, commit, dispatch }) {
+      commit("SET_OVERLAY_LOADING", true, { root: true });
+      return axios
+        .post("/api/plan-details", state.editedItem)
+        .then((result) => {
+          if (result.status == 201) {
+            // show message
+            this._vm.showToastMessage(
+              result.status,
+              "Plan creado exitosamente"
+            );
+            // Reload cash registers
+            dispatch("getAllPlansDetails");
+            // Result
+            return true;
+          }
+        })
+        .catch((errors) => {
+          // show error message
+          this._vm.showToastMessage(
+            errors.response.status,
+            this._vm.createMessageError(errors.response.data.errors)
+          );
+          return false;
+        })
+        .finally(() => {
+          commit("SET_OVERLAY_LOADING", false, { root: true });
+        });
+    },
+
+    updatePlanDetail({ state, commit, dispatch }) {
+      commit("SET_OVERLAY_LOADING", true, { root: true });
+      return axios
+        .put(`/api/plan-details/${state.editedItem.id}`, state.editedItem)
+        .then((result) => {
+          if (result.status == 201) {
+            // show message
+            this._vm.showToastMessage(
+              result.status,
+              "Plan actualizado exitosamente"
+            );
+            // Reload cash registers
+            dispatch("getAllPlansDetails");
+            // Result
+            return true;
+          }
+        })
+        .catch((errors) => {
+          // show error message
+          this._vm.showToastMessage(
+            errors.response.status,
+            this._vm.createMessageError(errors.response.data.errors)
+          );
+          return false;
+        })
+        .finally(() => {
+          commit("SET_OVERLAY_LOADING", false, { root: true });
+        });
+    },
+
+    changeStatusPlanDetail({ commit, dispatch }, id) {
+      commit("SET_OVERLAY_LOADING", true, { root: true });
+      return axios
+        .delete(`/api/plan-details/${id}`)
+        .then((result) => {
+          if (result.status == 204) {
+            // show message
+            this._vm.showToastMessage(result.status);
+            // Reload cash registers
+            dispatch("getAllPlansDetails");
+            return true;
+          } else {
+            return false;
+          }
+        })
+        .catch((errors) => {
+          // show error message
+          this._vm.showToastMessage(
+            errors.response.status,
+            this._vm.createMessageError(errors.response.data.errors)
+          );
+          return false;
+        })
+        .finally(() => {
+          commit("SET_OVERLAY_LOADING", false, { root: true });
+        });
     },
   },
 };

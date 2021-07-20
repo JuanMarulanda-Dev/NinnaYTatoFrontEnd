@@ -35,77 +35,113 @@ export default {
     },
   },
   actions: {
-    async getAllProducts({ commit, rootState }, status = 0) {
-      try {
-        // Activar el loading del datatable
-        commit("SET_LOADING_DATATABLE", true);
-        let result = await axios.get(
-          `/api/products/${rootState.mainBranchOffice}/${status}`
-        );
-        commit("SET_PRODUCTS", result.data.products);
-      } catch (error) {
-        console.log(error);
-      } finally {
-        commit("SET_LOADING_DATATABLE", false);
-      }
-    },
-
-    async storeProduct({ state, commit, dispatch }) {
-      try {
-        commit("SET_OVERLAY_LOADING", true, { root: true });
-        let result = await axios.post("/api/products", state.editedItem);
-        if (result.status == 201) {
-          // show message
-          this._vm.$toast.success("Producto creado exitosamente");
-          // Reload products
-          dispatch("getAllProducts");
-        }
-      } catch (error) {
-        this._vm.$toast.error("Ocurrio un error");
-      } finally {
-        commit("SET_OVERLAY_LOADING", false, { root: true });
-      }
-    },
-
-    async updateProduct({ state, commit, dispatch }) {
-      try {
-        commit("SET_OVERLAY_LOADING", true, { root: true });
-        let result = await axios.put(
-          `/api/products/${state.editedItem.id}`,
-          state.editedItem
-        );
-        if (result.status == 201) {
-          // show message
-          this._vm.$toast.success("Producto actualizado exitosamente");
-          // Reload products
-          dispatch("getAllProducts");
-        }
-      } catch (error) {
-        this._vm.$toast.error("Ocurrio un error");
-      } finally {
-        commit("SET_OVERLAY_LOADING", false, { root: true });
-      }
-    },
-
-    async changeStatusProduct({ commit, dispatch }, id) {
-      try {
-        commit("SET_OVERLAY_LOADING", true, { root: true });
-        let result = await axios.delete(`/api/products/${id}`);
-        if (result.status == 204) {
-          // show message
-          this._vm.$toast.success("Estado cambiado exitosamente");
-          // Reload products
-          dispatch("getAllProducts");
-          return true;
-        } else {
+    getAllProducts({ commit, rootState }, status = 0) {
+      commit("SET_LOADING_DATATABLE", true);
+      axios
+        .get(`/api/products/${rootState.mainBranchOffice}/${status}`)
+        .then((result) => {
+          // save all
+          commit("SET_PRODUCTS", result.data.products);
+        })
+        .catch((errors) => {
+          // show error message
+          this._vm.showToastMessage(
+            errors.response.status,
+            this._vm.createMessageError(errors.response.data.errors)
+          );
           return false;
-        }
-      } catch (error) {
-        this._vm.$toast.error("Ocurrio un error");
-        return false;
-      } finally {
-        commit("SET_OVERLAY_LOADING", false, { root: true });
-      }
+        })
+        .finally(() => {
+          commit("SET_LOADING_DATATABLE", false);
+        });
+    },
+
+    storeProduct({ state, commit, dispatch }) {
+      commit("SET_OVERLAY_LOADING", true, { root: true });
+      return axios
+        .post("/api/products", state.editedItem)
+        .then((result) => {
+          if (result.status == 201) {
+            // show message
+            this._vm.showToastMessage(
+              result.status,
+              "Producto creado exitosamente"
+            );
+            // Reload cash registers
+            dispatch("getAllProducts");
+            // Result
+            return true;
+          }
+        })
+        .catch((errors) => {
+          // show error message
+          this._vm.showToastMessage(
+            errors.response.status,
+            this._vm.createMessageError(errors.response.data.errors)
+          );
+          return false;
+        })
+        .finally(() => {
+          commit("SET_OVERLAY_LOADING", false, { root: true });
+        });
+    },
+
+    updateProduct({ state, commit, dispatch }) {
+      commit("SET_OVERLAY_LOADING", true, { root: true });
+      return axios
+        .put(`/api/products/${state.editedItem.id}`, state.editedItem)
+        .then((result) => {
+          if (result.status == 201) {
+            // show message
+            this._vm.showToastMessage(
+              result.status,
+              "Producto actualizado exitosamente"
+            );
+            // Reload cash registers
+            dispatch("getAllProducts");
+            // Result
+            return true;
+          }
+        })
+        .catch((errors) => {
+          // show error message
+          this._vm.showToastMessage(
+            errors.response.status,
+            this._vm.createMessageError(errors.response.data.errors)
+          );
+          return false;
+        })
+        .finally(() => {
+          commit("SET_OVERLAY_LOADING", false, { root: true });
+        });
+    },
+
+    changeStatusProduct({ commit, dispatch }, id) {
+      commit("SET_OVERLAY_LOADING", true, { root: true });
+      return axios
+        .delete(`/api/products/${id}`)
+        .then((result) => {
+          if (result.status == 204) {
+            // show message
+            this._vm.showToastMessage(result.status);
+            // Reload cash registers
+            dispatch("getAllProducts");
+            return true;
+          } else {
+            return false;
+          }
+        })
+        .catch((errors) => {
+          // show error message
+          this._vm.showToastMessage(
+            errors.response.status,
+            this._vm.createMessageError(errors.response.data.errors)
+          );
+          return false;
+        })
+        .finally(() => {
+          commit("SET_OVERLAY_LOADING", false, { root: true });
+        });
     },
   },
 };

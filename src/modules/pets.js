@@ -117,144 +117,174 @@ export default {
     },
   },
   actions: {
-    async getAllBreeds({ commit }) {
-      try {
-        // Activar el loading del datatable
-        let result = await axios.get("/api/breeds");
-        commit("SET_BREEDS", result.data.breeds);
-      } catch (error) {
-        this._vm.$toast.error("Ocurrior un error...");
-      }
+    getAllBreeds({ commit }) {
+      axios
+        .get("/api/breeds")
+        .then((result) => {
+          commit("SET_BREEDS", result.data.breeds);
+        })
+        .catch(() => {});
     },
-    async getAllSizes({ commit }) {
-      try {
-        // Activar el loading del datatable
-        let result = await axios.get("/api/sizes");
-        commit("SET_SIZES", result.data.sizes);
-      } catch (error) {
-        this._vm.$toast.error("Ocurrior un error...");
-      }
+    getAllSizes({ commit }) {
+      axios
+        .get("/api/sizes")
+        .then((result) => {
+          commit("SET_SIZES", result.data.sizes);
+        })
+        .catch(() => {});
     },
-    async getAllFurs({ commit }) {
-      try {
-        // Activar el loading del datatable
-        let result = await axios.get("/api/furs");
-        commit("SET_FURS", result.data.furs);
-      } catch (error) {
-        this._vm.$toast.error("Ocurrior un error...");
-      }
+    getAllFurs({ commit }) {
+      axios
+        .get("/api/furs")
+        .then((result) => {
+          commit("SET_FURS", result.data.furs);
+        })
+        .catch(() => {});
     },
-    async getAllFood({ commit }) {
-      try {
-        // Activar el loading del datatable
-        let result = await axios.get("/api/food");
-        commit("SET_FOODS", result.data.food);
-      } catch (error) {
-        this._vm.$toast.error("Ocurrior un error...");
-      }
+    getAllFood({ commit }) {
+      axios
+        .get("/api/food")
+        .then((result) => {
+          commit("SET_FOODS", result.data.food);
+        })
+        .catch(() => {});
     },
-    async storePet({ state, commit }, customerId) {
-      try {
-        commit("SET_OVERLAY_LOADING", true, { root: true });
+    storePet({ state, commit }, customerId) {
+      commit("SET_OVERLAY_LOADING", true, { root: true });
 
-        let data = {
-          ...state.pet,
-          ...state.vet_information,
-          ...state.pet_behavior,
-        };
+      let data = {
+        ...state.pet,
+        ...state.vet_information,
+        ...state.pet_behavior,
+      };
 
-        let formData = new FormData();
-        for (var key in data) {
-          if (data[key] == null) {
-            formData.append(key, "");
-          } else if (typeof data[key] === "boolean") {
-            formData.append(key, data[key] ? "1" : "0");
-          } else {
-            formData.append(key, data[key]);
+      let formData = new FormData();
+      for (var key in data) {
+        if (data[key] == null) {
+          formData.append(key, "");
+        } else if (typeof data[key] === "boolean") {
+          formData.append(key, data[key] ? "1" : "0");
+        } else {
+          formData.append(key, data[key]);
+        }
+      }
+
+      return axios
+        .post(`/api/customers/${customerId}/pets`, formData)
+        .then((result) => {
+          if (result.status == 201) {
+            // show message
+            this._vm.showToastMessage(
+              result.status,
+              "Mascota registrado exitosamente"
+            );
+            // Result
+            return true;
           }
-        }
-
-        let result = await axios.post(
-          `/api/customers/${customerId}/pets`,
-          formData
-        );
-        if (result.status == 201) {
-          // show message
-          this._vm.$toast.success("Mascota registrado exitosamente");
-          return true;
-        }
-      } catch (error) {
-        this._vm.$toast.error("Ocurrio un error");
-        return false;
-      } finally {
-        commit("SET_OVERLAY_LOADING", false, { root: true });
-      }
+        })
+        .catch((errors) => {
+          // show error message
+          this._vm.showToastMessage(
+            errors.response.status,
+            this._vm.createMessageError(errors.response.data.errors)
+          );
+          return false;
+        })
+        .finally(() => {
+          commit("SET_OVERLAY_LOADING", false, { root: true });
+        });
     },
-    async updatePet({ state, commit }) {
-      try {
-        commit("SET_OVERLAY_LOADING", true, { root: true });
+    updatePet({ state, commit }) {
+      commit("SET_OVERLAY_LOADING", true, { root: true });
 
-        let data = {
-          ...state.pet,
-          ...state.vet_information,
-          ...state.pet_behavior,
-        };
+      let data = {
+        ...state.pet,
+        ...state.vet_information,
+        ...state.pet_behavior,
+      };
 
-        let formData = new FormData();
-        for (var key in data) {
-          if (data[key] == null) {
-            formData.append(key, "");
-          } else if (typeof data[key] === "boolean") {
-            formData.append(key, data[key] ? "1" : "0");
-          } else {
-            formData.append(key, data[key]);
+      let formData = new FormData();
+      for (var key in data) {
+        if (data[key] == null) {
+          formData.append(key, "");
+        } else if (typeof data[key] === "boolean") {
+          formData.append(key, data[key] ? "1" : "0");
+        } else {
+          formData.append(key, data[key]);
+        }
+      }
+      formData.append("_method", "put");
+
+      return axios
+        .post(`/api/pets/${state.pet.id}`, formData)
+        .then((result) => {
+          if (result.status == 201) {
+            // show message
+            this._vm.showToastMessage(
+              result.status,
+              "Mascota actualizado exitosamente"
+            );
+            // Result
+            return true;
           }
-        }
-        formData.append("_method", "put");
-        let result = await axios.post(`/api/pets/${state.pet.id}`, formData);
-        if (result.status == 201) {
-          // show message
-          this._vm.$toast.success("Mascota actualizado exitosamente");
-          // Reset object with default information
-          commit("SET_PET_DEFAULT");
-          return true;
-        }
-      } catch (error) {
-        this._vm.$toast.error("Ocurrio un error");
-        return false;
-      } finally {
-        commit("SET_OVERLAY_LOADING", false, { root: true });
-      }
+        })
+        .catch((errors) => {
+          // show error message
+          this._vm.showToastMessage(
+            errors.response.status,
+            this._vm.createMessageError(errors.response.data.errors)
+          );
+          return false;
+        })
+        .finally(() => {
+          commit("SET_OVERLAY_LOADING", false, { root: true });
+        });
     },
-    async getDetailsPet({ commit }, petId) {
-      try {
-        // Activar el loading del datatable
-        commit("SET_OVERLAY_LOADING", true, { root: true });
-        let result = await axios.get(`/api/pets/${petId}`);
-        commit("SET_PET_DETAILS", result.data.pet);
-      } catch (error) {
-        this._vm.$toast.error("Ocurrior un error...");
-      } finally {
-        commit("SET_OVERLAY_LOADING", false, { root: true });
-      }
+
+    getDetailsPet({ commit }, petId) {
+      commit("SET_LOADING_DATATABLE", true);
+      axios
+        .get(`/api/pets/${petId}`)
+        .then((result) => {
+          // save all
+          commit("SET_PET_DETAILS", result.data.pet);
+        })
+        .catch((errors) => {
+          // show error message
+          this._vm.showToastMessage(
+            errors.response.status,
+            this._vm.createMessageError(errors.response.data.errors)
+          );
+          return false;
+        })
+        .finally(() => {
+          commit("SET_LOADING_DATATABLE", false);
+        });
     },
     async changeStatusPet({ state, commit }) {
-      try {
-        commit("SET_OVERLAY_LOADING", true, { root: true });
-        let result = await axios.delete(`/api/pets/${state.pet.id}`);
-        if (result.status == 204) {
-          // show message
-          this._vm.$toast.success("Estado cambiado exitosamente");
-          return true;
-        } else {
+      commit("SET_OVERLAY_LOADING", true, { root: true });
+      return axios
+        .delete(`/api/pets/${state.pet.id}`)
+        .then((result) => {
+          if (result.status == 204) {
+            // show message
+            this._vm.showToastMessage(result.status);
+            return true;
+          } else {
+            return false;
+          }
+        })
+        .catch((errors) => {
+          // show error message
+          this._vm.showToastMessage(
+            errors.response.status,
+            this._vm.createMessageError(errors.response.data.errors)
+          );
           return false;
-        }
-      } catch (error) {
-        this._vm.$toast.error("Ocurrio un error");
-        return false;
-      } finally {
-        commit("SET_OVERLAY_LOADING", false, { root: true });
-      }
+        })
+        .finally(() => {
+          commit("SET_OVERLAY_LOADING", false, { root: true });
+        });
     },
   },
   getters: {},
