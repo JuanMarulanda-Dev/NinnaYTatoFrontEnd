@@ -14,6 +14,7 @@ import plans from "@/modules/plans.js";
 import plans_details from "@/modules/plans_details.js";
 import discounts from "@/modules/discounts.js";
 import cash_registers from "@/modules/cash_registers.js";
+import purchases from "@/modules/purchases.js";
 
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL = process.env.VUE_APP_API_URL;
@@ -186,5 +187,6 @@ export default new Vuex.Store({
     plans_details,
     discounts,
     cash_registers,
+    purchases,
   },
 });
