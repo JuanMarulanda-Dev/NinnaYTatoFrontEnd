@@ -2,11 +2,13 @@ exports.install = function (Vue) {
   Vue.prototype.createMessageError = function (errors) {
     let message = "";
 
-    if (Array.isArray(errors)) {
-      // Make message
-      errors.forEach((error) => {
-        message += `* ${error}\n`;
-      });
+    if (typeof errors === "object") {
+      for (const item in errors) {
+        // Make message
+        errors[item].forEach((error) => {
+          message += `* ${error}\n`;
+        });
+      }
     } else {
       message = "Algo no anda bien...";
     }
@@ -29,6 +31,16 @@ exports.install = function (Vue) {
         400: () => {
           // Bad request
           Vue.$toast.warning(message);
+        },
+        401: () => {
+          // Unauthenticate
+          Vue.$toast.warning(message);
+          // Eliminar la sesssion y retornar al login
+          // pendding...
+        },
+        403: () => {
+          // access to the requested resource is forbidden.
+          Vue.$toast.warning("No tienes permiso para realizar esta acción.");
         },
         500: () => {
           // Server error
