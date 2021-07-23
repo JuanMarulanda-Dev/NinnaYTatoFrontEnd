@@ -44,7 +44,7 @@ export default {
     getAllPurchases({ commit, rootState }) {
       commit("SET_LOADING_DATATABLE", true);
       axios
-        .get(`/api/purchases/${rootState.mainBranchOffice}`)
+        .get(`/api/purchases?branch_office_id=${rootState.mainBranchOffice}`)
         .then((result) => {
           // save all
           commit("SET_PURCHASES", result.data.purchases);

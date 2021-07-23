@@ -38,7 +38,9 @@ export default {
     getAllProducts({ commit, rootState }, status = 0) {
       commit("SET_LOADING_DATATABLE", true);
       axios
-        .get(`/api/products/${rootState.mainBranchOffice}/${status}`)
+        .get(
+          `/api/products?branch_office_id=${rootState.mainBranchOffice}&state=${status}`
+        )
         .then((result) => {
           // save all
           commit("SET_PRODUCTS", result.data.products);

@@ -36,7 +36,8 @@
                 <v-list-item-subtitle>{{ user.email }} </v-list-item-subtitle>
                 <!-- Role is different to Admin?-->
                 <v-list-item-subtitle v-if="!user.is_admin">
-                  <v-icon>mdi-home-circle-outline</v-icon> Sucursal principal
+                  <v-icon>mdi-home-circle-outline</v-icon>
+                  {{ user.branch_office }}
                 </v-list-item-subtitle>
               </v-list-item-content>
             </v-list-item>

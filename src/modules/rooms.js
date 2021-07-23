@@ -7,21 +7,25 @@ export default {
   state: {
     // Generals loading datatables
     loading: false,
-    cash_registers: [],
+    rooms: [],
     editedItem: {
       id: 0,
       name: "",
+      capacity: "",
+      color: "",
       state: false,
     },
     defaultItem: {
       id: 0,
       name: "",
+      capacity: "",
+      color: "",
       state: false,
     },
   },
   mutations: {
-    SET_CASH_REGISTER(state, cash_registers) {
-      state.cash_registers = cash_registers;
+    SET_ROOMS(state, rooms) {
+      state.rooms = rooms;
     },
     SET_LOADING_DATATABLE(state, status) {
       state.loading = status;
@@ -31,15 +35,15 @@ export default {
     },
   },
   actions: {
-    getAllCashRegisters({ commit, rootState }, status = 0) {
+    getAllRooms({ commit, rootState }, status = 0) {
       commit("SET_LOADING_DATATABLE", true);
       axios
         .get(
-          `/api/cash-registers?branch_office_id=${rootState.mainBranchOffice}&state=${status}`
+          `/api/rooms?branch_office_id=${rootState.mainBranchOffice}&state=${status}`
         )
         .then((result) => {
           // save all
-          commit("SET_CASH_REGISTER", result.data.cashRegisters);
+          commit("SET_ROOMS", result.data.rooms);
         })
         .catch((errors) => {
           // show error message
@@ -54,20 +58,20 @@ export default {
         });
     },
 
-    storeCahsRegister({ state, commit, dispatch, rootState }) {
+    storeRoom({ state, commit, dispatch, rootState }) {
       commit("SET_OVERLAY_LOADING", true, { root: true });
       state.editedItem.branch_office_id = rootState.mainBranchOffice;
       return axios
-        .post("/api/cash-registers", state.editedItem)
+        .post("/api/rooms", state.editedItem)
         .then((result) => {
           if (result.status == 201) {
             // show message
             this._vm.showToastMessage(
               result.status,
-              "Caja creada exitosamente"
+              "Habitación creada exitosamente"
             );
             // Reload cash registers
-            dispatch("getAllCashRegisters");
+            dispatch("getAllRooms");
             // Result
             return true;
           }
@@ -85,18 +89,20 @@ export default {
         });
     },
 
-    updateCahsRegister({ state, commit, dispatch }) {
+    updateRoom({ state, commit, dispatch, rootState }) {
+      commit("SET_OVERLAY_LOADING", true, { root: true });
+      state.editedItem.branch_office_id = rootState.mainBranchOffice;
       return axios
-        .put(`/api/cash-registers/${state.editedItem.id}`, state.editedItem)
+        .put(`/api/rooms/${state.editedItem.id}`, state.editedItem)
         .then((result) => {
           if (result.status == 201) {
             // show message
             this._vm.showToastMessage(
               result.status,
-              "Caja actualizada exitosamente"
+              "Habitación actualizada exitosamente"
             );
             // Reload cash registers
-            dispatch("getAllCashRegisters");
+            dispatch("getAllRooms");
             // Result
             return true;
           }
@@ -114,16 +120,16 @@ export default {
         });
     },
 
-    changeStatusCahsRegister({ commit, dispatch }, id) {
+    changeStatusRoom({ commit, dispatch }, id) {
       commit("SET_OVERLAY_LOADING", true, { root: true });
       return axios
-        .delete(`/api/cash-registers/${id}`)
+        .delete(`/api/rooms/${id}`)
         .then((result) => {
           if (result.status == 204) {
             // show message
             this._vm.showToastMessage(result.status);
             // Reload cash registers
-            dispatch("getAllCashRegisters");
+            dispatch("getAllRooms");
             return true;
           } else {
             return false;

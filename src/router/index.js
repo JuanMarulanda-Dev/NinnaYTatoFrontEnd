@@ -142,6 +142,15 @@ const routes = [
       permissions: {},
     },
   },
+  {
+    path: "/habitaciones",
+    name: "Habitaciones",
+    component: () =>
+      import(/* webpackChunkName: "Rooms" */ "@/views/Rooms.vue"),
+    meta: {
+      permissions: {},
+    },
+  },
 ];
 
 const router = new VueRouter({
