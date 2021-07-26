@@ -18,6 +18,11 @@ export default {
       name: "",
       state: false,
     },
+    exchange: {
+      cash_register_from_id: "",
+      cash_register_to_id: "",
+      amount: "",
+    },
   },
   mutations: {
     SET_CASH_REGISTER(state, cash_registers) {
@@ -51,6 +56,36 @@ export default {
         })
         .finally(() => {
           commit("SET_LOADING_DATATABLE", false);
+        });
+    },
+
+    saveExchange({ state, commit, dispatch }) {
+      commit("SET_OVERLAY_LOADING", true, { root: true });
+      axios
+        .post("/api/cash-registers/exchange", state.exchange)
+        .then((result) => {
+          if (result.status == 201) {
+            // show message
+            this._vm.showToastMessage(
+              result.status,
+              "Intercambio realizado exitosamente."
+            );
+            // get all cash registers
+            dispatch("getAllCashRegisters");
+            // Result
+            return true;
+          }
+        })
+        .catch((errors) => {
+          // show error message
+          this._vm.showToastMessage(
+            errors.response.status,
+            this._vm.createMessageError(errors.response.data.errors)
+          );
+          return false;
+        })
+        .finally(() => {
+          commit("SET_OVERLAY_LOADING", false, { root: true });
         });
     },
 

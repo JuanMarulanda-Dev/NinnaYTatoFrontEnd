@@ -17,6 +17,10 @@
         </v-toolbar-title>
         <v-divider class="mx-4" inset vertical></v-divider>
         <v-spacer></v-spacer>
+
+        <!-- exchanges cash_registers-->
+        <cash-register-change-form></cash-register-change-form>
+
         <!-- Modal New/edit-->
         <v-dialog v-model="dialog" persistent max-width="500px">
           <!-- Button active modal -->
@@ -117,6 +121,7 @@ import { validationMixin } from "vuelidate";
 import { moneyFormatMixin } from "@/mixins/moneyFormatMixin.js";
 import { required, maxLength } from "vuelidate/lib/validators";
 import { mapState, mapActions, mapMutations } from "vuex";
+import CashRegisterChangeForm from "@/components/cash_registers/CashRegisterChangeForm.vue";
 
 export default {
   data: () => ({
@@ -141,6 +146,9 @@ export default {
     editedItem: {
       name: { required, maxLength: maxLength(255) },
     },
+  },
+  components: {
+    CashRegisterChangeForm,
   },
   computed: {
     ...mapState(["editIcon", "loadingText", "mainBranchOffice"]),
