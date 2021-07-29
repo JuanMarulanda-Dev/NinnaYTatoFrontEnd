@@ -396,8 +396,8 @@ export default {
 
     rollbackStatePurchases(item) {
       let purchasesIndex = this.purchases.indexOf(item);
-      this.purchases[purchasesIndex].state =
-        !this.purchases[purchasesIndex].state;
+      this.purchases[purchasesIndex].state = !this.purchases[purchasesIndex]
+        .state;
     },
 
     close() {

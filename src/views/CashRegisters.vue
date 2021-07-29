@@ -228,8 +228,9 @@ export default {
 
     rollbackStateCahsRegister(item) {
       let cashRegisterIndex = this.cash_registers.indexOf(item);
-      this.cash_registers[cashRegisterIndex].state =
-        !this.cash_registers[cashRegisterIndex].state;
+      this.cash_registers[cashRegisterIndex].state = !this.cash_registers[
+        cashRegisterIndex
+      ].state;
     },
 
     editItem(item) {

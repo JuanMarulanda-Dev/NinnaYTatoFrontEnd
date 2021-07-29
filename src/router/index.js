@@ -151,6 +151,15 @@ const routes = [
       permissions: {},
     },
   },
+  {
+    path: "/historial",
+    name: "Historial",
+    component: () =>
+      import(/* webpackChunkName: "Records" */ "@/views/Records.vue"),
+    meta: {
+      permissions: {},
+    },
+  },
 ];
 
 const router = new VueRouter({

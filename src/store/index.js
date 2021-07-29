@@ -16,6 +16,7 @@ import discounts from "@/modules/discounts.js";
 import cash_registers from "@/modules/cash_registers.js";
 import purchases from "@/modules/purchases.js";
 import rooms from "@/modules/rooms.js";
+import records from "@/modules/records.js";
 
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL = process.env.VUE_APP_API_URL;
@@ -190,5 +191,6 @@ export default new Vuex.Store({
     cash_registers,
     purchases,
     rooms,
+    records,
   },
 });
