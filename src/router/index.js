@@ -160,6 +160,15 @@ const routes = [
       permissions: {},
     },
   },
+  {
+    path: "/tienda",
+    name: "tienda",
+    component: () =>
+      import(/* webpackChunkName: "Sales" */ "@/views/Sales.vue"),
+    meta: {
+      permissions: {},
+    },
+  },
 ];
 
 const router = new VueRouter({
