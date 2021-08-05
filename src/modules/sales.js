@@ -6,6 +6,14 @@ export default {
   namespaced: true,
   state: {
     sales: [],
+    sale: {
+      customer: "",
+      print: false,
+      send: false,
+      cash_register: "",
+      money: 0,
+      cart: [],
+    },
   },
   mutations: {
     SET_SALES(state, sales) {
