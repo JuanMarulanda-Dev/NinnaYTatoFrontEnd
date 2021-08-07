@@ -96,6 +96,9 @@ export default {
       default: NaN,
     },
   },
+  emits: [
+    'update:modelValue',
+  ],
   data() {
     return {
     };
@@ -194,12 +197,14 @@ export default {
         this.$refs.input.value = String(newValue);
       }
       this.$emit('input', newValue);
+      this.$emit('update:modelValue', newValue);
     },
   },
 };
 </script>
 
 <style lang="scss">
+// https://fengyuanchen.github.io/vue-number-input/
 .vue-number-input {
   display: block;
   font-size: 0;

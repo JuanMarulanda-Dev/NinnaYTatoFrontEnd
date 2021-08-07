@@ -42,8 +42,12 @@ export default {
           `/api/products?branch_office_id=${rootState.mainBranchOffice}&state=${status}`
         )
         .then((result) => {
+          let products = result.data.products.map((obj) => ({
+            ...obj,
+            type: 1,
+          }));
           // save all
-          commit("SET_PRODUCTS", result.data.products);
+          commit("SET_PRODUCTS", products);
         })
         .catch((errors) => {
           // show error message

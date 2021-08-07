@@ -41,13 +41,17 @@ export default {
     },
   },
   actions: {
-    getAllPlansDetails({ commit }) {
+    getAllPlansDetails({ commit }, discounts = 0, status = 0) {
       commit("SET_LOADING_DATATABLE", true);
       axios
-        .get("/api/plan-details")
+        .get(`/api/plan-details?discounts=${discounts}&state=${status}`)
         .then((result) => {
+          let planDetails = result.data.planDetails.map((obj) => ({
+            ...obj,
+            type: 2,
+          }));
           // save all
-          commit("SET_PLAN_DETAILS", result.data.planDetails);
+          commit("SET_PLAN_DETAILS", planDetails);
         })
         .catch((errors) => {
           // show error message

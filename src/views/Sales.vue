@@ -34,12 +34,12 @@
           <!-- Customer -->
           <v-col cols="4">
             <v-autocomplete
-              v-model="sale.customer"
+              v-model="sale.customer_id"
               :items="customers"
               class="pb-3"
               prepend-icon="mdi-paw"
               label="Cliente"
-              item-text="dni"
+              item-text="name"
               item-value="id"
             >
               <template slot="selection" slot-scope="{ item }">
@@ -88,7 +88,7 @@
                 <v-row>
                   <v-col cols="6">
                     <v-select
-                      v-model="sale.cash_register"
+                      v-model="sale.cash_register_id"
                       :items="cash_registers"
                       prepend-inner-icon="mdi-cash-register"
                       item-text="name"
@@ -103,7 +103,7 @@
                 <v-row>
                   <v-col cols="6">
                     <vuetify-money
-                      v-model="sale.money"
+                      v-model="sale.payment"
                       label="Dinero ingresado*"
                       dense
                     />
@@ -166,7 +166,7 @@
           </v-col>
           <v-col cols="4" class="d-flex justify-end">
             <v-btn class="mr-2" small color="error">Limpiar</v-btn>
-            <v-btn small color="secondary">Guardar</v-btn>
+            <v-btn small color="secondary" @click="save()">Guardar</v-btn>
           </v-col>
           <!-- Cart sale -->
           <v-col cols="12">
@@ -182,43 +182,11 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="(item, index) in sale.cart" :key="index">
-                    <th>{{ item.name }}</th>
-                    <th class="text-center">
-                      <vue-number-input
-                        v-model="item.quantity"
-                        :min="1"
-                        :max="10"
-                        inline
-                        controls
-                        center
-                        size="small"
-                      ></vue-number-input>
-                    </th>
-                    <th class="text-center">
-                      <v-icon small>{{ moneyIcon }}</v-icon>
-                      {{
-                        currencyFormat(
-                          calculatePriceTotalCartItem(
-                            item.quantity,
-                            item.unit_price,
-                            item.discount
-                          )
-                        )
-                      }}
-                    </th>
-                    <th class="text-center">{{ item.discount }}</th>
-                    <th class="text-center">
-                      <v-btn
-                        medium
-                        icon
-                        color="primary"
-                        @click="deleteCartItem(index)"
-                      >
-                        <v-icon>mdi-close-circle-outline</v-icon>
-                      </v-btn>
-                    </th>
-                  </tr>
+                  <cart-item
+                    v-for="(item, index) in sale.cart"
+                    :item="item"
+                    :key="index"
+                  ></cart-item>
                 </tbody>
               </template>
             </v-simple-table>
@@ -233,7 +201,7 @@
 import { mapState, mapActions } from "vuex";
 import { moneyFormatMixin } from "@/mixins/moneyFormatMixin.js";
 import VuetifyMoney from "@/components/vuetifyMoney.vue";
-import VueNumberInput from "@/components/vueNumberInput.vue";
+import CartItem from "@/components/sales/CartItem.vue";
 
 export default {
   data: () => ({
@@ -250,57 +218,71 @@ export default {
     total() {
       let result = 0;
       if (this.sale.cart.length > 0) {
-        this.sale.cart.forEach(
-          (cartItem) =>
-            (result += this.calculatePriceTotalCartItem(
-              cartItem.quantity,
-              cartItem.unit_price,
-              cartItem.discount
-            ))
-        );
+        this.sale.cart.forEach((cartItem) => (result += cartItem.total));
       }
       return result;
     },
   },
   created() {
-    this.getAllCustomers();
+    this.getAllCustomers(1);
     this.getAllCashRegisters(1);
     this.getAllProducts(1);
     this.getAllPlansDetails(1);
   },
   methods: {
+    ...mapActions("sales", ["storeSale", "findDiscountToQuantity"]),
     ...mapActions("customers", ["getAllCustomers"]),
     ...mapActions("cash_registers", ["getAllCashRegisters"]),
     ...mapActions("products", ["getAllProducts"]),
     ...mapActions("plans_details", ["getAllPlansDetails"]),
 
-    addCartItem(item) {
-      // Prodcuts = 0 & planes/servicios = 1
+    validateAvaliableStockProduct(product) {
+      return product.stock > 0 ? true : false;
+    },
+
+    addCartItem(newItemCart) {
+      // Item type: 1 = producto, 2 = plan/servicio
       this.sale.cart.push({
-        name: item.name,
+        item_id: newItemCart.id,
+        item_type: newItemCart.type,
+        name: newItemCart.name,
         quantity: 1,
-        unit_price: item.full_value ?? item.price,
-        discount: item.discount ?? 0,
+        unit_price: newItemCart.full_value ?? newItemCart.price,
+        discount: newItemCart.discount ?? 0,
+        discounts: newItemCart.discounts,
+        total: 0,
       });
     },
 
-    calculatePriceTotalCartItem(quantity, unit_price, discount) {
-      let total = unit_price * quantity;
-      return total - total * (discount / 100);
-    },
+    save() {
+      // Confirmation action
 
-    deleteCartItem(indexItem) {
-      this.sale.cart.splice(indexItem, 1);
+      // Store
+      this.storeSale();
     },
   },
   watch: {
-    itemSelected(item) {
-      this.addCartItem(item);
+    itemSelected(itemSelected) {
+      let disponibleToAdd = true;
+      // Is it a product?
+      if (itemSelected.type === 1) {
+        disponibleToAdd = this.validateAvaliableStockProduct(itemSelected);
+        if (!disponibleToAdd) {
+          // Does't have stock avaliable.
+          this.$toast.warning(
+            "No tienes stock disponible del producto seleccionado"
+          );
+        }
+      }
+
+      if (disponibleToAdd) {
+        this.addCartItem(itemSelected);
+      }
     },
   },
   components: {
     VuetifyMoney,
-    VueNumberInput,
+    CartItem,
   },
 };
 </script>

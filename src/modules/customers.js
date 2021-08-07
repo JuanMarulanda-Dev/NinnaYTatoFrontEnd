@@ -97,10 +97,12 @@ export default {
     },
   },
   actions: {
-    getAllCustomers({ commit }) {
+    getAllCustomers({ commit, rootState }, status = 0) {
       commit("SET_LOADING_DATATABLE", true);
       axios
-        .get("/api/customers")
+        .get(
+          `/api/customers?branch_office_id=${rootState.mainBranchOffice}&state=${status}`
+        )
         .then((result) => {
           // save all
           commit("SET_CUSTOMERS", result.data.customers);
