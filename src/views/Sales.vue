@@ -32,7 +32,7 @@
         </v-row>
         <v-row>
           <!-- Customer -->
-          <v-col cols="4">
+          <v-col md="4" cols="12">
             <v-autocomplete
               v-model="sale.customer_id"
               :items="customers"
@@ -79,7 +79,7 @@
             </v-row>
           </v-col>
           <!-- Pagos -->
-          <v-col cols="8">
+          <v-col md="8" cols="12">
             <v-card outlined>
               <v-card-text class="pb-0">
                 <h4 class="text-center">Informacion de pago</h4>
@@ -94,6 +94,9 @@
                       item-text="name"
                       item-value="id"
                       label="Caja*"
+                      :error-messages="cashRegisterErrors"
+                      @input="$v.sale.cash_register_id.$touch()"
+                      @blur="$v.sale.cash_register_id.$touch()"
                     ></v-select>
                   </v-col>
                   <v-col cols="6" class="vue-money-x-large">
@@ -123,7 +126,7 @@
         </v-row>
         <v-row>
           <!-- actions -->
-          <v-col cols="4" class="py-0">
+          <v-col md="4" cols="12" class="py-0">
             <v-autocomplete
               v-model="itemSelected"
               :items="products"
@@ -144,7 +147,7 @@
               </template>
             </v-autocomplete>
           </v-col>
-          <v-col cols="4" class="py-0">
+          <v-col md="4" cols="12" class="py-0">
             <v-autocomplete
               v-model="itemSelected"
               :items="plans_details"
@@ -153,6 +156,7 @@
               item-text="name"
               return-object
               dense
+              :disabled="customerSelected"
             >
               <template slot="item" slot-scope="{ item }">
                 {{ item.name }}
@@ -164,7 +168,7 @@
               </template>
             </v-autocomplete>
           </v-col>
-          <v-col cols="4" class="d-flex justify-end">
+          <v-col md="4" cols="12" class="d-flex justify-end">
             <v-btn class="mr-2" small color="error">Limpiar</v-btn>
             <v-btn small color="secondary" @click="save()">Guardar</v-btn>
           </v-col>
@@ -199,6 +203,8 @@
 
 <script>
 import { mapState, mapActions } from "vuex";
+import { validationMixin } from "vuelidate";
+import { required } from "vuelidate/lib/validators";
 import { moneyFormatMixin } from "@/mixins/moneyFormatMixin.js";
 import VuetifyMoney from "@/components/vuetifyMoney.vue";
 import CartItem from "@/components/sales/CartItem.vue";
@@ -208,7 +214,13 @@ export default {
     changes: 0,
     itemSelected: {},
   }),
-  mixins: [moneyFormatMixin],
+  mixins: [validationMixin, moneyFormatMixin],
+  validations: {
+    sale: {
+      cash_register_id: { required },
+      cart: { required },
+    },
+  },
   computed: {
     ...mapState("sales", ["sales", "sale"]),
     ...mapState("customers", ["customers"]),
@@ -221,6 +233,16 @@ export default {
         this.sale.cart.forEach((cartItem) => (result += cartItem.total));
       }
       return result;
+    },
+    customerSelected() {
+      return this.sale.customer_id === "" || this.sale.customer_id === null;
+    },
+    cashRegisterErrors() {
+      const errors = [];
+      if (!this.$v.sale.cash_register_id.$dirty) return errors;
+      !this.$v.sale.cash_register_id.required &&
+        errors.push("La caja es requerida.");
+      return errors;
     },
   },
   created() {
@@ -236,13 +258,23 @@ export default {
     ...mapActions("products", ["getAllProducts"]),
     ...mapActions("plans_details", ["getAllPlansDetails"]),
 
-    validateAvaliableStockProduct(product) {
-      return product.stock > 0 ? true : false;
+    validateAvaliableStockProduct(stock) {
+      return stock > 0 ? true : false;
     },
 
-    addCartItem(newItemCart) {
+    searchSameProductOnTheCart(item_id_selected, item_type_selected) {
+      // Products = 1 | Plans = 2
+      let cartItemIndex = this.sale.cart.findIndex(
+        (item) =>
+          item.item_id === item_id_selected &&
+          item.item_type === item_type_selected
+      );
+      return cartItemIndex;
+    },
+
+    addCartItem(newItemCart, cartItemIndex) {
       // Item type: 1 = producto, 2 = plan/servicio
-      this.sale.cart.push({
+      let object = {
         item_id: newItemCart.id,
         item_type: newItemCart.type,
         name: newItemCart.name,
@@ -251,22 +283,54 @@ export default {
         discount: newItemCart.discount ?? 0,
         discounts: newItemCart.discounts,
         total: 0,
-      });
+      };
+      if (cartItemIndex > -1) {
+        // Incremente quantity to the cart item.
+        this.sale.cart[cartItemIndex].quantity++;
+      } else {
+        // Add new element
+        this.sale.cart.push(object);
+      }
     },
 
     save() {
-      // Confirmation action
-
-      // Store
-      this.storeSale();
+      this.$v.$touch();
+      // Correct validations
+      if (!this.$v.$invalid) {
+        // Confirmation action
+        this.$confirm("¿Estas seguro que quieres registrar esta venta?", {
+          title: "Advertencia",
+        }).then((result) => {
+          if (result) {
+            // Store
+            this.storeSale();
+          }
+        });
+      } else {
+        if (this.sale.cart.length == 0) {
+          // Does't have a item
+          this.$toast.warning("No tienes ningun producto/plan seleccionado.");
+        }
+      }
     },
   },
   watch: {
     itemSelected(itemSelected) {
       let disponibleToAdd = true;
+      let cartItemIndex = this.searchSameProductOnTheCart(
+        itemSelected.id,
+        itemSelected.type
+      );
+
       // Is it a product?
       if (itemSelected.type === 1) {
-        disponibleToAdd = this.validateAvaliableStockProduct(itemSelected);
+        //
+        let cartItemQuantity =
+          cartItemIndex > -1 ? this.sale.cart[cartItemIndex].quantity : 0;
+        //
+        disponibleToAdd = this.validateAvaliableStockProduct(
+          itemSelected.stock - cartItemQuantity
+        );
         if (!disponibleToAdd) {
           // Does't have stock avaliable.
           this.$toast.warning(
@@ -276,7 +340,7 @@ export default {
       }
 
       if (disponibleToAdd) {
-        this.addCartItem(itemSelected);
+        this.addCartItem(itemSelected, cartItemIndex);
       }
     },
   },

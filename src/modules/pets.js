@@ -242,7 +242,7 @@ export default {
     },
 
     getDetailsPet({ commit }, petId) {
-      commit("SET_LOADING_DATATABLE", true);
+      commit("SET_OVERLAY_LOADING", true, { root: true });
       axios
         .get(`/api/pets/${petId}`)
         .then((result) => {
@@ -258,7 +258,7 @@ export default {
           return false;
         })
         .finally(() => {
-          commit("SET_LOADING_DATATABLE", false);
+          commit("SET_OVERLAY_LOADING", false, { root: true });
         });
     },
     async changeStatusPet({ state, commit }) {
