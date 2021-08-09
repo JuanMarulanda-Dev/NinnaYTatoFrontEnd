@@ -22,6 +22,7 @@
                   dark
                   v-bind="attrs"
                   v-on="on"
+                  @click="SET_DIALOG_SALES_HITORY(true)"
                 >
                   <v-icon>mdi-magnify</v-icon>
                 </v-btn>
@@ -198,16 +199,20 @@
         </v-row>
       </v-container>
     </v-card>
+
+    <!-- Sales -->
+    <sales-data-table></sales-data-table>
   </div>
 </template>
 
 <script>
-import { mapState, mapActions } from "vuex";
+import { mapState, mapActions, mapMutations } from "vuex";
 import { validationMixin } from "vuelidate";
 import { required } from "vuelidate/lib/validators";
 import { moneyFormatMixin } from "@/mixins/moneyFormatMixin.js";
 import VuetifyMoney from "@/components/vuetifyMoney.vue";
 import CartItem from "@/components/sales/CartItem.vue";
+import SalesDataTable from "@/components/sales/SalesDataTable.vue";
 
 export default {
   data: () => ({
@@ -250,6 +255,8 @@ export default {
     this.getAllCashRegisters(1);
     this.getAllProducts(1);
     this.getAllPlansDetails(1);
+    // Obtener los permisos
+    this.SET_PERMISSIONS(this.$route.meta.permissions);
   },
   methods: {
     ...mapActions("sales", ["storeSale", "findDiscountToQuantity"]),
@@ -257,6 +264,8 @@ export default {
     ...mapActions("cash_registers", ["getAllCashRegisters"]),
     ...mapActions("products", ["getAllProducts"]),
     ...mapActions("plans_details", ["getAllPlansDetails"]),
+
+    ...mapMutations("sales", ["SET_DIALOG_SALES_HITORY", "SET_PERMISSIONS"]),
 
     validateAvaliableStockProduct(stock) {
       return stock > 0 ? true : false;
@@ -347,6 +356,7 @@ export default {
   components: {
     VuetifyMoney,
     CartItem,
+    SalesDataTable,
   },
 };
 </script>
