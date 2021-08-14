@@ -113,12 +113,13 @@
                     />
                   </v-col>
                   <v-col cols="6">
-                    <vuetify-money
-                      v-model="changes"
-                      label="Devuelta"
-                      readonly
+                    <v-text-field
                       dense
-                    />
+                      :value="currencyFormat(devuelta)"
+                      :prepend-inner-icon="moneyIcon"
+                      readonly
+                    >
+                    </v-text-field>
                   </v-col>
                 </v-row>
               </v-container>
@@ -170,7 +171,9 @@
             </v-autocomplete>
           </v-col>
           <v-col md="4" cols="12" class="d-flex justify-end">
-            <v-btn class="mr-2" small color="error">Limpiar</v-btn>
+            <v-btn class="mr-2" small color="error" @click="clear()"
+              >Limpiar</v-btn
+            >
             <v-btn small color="secondary" @click="save()">Guardar</v-btn>
           </v-col>
           <!-- Cart sale -->
@@ -239,6 +242,9 @@ export default {
       }
       return result;
     },
+    devuelta() {
+      return this.total - this.sale.payment;
+    },
     customerSelected() {
       return this.sale.customer_id === "" || this.sale.customer_id === null;
     },
@@ -259,13 +265,21 @@ export default {
     this.SET_PERMISSIONS(this.$route.meta.permissions);
   },
   methods: {
-    ...mapActions("sales", ["storeSale", "findDiscountToQuantity"]),
+    ...mapActions("sales", [
+      "storeSale",
+      "findDiscountToQuantity",
+      "comprobante",
+    ]),
     ...mapActions("customers", ["getAllCustomers"]),
     ...mapActions("cash_registers", ["getAllCashRegisters"]),
     ...mapActions("products", ["getAllProducts"]),
     ...mapActions("plans_details", ["getAllPlansDetails"]),
 
-    ...mapMutations("sales", ["SET_DIALOG_SALES_HITORY", "SET_PERMISSIONS"]),
+    ...mapMutations("sales", [
+      "SET_DIALOG_SALES_HITORY",
+      "SET_PERMISSIONS",
+      "SET_SALE_DEFAULT",
+    ]),
 
     validateAvaliableStockProduct(stock) {
       return stock > 0 ? true : false;
@@ -321,6 +335,11 @@ export default {
           this.$toast.warning("No tienes ningun producto/plan seleccionado.");
         }
       }
+    },
+
+    clear() {
+      this.SET_SALE_DEFAULT();
+      this.$v.$reset();
     },
   },
   watch: {

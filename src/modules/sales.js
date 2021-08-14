@@ -12,7 +12,15 @@ export default {
     sales: [],
     sale: {
       customer_id: "",
-      print: false,
+      print: true,
+      send: false,
+      cash_register_id: "",
+      payment: 0,
+      cart: [],
+    },
+    saleDefault: {
+      customer_id: "",
+      print: true,
       send: false,
       cash_register_id: "",
       payment: 0,
@@ -22,6 +30,9 @@ export default {
   mutations: {
     SET_SALES(state, sales) {
       state.sales = sales;
+    },
+    SET_SALE_DEFAULT(state) {
+      state.sale = Object.assign({}, state.saleDefault);
     },
     SET_QUANTITY_CART_ITEM(state, { item, quantity }) {
       let index = state.sale.cart.indexOf(item);
@@ -68,6 +79,33 @@ export default {
           commit("SET_LOADING_DATATABLE", false);
         });
     },
+
+    comprobante() {
+      // window.open(`${process.env.VUE_APP_API_URL}/api/comprobante`);
+      axios
+        .get(`/api/comprobante`, {
+          responseType: "blob",
+        })
+        .then((result) => {
+          // save all
+          const url = window.URL.createObjectURL(new Blob([result.data]));
+          const link = document.createElement("a");
+          link.href = url;
+          link.setAttribute("download", "Ticket123.pdf");
+          document.body.appendChild(link);
+          link.click();
+        })
+        .catch((errors) => {
+          // show error message
+          this._vm.showToastMessage(
+            errors.response.status,
+            this._vm.createMessageError(errors.response.data.errors)
+          );
+          return false;
+        })
+        .finally(() => {});
+    },
+
     storeSale({ state, commit }) {
       commit("SET_OVERLAY_LOADING", true, { root: true });
       // Process data before to send HTTP request
@@ -80,6 +118,8 @@ export default {
               result.status,
               "Venta registrada exitosamente"
             );
+            commit("SET_SALE_DEFAULT");
+
             // Result
             return true;
           }

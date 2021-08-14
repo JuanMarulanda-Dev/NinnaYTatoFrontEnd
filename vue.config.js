@@ -1,6 +1,6 @@
 module.exports = {
   transpileDependencies: ["vuetify"],
   devServer: {
-    host: "spa.4067a4a60921.ngrok.io",
+    host: "spa.13ae14d76dd5.ngrok.io",
   },
 };
