@@ -168,7 +168,12 @@
                       color="primary mr-1"
                       v-bind="attrs"
                       v-on="on"
-                      @click="downloadPaymentProof(item.id)"
+                      @click="
+                        downloadPaymentProof({
+                          saleId: item.id,
+                          name: item.number_payment_proof,
+                        })
+                      "
                     >
                       <v-icon>mdi-printer</v-icon>
                     </v-btn>

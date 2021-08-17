@@ -123,7 +123,7 @@ export default {
         });
     },
 
-    downloadPaymentProof(state, saleId) {
+    downloadPaymentProof(state, { saleId, name }) {
       // Processing payment prof
       this._vm.showToastMessage(102, "El comprobante se esta descargando...");
       //
@@ -136,7 +136,7 @@ export default {
           const url = window.URL.createObjectURL(new Blob([result.data]));
           const link = document.createElement("a");
           link.href = url;
-          link.setAttribute("download", "ticket.pdf");
+          link.setAttribute("download", `${name}.pdf`);
           document.body.appendChild(link);
           link.click();
 
