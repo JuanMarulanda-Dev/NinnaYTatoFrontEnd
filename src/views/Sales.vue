@@ -114,6 +114,7 @@
                   </v-col>
                   <v-col cols="6">
                     <v-text-field
+                      label="Devuelta"
                       dense
                       :value="currencyFormat(devuelta)"
                       :prepend-inner-icon="moneyIcon"
@@ -230,6 +231,7 @@ export default {
     },
   },
   computed: {
+    ...mapState(["mainBranchOffice"]),
     ...mapState("sales", ["sales", "sale"]),
     ...mapState("customers", ["customers"]),
     ...mapState("cash_registers", ["cash_registers"]),
@@ -243,7 +245,7 @@ export default {
       return result;
     },
     devuelta() {
-      return this.total - this.sale.payment;
+      return this.sale.payment - this.total;
     },
     customerSelected() {
       return this.sale.customer_id === "" || this.sale.customer_id === null;
@@ -268,7 +270,7 @@ export default {
     ...mapActions("sales", [
       "storeSale",
       "findDiscountToQuantity",
-      "comprobante",
+      "downloadPaymentProof",
     ]),
     ...mapActions("customers", ["getAllCustomers"]),
     ...mapActions("cash_registers", ["getAllCashRegisters"]),
@@ -326,7 +328,18 @@ export default {
         }).then((result) => {
           if (result) {
             // Store
-            this.storeSale();
+            this.storeSale().then((result) => {
+              if (result) {
+                this.$v.$reset();
+                // Download payment proof
+                if (result.print) {
+                  this.downloadPaymentProof(result.saleId);
+                }
+                this.SET_SALE_DEFAULT();
+                // Research products}
+                this.getAllProducts(1);
+              }
+            });
           }
         });
       } else {
@@ -370,6 +383,10 @@ export default {
       if (disponibleToAdd) {
         this.addCartItem(itemSelected, cartItemIndex);
       }
+    },
+    mainBranchOffice() {
+      this.getAllProducts(1);
+      this.SET_SALE_DEFAULT();
     },
   },
   components: {

@@ -20,6 +20,14 @@ exports.install = function (Vue) {
     {
       // Type messages...
       let status_codes = {
+        102: () => {
+          // Processing
+          Vue.$toast.info(message);
+        },
+        200: () => {
+          // Resource created succesfull
+          Vue.$toast.success(message);
+        },
         201: () => {
           // Resource created succesfull
           Vue.$toast.success(message);

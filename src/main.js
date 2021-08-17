@@ -11,7 +11,7 @@ import "@/styles/main.scss";
 import axios from "axios";
 import VueAxios from "vue-axios";
 import Vuelidate from "vuelidate";
-import showErrorMessageMixin from "@/mixins/showErrorMessageMixin.js"; // my own helper
+import showMessageMixin from "@/mixins/showMessageMixin.js"; // my own helper
 
 import Toast from "vue-toastification";
 // Import the CSS or use your own!
@@ -31,7 +31,7 @@ Vue.use(Vuelidate);
 Vue.use(VuetifyConfirm, { vuetify });
 
 // My helpers
-Vue.use(showErrorMessageMixin);
+Vue.use(showMessageMixin);
 
 new Vue({
   router,
