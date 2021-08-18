@@ -131,7 +131,7 @@
                       color="info mr-1"
                       v-bind="attrs"
                       v-on="on"
-                      @click="getSaleDetails(item.id)"
+                      @click="searchDetails(item.id, item.number_payment_proof)"
                     >
                       <v-icon>{{ detailsIcon }}</v-icon>
                     </v-btn>
@@ -188,6 +188,8 @@
     </v-dialog>
     <!-- Show dialog payments -->
     <sale-payments :payment_proof="payment_proof"></sale-payments>
+    <!-- Show dialog details -->
+    <sale-details :payment_proof="payment_proof"></sale-details>
   </div>
 </template>
 
@@ -195,6 +197,7 @@
 import { moneyFormatMixin } from "@/mixins/moneyFormatMixin.js";
 import { mapState, mapMutations, mapActions } from "vuex";
 import SalePayments from "@/components/sales/SalePayments.vue";
+import SaleDetails from "@/components/sales/SaleDetails.vue";
 
 export default {
   name: "sales-data-table",
@@ -256,6 +259,11 @@ export default {
       this.getSalePayments(saleId);
     },
 
+    searchDetails(saleId, payment_proof) {
+      this.payment_proof = payment_proof;
+      this.getSaleDetails(saleId);
+    },
+
     changeStateSale(item) {
       // Confirmation to change de status
       this.$confirm("¿Quieres cambiar el estado de esta venta?", {
@@ -283,6 +291,7 @@ export default {
   },
   components: {
     SalePayments,
+    SaleDetails,
   },
 };
 </script>

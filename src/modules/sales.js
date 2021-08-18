@@ -9,6 +9,7 @@ export default {
     loading: false,
     dialog: false,
     dialogPayments: false,
+    dialogSaleDitails: false,
     saleId: null,
     dateSales: new Date().toISOString().substr(0, 10),
     payments: [],
@@ -69,6 +70,9 @@ export default {
     SET_DIALOG_SALE_PAYMENTS(state, dialogPayments) {
       state.dialogPayments = dialogPayments;
     },
+    SET_DIALOG_SALE_DETAILS(state, dialogSaleDitails) {
+      state.dialogSaleDitails = dialogSaleDitails;
+    },
     SET_LOADING_DATATABLE(state, status) {
       state.loading = status;
     },
@@ -107,7 +111,8 @@ export default {
         .then((result) => {
           // save all
           if (result.status == 200) {
-            commit("SET_SALE_DETAILS", result.data.sale);
+            commit("SET_SALE_DETAILS", result.data.details);
+            commit("SET_DIALOG_SALE_DETAILS", true);
           }
         })
         .catch((errors) => {
