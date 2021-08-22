@@ -51,7 +51,6 @@ export default {
     },
   },
   created() {
-    console.log(1);
     this.initialize(this.item.quantity);
   },
   methods: {
@@ -130,7 +129,17 @@ export default {
       this.DELETE_CART_ITEM(this.item);
     },
   },
+  watch: {
+    item: {
+      // This will let Vue know to look inside the array
+      deep: true,
 
+      // We have to move our method to a handler field
+      handler(item) {
+        this.initialize(item.quantity);
+      },
+    },
+  },
   components: {
     VueNumberInput,
   },
