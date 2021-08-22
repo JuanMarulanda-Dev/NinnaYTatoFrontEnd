@@ -333,7 +333,10 @@ export default {
                 this.$v.$reset();
                 // Download payment proof
                 if (result.print) {
-                  this.downloadPaymentProof(result.saleId);
+                  this.downloadPaymentProof({
+                    saleId: result.saleId,
+                    name: result.name,
+                  });
                 }
                 this.SET_SALE_DEFAULT();
                 // Research products}
@@ -362,7 +365,7 @@ export default {
         itemSelected.id,
         itemSelected.type
       );
-
+      console.log(1);
       // Is it a product?
       if (itemSelected.type === 1) {
         //

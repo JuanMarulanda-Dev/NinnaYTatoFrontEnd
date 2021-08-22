@@ -171,7 +171,8 @@ export default {
 
             // Result
             return {
-              saleId: result.data.saleId,
+              saleId: result.data.id,
+              name: result.data.number_payment_proof,
               print: state.sale.print,
             };
           }
