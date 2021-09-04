@@ -76,7 +76,7 @@
               color="info mr-1"
               v-bind="attrs"
               v-on="on"
-              @click="editItem(item)"
+              @click="showPetDetails(item.id, item.name)"
             >
               <v-icon> mdi-paw</v-icon>
             </v-btn>
@@ -149,7 +149,7 @@
               color="error mr-1"
               v-bind="attrs"
               v-on="on"
-              @click="editItem(item)"
+              @click="deleteEntry(item.id, item.name)"
             >
               <v-icon> mdi-close-thick </v-icon>
             </v-btn>
@@ -172,6 +172,11 @@
       :pet_name="pet_name"
       :pet_id="pet_id"
     ></follow-up-form>
+
+    <entry-pet-details
+      v-model="dialogPetDetails"
+      :pet="entry_pet_details"
+    ></entry-pet-details>
   </div>
 </template>
 
@@ -182,10 +187,12 @@ import { mapState, mapActions, mapMutations } from "vuex";
 import EntryForm from "@/components/lodging/EntryForm.vue";
 import OutputForm from "@/components/lodging/OutputForm.vue";
 import FollowUpForm from "@/components/lodging/FollowUpForm.vue";
+import EntryPetDetails from "@/components/lodging/EntryPetDetails.vue";
 
 export default {
   data: () => ({
     permissions: {},
+    dialogPetDetails: false,
     dialogEntry: false,
     dialogOutput: false,
     dialogFollowUp: false,
@@ -206,6 +213,7 @@ export default {
       { text: "Acciones", align: "center", value: "actions", sortable: false },
     ],
     editedIndex: -1,
+    entry_pet_details: {},
   }),
   mixins: [validationMixin],
   validations: {
@@ -217,6 +225,7 @@ export default {
     EntryForm,
     OutputForm,
     FollowUpForm,
+    EntryPetDetails,
   },
   computed: {
     ...mapState(["editIcon", "loadingText", "mainBranchOffice"]),
@@ -267,11 +276,18 @@ export default {
       "getAllProducts",
       "storeProduct",
       "updateProduct",
+      "deleteEntry",
       "changeStatusProduct",
     ]),
     ...mapMutations("lodging", ["SET_EDIT_ITEM"]),
     initialize() {
       this.getAllProducts();
+    },
+
+    showPetDetails(id) {
+      // Consultar el detalle de la mascota
+      console.log(id);
+      this.dialogPetDetails = true;
     },
 
     showOutputForm(pet_name, pet_id) {
@@ -285,6 +301,16 @@ export default {
       this.pet_id = pet_id;
       // search follow up by the last lodging by pet
       this.dialogFollowUp = true;
+    },
+
+    deleteEntry(id, name) {
+      this.$confirm(`¿Seguro quieres eliminar este ingreso de ${name}?`, {
+        title: "Advertencia",
+      }).then((res) => {
+        if (res) {
+          this.deleteEntry(id);
+        }
+      });
     },
   },
 };
