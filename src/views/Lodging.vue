@@ -3,7 +3,7 @@
     <v-data-table
       fixed-header
       :headers="headers"
-      :items="products"
+      :items="lodgings"
       sort-by="name"
       class="elevation-3"
       :search="search"
@@ -76,7 +76,7 @@
               color="info mr-1"
               v-bind="attrs"
               v-on="on"
-              @click="showPetDetails(item.id, item.name)"
+              @click="showPetDetails(item.customer_id, item.pet_id)"
             >
               <v-icon> mdi-paw</v-icon>
             </v-btn>
@@ -149,7 +149,7 @@
               color="error mr-1"
               v-bind="attrs"
               v-on="on"
-              @click="deleteEntry(item.id, item.name)"
+              @click="deleteItem(item.id, item.name)"
             >
               <v-icon> mdi-close-thick </v-icon>
             </v-btn>
@@ -205,11 +205,11 @@ export default {
         align: "start",
         value: "name",
       },
-      { text: "Desayuno", align: "center", value: "price" },
-      { text: "Almuerzo", align: "center", value: "stock" },
-      { text: "Cena", align: "center", value: "state" },
-      { text: "Ingreso", align: "center", value: "created_at" },
-      { text: "Salida", align: "center", value: "deleted_at" },
+      { text: "Desayuno", align: "center", value: "breakfast" },
+      { text: "Almuerzo", align: "center", value: "lunch" },
+      { text: "Cena", align: "center", value: "dinner" },
+      { text: "Ingreso", align: "center", value: "arrival_date" },
+      { text: "Salida", align: "center", value: "departure_date" },
       { text: "Acciones", align: "center", value: "actions", sortable: false },
     ],
     editedIndex: -1,
@@ -230,11 +230,12 @@ export default {
   computed: {
     ...mapState(["editIcon", "loadingText", "mainBranchOffice"]),
     ...mapState("lodging", [
-      "products",
+      "lodgings",
       "loading",
       "editedItem",
       "defaultItem",
     ]),
+    ...mapState("customers", ["personal_infomation"]),
     formTitle() {
       return this.editedIndex === -1 ? "Nueva Producto" : "Editar Producto";
     },
@@ -273,7 +274,10 @@ export default {
 
   methods: {
     ...mapActions("lodging", [
-      "getAllProducts",
+      "getAllLodging",
+      "getAllAccessories",
+      "getAllCustomersPets",
+      "getMonitoryByPetLodging",
       "storeProduct",
       "updateProduct",
       "deleteEntry",
@@ -281,13 +285,17 @@ export default {
     ]),
     ...mapMutations("lodging", ["SET_EDIT_ITEM"]),
     initialize() {
-      this.getAllProducts();
+      this.getAllLodging();
+      this.getAllAccessories();
+      this.getAllCustomersPets();
     },
 
-    showPetDetails(id) {
+    showPetDetails(customer_id, pet_id) {
       // Consultar el detalle de la mascota
-      console.log(id);
-      this.dialogPetDetails = true;
+      this.personal_infomation.id = customer_id;
+      this.$router.push({
+        path: `/clientes/detalles/${customer_id}/mascota/${pet_id}`,
+      });
     },
 
     showOutputForm(pet_name, pet_id) {
@@ -296,14 +304,17 @@ export default {
       this.dialogOutput = true;
     },
 
-    showFollowUpForm(pet_name, pet_id) {
+    showFollowUpForm(pet_name, lodging_id) {
       this.pet_name = pet_name;
-      this.pet_id = pet_id;
-      // search follow up by the last lodging by pet
-      this.dialogFollowUp = true;
+      this.getMonitoryByPetLodging(lodging_id).then((result) => {
+        if (result) {
+          // search follow up by the last lodging by pet
+          this.dialogFollowUp = true;
+        }
+      });
     },
 
-    deleteEntry(id, name) {
+    deleteItem(id, name) {
       this.$confirm(`¿Seguro quieres eliminar este ingreso de ${name}?`, {
         title: "Advertencia",
       }).then((res) => {

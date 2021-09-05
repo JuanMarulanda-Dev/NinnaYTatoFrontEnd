@@ -101,8 +101,10 @@
               <!-- pet -->
               <v-autocomplete
                 label="Mascota*"
-                :item-text="getNamePetAndOwn"
+                v-model="entryData.pet_id"
+                :items="pets"
                 item-value="id"
+                item-text="name"
                 chips
                 :error-messages="petErrors"
                 @input="$v.entryData.pet_id.$touch()"
@@ -112,12 +114,11 @@
 
             <v-col cols="12" md="6" sm="6">
               <v-autocomplete
-                label="Indumentaria"
+                label="Accesorios"
                 multiple
                 chips
-                item-text="name"
-                item-value="id"
-                :items="attires"
+                :items="accessories"
+                v-model="entryData.accessories"
               >
                 <template v-slot:item="data">
                   <template>
@@ -129,7 +130,7 @@
                         dense
                       ></v-checkbox> -->
                       <v-text-field
-                        :placeholder="data.item.name"
+                        :label="data.item.name"
                         v-model="data.item.description"
                         dense
                       ></v-text-field>
@@ -149,8 +150,8 @@
 
             <v-col cols="6" md="6" sm="6" class="py-0">
               <v-switch
-                :input-value="entryData.walks"
-                v-model="entryData.walks"
+                :input-value="entryData.walk"
+                v-model="entryData.walk"
                 label="Paseos"
               ></v-switch>
             </v-col>
@@ -159,7 +160,7 @@
               <v-textarea
                 outlined
                 height="100"
-                v-model="entryData.instructions"
+                v-model="entryData.day_instructions"
                 label="Instrucciones del día"
               ></v-textarea>
             </v-col>
@@ -177,6 +178,7 @@
 </template>
 
 <script>
+import { mapActions, mapState } from "vuex";
 import { validationMixin } from "vuelidate";
 import { required } from "vuelidate/lib/validators";
 
@@ -187,31 +189,14 @@ export default {
       modalDatePicker: false,
       modalTimePicker: false,
       maxDate: new Date().toISOString().substr(0, 10),
-      attires: [
-        {
-          id: 1,
-          name: "Cama",
-          description: "",
-        },
-        {
-          id: 2,
-          name: "Cobija",
-          description: "",
-        },
-        {
-          id: 3,
-          name: "Juguetes",
-          description: "",
-        },
-      ],
       entryData: {
         pet_id: "",
-        attire: {},
+        accessories: {},
         prize: false,
-        walks: false,
+        walk: false,
         date: "",
         time: "",
-        instructions: "",
+        day_instructions: "",
       },
     };
   },
@@ -231,6 +216,7 @@ export default {
     },
   },
   computed: {
+    ...mapState("lodging", ["pets", "accessories"]),
     dialogEntry: {
       get: function () {
         return this.value;
@@ -261,6 +247,8 @@ export default {
   },
 
   methods: {
+    ...mapActions("lodging", ["storeLodging"]),
+
     getNamePetAndOwn(item) {
       return `${item.name} - ${item.own}`;
     },
@@ -273,7 +261,19 @@ export default {
     },
 
     save() {
+      // Validar si es un guardar o actualizar
+
+      let data = {
+        pet_id: this.entryData.pet_id,
+        accessories: this.entryData.accessories,
+        prize: this.entryData.prize,
+        walk: this.entryData.walk,
+        arrival_date: `${this.entryData.date} ${this.entryData.time}`,
+        day_instructions: this.entryData.day_instructions,
+      };
+
       // Save entry
+      this.storeLodging(data);
     },
   },
 };
