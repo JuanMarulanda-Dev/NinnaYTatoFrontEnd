@@ -170,8 +170,8 @@ const routes = [
     },
   },
   {
-    path: "/ingresos",
-    name: "ingresos",
+    path: "/alojamientos",
+    name: "alojamientos",
     component: () =>
       import(/* webpackChunkName: "Lodging" */ "@/views/Lodging.vue"),
     meta: {

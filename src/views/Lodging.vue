@@ -55,6 +55,7 @@
                 v-bind="attrs"
                 v-on="on"
                 @click="dialogEntry = true"
+                v-show="permissions.create"
               >
                 <v-icon>mdi-plus-thick</v-icon>
               </v-btn>
@@ -94,7 +95,7 @@
               color="warning mr-1"
               v-bind="attrs"
               v-on="on"
-              @click="showFollowUpForm(item.name, item.id)"
+              @click="showMonitoringForm(item.name, item.id, item.pet_avatar)"
             >
               <v-icon>mdi-timeline</v-icon>
             </v-btn>
@@ -132,6 +133,7 @@
               v-bind="attrs"
               v-on="on"
               @click="showOutputForm(item.name, item.id)"
+              v-show="permissions.create"
             >
               <v-icon> mdi-home-import-outline </v-icon>
             </v-btn>
@@ -150,6 +152,7 @@
               v-bind="attrs"
               v-on="on"
               @click="deleteItem(item.id, item.name)"
+              v-show="permissions.delete"
             >
               <v-icon> mdi-close-thick </v-icon>
             </v-btn>
@@ -167,11 +170,12 @@
       :pet_id="pet_id"
     ></output-form>
 
-    <follow-up-form
-      v-model="dialogFollowUp"
+    <monitoring-form
+      v-model="dialogMonitoring"
       :pet_name="pet_name"
-      :pet_id="pet_id"
-    ></follow-up-form>
+      :pet_avatar="pet_avatar"
+      :lodging_id="lodging_id"
+    ></monitoring-form>
 
     <entry-pet-details
       v-model="dialogPetDetails"
@@ -186,7 +190,7 @@ import { required, maxLength } from "vuelidate/lib/validators";
 import { mapState, mapActions, mapMutations } from "vuex";
 import EntryForm from "@/components/lodging/EntryForm.vue";
 import OutputForm from "@/components/lodging/OutputForm.vue";
-import FollowUpForm from "@/components/lodging/FollowUpForm.vue";
+import MonitoringForm from "@/components/lodging/MonitoringForm.vue";
 import EntryPetDetails from "@/components/lodging/EntryPetDetails.vue";
 
 export default {
@@ -195,9 +199,11 @@ export default {
     dialogPetDetails: false,
     dialogEntry: false,
     dialogOutput: false,
-    dialogFollowUp: false,
+    dialogMonitoring: false,
     pet_name: "",
+    pet_avatar: "",
     pet_id: "",
+    lodging_id: "",
     search: "",
     headers: [
       {
@@ -224,7 +230,7 @@ export default {
   components: {
     EntryForm,
     OutputForm,
-    FollowUpForm,
+    MonitoringForm,
     EntryPetDetails,
   },
   computed: {
@@ -277,17 +283,16 @@ export default {
       "getAllLodging",
       "getAllAccessories",
       "getAllCustomersPets",
+      "getAllMonitoringTypes",
       "getMonitoryByPetLodging",
-      "storeProduct",
-      "updateProduct",
       "deleteEntry",
-      "changeStatusProduct",
     ]),
     ...mapMutations("lodging", ["SET_EDIT_ITEM"]),
     initialize() {
       this.getAllLodging();
       this.getAllAccessories();
       this.getAllCustomersPets();
+      this.getAllMonitoringTypes();
     },
 
     showPetDetails(customer_id, pet_id) {
@@ -304,12 +309,14 @@ export default {
       this.dialogOutput = true;
     },
 
-    showFollowUpForm(pet_name, lodging_id) {
+    showMonitoringForm(pet_name, lodging_id, pet_avatar = null) {
       this.pet_name = pet_name;
+      this.pet_avatar = pet_avatar;
+      this.lodging_id = lodging_id;
       this.getMonitoryByPetLodging(lodging_id).then((result) => {
         if (result) {
           // search follow up by the last lodging by pet
-          this.dialogFollowUp = true;
+          this.dialogMonitoring = true;
         }
       });
     },

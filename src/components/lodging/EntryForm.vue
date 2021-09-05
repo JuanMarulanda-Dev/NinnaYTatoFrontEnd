@@ -198,6 +198,15 @@ export default {
         time: "",
         day_instructions: "",
       },
+      entryDataDefault: {
+        pet_id: "",
+        accessories: {},
+        prize: false,
+        walk: false,
+        date: "",
+        time: "",
+        day_instructions: "",
+      },
     };
   },
   model: { prop: "value", event: "input" },
@@ -249,11 +258,8 @@ export default {
   methods: {
     ...mapActions("lodging", ["storeLodging"]),
 
-    getNamePetAndOwn(item) {
-      return `${item.name} - ${item.own}`;
-    },
-
     close() {
+      this.entryData = Object.assign({}, this.entryDataDefault);
       // Reset vuelidate rules
       this.$v.$reset();
       // Close modal
@@ -262,7 +268,6 @@ export default {
 
     save() {
       // Validar si es un guardar o actualizar
-
       let data = {
         pet_id: this.entryData.pet_id,
         accessories: this.entryData.accessories,
@@ -273,7 +278,11 @@ export default {
       };
 
       // Save entry
-      this.storeLodging(data);
+      this.storeLodging(data).then((result) => {
+        if (result) {
+          this.close();
+        }
+      });
     },
   },
 };

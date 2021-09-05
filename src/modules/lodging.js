@@ -12,7 +12,8 @@ export default {
     accessories: [],
     default_accessories: [],
     pets: [],
-    motinitoring: [],
+    monitorings: [],
+    monitoring_types: [],
     editedItem: {
       id: 0,
       name: "",
@@ -50,8 +51,11 @@ export default {
     SET_PETS(state, pets) {
       state.pets = pets;
     },
-    SET_MONITORINGS(state, motinitoring) {
-      state.motinitoring = motinitoring;
+    SET_MONITORINGS(state, monitorings) {
+      state.monitorings = monitorings;
+    },
+    SET_MONITORING_TYPE(state, monitoring_types) {
+      state.monitoring_types = monitoring_types;
     },
   },
   actions: {
@@ -96,6 +100,15 @@ export default {
         .catch(() => {});
     },
 
+    getAllMonitoringTypes({ commit }) {
+      axios
+        .get(`/api/monitoring-types`)
+        .then((result) => {
+          commit("SET_MONITORING_TYPE", result.data.monitoringTypes);
+        })
+        .catch(() => {});
+    },
+
     getMonitoryByPetLodging({ commit }, id) {
       commit("SET_OVERLAY_LOADING", true, { root: true });
       return axios
@@ -106,9 +119,8 @@ export default {
             commit("SET_MONITORINGS", result.data.monitorings);
             // Result
             return true;
-          } else {
-            return false;
           }
+          return false;
         })
         .catch((errors) => {
           // show error message
@@ -137,34 +149,7 @@ export default {
             );
             // Reload cash registers
             dispatch("getAllLodging");
-          }
-        })
-        .catch((errors) => {
-          // show error message
-          this._vm.showToastMessage(
-            errors.response.status,
-            this._vm.createMessageError(errors.response.data.errors)
-          );
-        })
-        .finally(() => {
-          commit("SET_OVERLAY_LOADING", false, { root: true });
-        });
-    },
 
-    updateProduct({ state, commit, dispatch }) {
-      commit("SET_OVERLAY_LOADING", true, { root: true });
-      return axios
-        .put(`/api/products/${state.editedItem.id}`, state.editedItem)
-        .then((result) => {
-          if (result.status == 201) {
-            // show message
-            this._vm.showToastMessage(
-              result.status,
-              "Producto actualizado exitosamente"
-            );
-            // Reload cash registers
-            dispatch("getAllProducts");
-            // Result
             return true;
           }
         })
@@ -181,19 +166,40 @@ export default {
         });
     },
 
-    changeStatusProduct({ commit, dispatch }, id) {
+    storeMonitoring({ commit, dispatch }, { id, form }) {
       commit("SET_OVERLAY_LOADING", true, { root: true });
+
+      let data = {
+        monitoring_type_id: form.monitoring_type_id,
+        date: `${form.date} ${form.time}`,
+        image: form.image,
+        description: form.description,
+      };
+
+      let formData = new FormData();
+      for (var key in data) {
+        if (data[key] == null) {
+          formData.append(key, "");
+        } else if (typeof data[key] === "boolean") {
+          formData.append(key, data[key] ? "1" : "0");
+        } else {
+          formData.append(key, data[key]);
+        }
+      }
+
       return axios
-        .delete(`/api/products/${id}`)
+        .post(`/api/lodgings/${id}/monitorings`, formData)
         .then((result) => {
-          if (result.status == 204) {
+          if (result.status == 201) {
             // show message
-            this._vm.showToastMessage(result.status);
+            this._vm.showToastMessage(
+              result.status,
+              "Seguimiento registrado exitosamente."
+            );
             // Reload cash registers
-            dispatch("getAllProducts");
+            dispatch("getMonitoryByPetLodging", id);
+
             return true;
-          } else {
-            return false;
           }
         })
         .catch((errors) => {
@@ -227,6 +233,34 @@ export default {
             errors.response.status,
             this._vm.createMessageError(errors.response.data.errors)
           );
+        })
+        .finally(() => {
+          commit("SET_OVERLAY_LOADING", false, { root: true });
+        });
+    },
+
+    deleteMonitoringPet({ commit }, id) {
+      commit("SET_OVERLAY_LOADING", true, { root: true });
+      return axios
+        .delete(`/api/monitorings/${id}`)
+        .then((result) => {
+          if (result.status == 204) {
+            // show message
+            this._vm.showToastMessage(
+              result.status,
+              "Seguimiento eliminado exitosamente"
+            );
+            // Reload cash registers
+            return true;
+          }
+        })
+        .catch((errors) => {
+          // show error message
+          this._vm.showToastMessage(
+            errors.response.status,
+            this._vm.createMessageError(errors.response.data.errors)
+          );
+          return false;
         })
         .finally(() => {
           commit("SET_OVERLAY_LOADING", false, { root: true });

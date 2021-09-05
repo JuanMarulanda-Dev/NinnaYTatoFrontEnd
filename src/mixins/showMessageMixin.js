@@ -34,7 +34,7 @@ exports.install = function (Vue) {
         },
         204: () => {
           // No contect (use to changes status to all resources)
-          Vue.$toast.success("Estado cambiado exitosamente");
+          Vue.$toast.success(message ?? "Estado cambiado exitosamente");
         },
         400: () => {
           // Bad request
