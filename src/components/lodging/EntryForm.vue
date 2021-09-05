@@ -118,6 +118,8 @@
                 multiple
                 chips
                 :items="accessories"
+                item-text="name"
+                return-object
                 v-model="entryData.accessories"
               >
                 <template v-slot:item="data">
@@ -191,7 +193,7 @@ export default {
       maxDate: new Date().toISOString().substr(0, 10),
       entryData: {
         pet_id: "",
-        accessories: {},
+        accessories: [],
         prize: false,
         walk: false,
         date: "",
@@ -200,7 +202,7 @@ export default {
       },
       entryDataDefault: {
         pet_id: "",
-        accessories: {},
+        accessories: [],
         prize: false,
         walk: false,
         date: "",
