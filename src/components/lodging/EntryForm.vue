@@ -180,7 +180,7 @@
 </template>
 
 <script>
-import { mapActions, mapState } from "vuex";
+import { mapActions, mapState, mapMutations } from "vuex";
 import { validationMixin } from "vuelidate";
 import { required } from "vuelidate/lib/validators";
 
@@ -191,24 +191,6 @@ export default {
       modalDatePicker: false,
       modalTimePicker: false,
       maxDate: new Date().toISOString().substr(0, 10),
-      entryData: {
-        pet_id: "",
-        accessories: [],
-        prize: false,
-        walk: false,
-        date: "",
-        time: "",
-        day_instructions: "",
-      },
-      entryDataDefault: {
-        pet_id: "",
-        accessories: [],
-        prize: false,
-        walk: false,
-        date: "",
-        time: "",
-        day_instructions: "",
-      },
     };
   },
   model: { prop: "value", event: "input" },
@@ -227,7 +209,7 @@ export default {
     },
   },
   computed: {
-    ...mapState("lodging", ["pets", "accessories"]),
+    ...mapState("lodging", ["pets", "accessories", "entryData"]),
     dialogEntry: {
       get: function () {
         return this.value;
@@ -258,10 +240,10 @@ export default {
   },
 
   methods: {
-    ...mapActions("lodging", ["storeLodging"]),
-
+    ...mapActions("lodging", ["storeLodging", "updateLodging"]),
+    ...mapMutations("lodging", ["SET_DEFAULT_DATAENTRY"]),
     close() {
-      this.entryData = Object.assign({}, this.entryDataDefault);
+      this.SET_DEFAULT_DATAENTRY();
       // Reset vuelidate rules
       this.$v.$reset();
       // Close modal

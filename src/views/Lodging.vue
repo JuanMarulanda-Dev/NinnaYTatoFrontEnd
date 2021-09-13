@@ -37,6 +37,7 @@
                 color="secondary"
                 v-bind="attrs"
                 v-on="on"
+                @click="dialogHistoryLodgingTable = true"
               >
                 <v-icon>mdi-book-search</v-icon>
               </v-btn>
@@ -113,7 +114,7 @@
               color="secondary mr-1"
               v-bind="attrs"
               v-on="on"
-              @click="editItem(item)"
+              @click="showEditEntryForm(item)"
               v-show="permissions.update"
             >
               <v-icon> {{ editIcon }} </v-icon>
@@ -132,7 +133,15 @@
               color="accent mr-1"
               v-bind="attrs"
               v-on="on"
-              @click="showOutputForm(item.name, item.id)"
+              @click="
+                showOutputForm(
+                  item.id,
+                  item.customer_id,
+                  item.arrival_date_no_format,
+                  item.name,
+                  item.id
+                )
+              "
               v-show="permissions.create"
             >
               <v-icon> mdi-home-import-outline </v-icon>
@@ -166,6 +175,8 @@
 
     <output-form
       v-model="dialogOutput"
+      :lodging_id="lodging_id"
+      :arrival_date="arrival_date"
       :pet_name="pet_name"
       :pet_id="pet_id"
     ></output-form>
@@ -175,23 +186,33 @@
       :pet_name="pet_name"
       :pet_avatar="pet_avatar"
       :lodging_id="lodging_id"
+      :add_monitoring="add_monitoring"
     ></monitoring-form>
 
     <entry-pet-details
       v-model="dialogPetDetails"
       :pet="entry_pet_details"
     ></entry-pet-details>
+
+    <history-lodging-table
+      @showMonitoring="
+        showMonitoringForm($event.name, $event.id, $event.pet_avatar, false)
+      "
+      @showPetDetails="showPetDetails($event.customer_id, $event.pet_id)"
+      showMonitoringForm
+      v-model="dialogHistoryLodgingTable"
+    >
+    </history-lodging-table>
   </div>
 </template>
 
 <script>
-import { validationMixin } from "vuelidate";
-import { required, maxLength } from "vuelidate/lib/validators";
 import { mapState, mapActions, mapMutations } from "vuex";
 import EntryForm from "@/components/lodging/EntryForm.vue";
 import OutputForm from "@/components/lodging/OutputForm.vue";
 import MonitoringForm from "@/components/lodging/MonitoringForm.vue";
 import EntryPetDetails from "@/components/lodging/EntryPetDetails.vue";
+import HistoryLodgingTable from "@/components/lodging/HistoryLodgingTable.vue";
 
 export default {
   data: () => ({
@@ -200,10 +221,13 @@ export default {
     dialogEntry: false,
     dialogOutput: false,
     dialogMonitoring: false,
+    dialogHistoryLodgingTable: false,
     pet_name: "",
+    add_monitoring: false,
     pet_avatar: "",
     pet_id: "",
     lodging_id: "",
+    arrival_date: "",
     search: "",
     headers: [
       {
@@ -218,44 +242,13 @@ export default {
       { text: "Salida", align: "center", value: "departure_date" },
       { text: "Acciones", align: "center", value: "actions", sortable: false },
     ],
-    editedIndex: -1,
     entry_pet_details: {},
   }),
-  mixins: [validationMixin],
-  validations: {
-    editedItem: {
-      name: { required, maxLength: maxLength(255) },
-    },
-  },
-  components: {
-    EntryForm,
-    OutputForm,
-    MonitoringForm,
-    EntryPetDetails,
-  },
   computed: {
     ...mapState(["editIcon", "loadingText", "mainBranchOffice"]),
-    ...mapState("lodging", [
-      "lodgings",
-      "loading",
-      "editedItem",
-      "defaultItem",
-    ]),
+    ...mapState("lodging", ["lodgings", "loading"]),
     ...mapState("customers", ["personal_infomation"]),
-    formTitle() {
-      return this.editedIndex === -1 ? "Nueva Producto" : "Editar Producto";
-    },
-    nameErrors() {
-      const errors = [];
-      if (!this.$v.editedItem.name.$dirty) return errors;
-      !this.$v.editedItem.name.required &&
-        errors.push("El nombre es requerido");
-      !this.$v.editedItem.name.maxLength &&
-        errors.push("Longitud no permitida");
-      return errors;
-    },
   },
-
   watch: {
     dialog(val) {
       val || this.close();
@@ -267,17 +260,18 @@ export default {
       }
     },
   },
-
   created() {
     // Obtener los permisos
     this.permissions = this.$route.meta.permissions;
+
+    this.getAllDefaultPlans();
+    this.getAllCashRegisters(1);
 
     // Acciones que debe realizar el componente una vez creado
     if (this.permissions.read) {
       this.initialize();
     }
   },
-
   methods: {
     ...mapActions("lodging", [
       "getAllLodging",
@@ -285,11 +279,14 @@ export default {
       "getAllCustomersPets",
       "getAllMonitoringTypes",
       "getMonitoryByPetLodging",
+      "getAllDefaultPlans",
       "deleteEntry",
     ]),
-    ...mapMutations("lodging", ["SET_EDIT_ITEM"]),
+    ...mapActions("customers", ["getAllCustomersPlans"]),
+    ...mapActions("cash_registers", ["getAllCashRegisters"]),
+    ...mapMutations("lodging", ["SET_ENTRY_DATA"]),
     initialize() {
-      this.getAllLodging();
+      this.getAllLodging({ status: 1 });
       this.getAllAccessories();
       this.getAllCustomersPets();
       this.getAllMonitoringTypes();
@@ -303,22 +300,36 @@ export default {
       });
     },
 
-    showOutputForm(pet_name, pet_id) {
+    showOutputForm(lodging_id, customer_id, arrival_date, pet_name, pet_id) {
+      this.getAllCustomersPlans(customer_id);
+      this.lodging_id = lodging_id;
+      this.arrival_date = arrival_date;
       this.pet_name = pet_name;
       this.pet_id = pet_id;
       this.dialogOutput = true;
     },
 
-    showMonitoringForm(pet_name, lodging_id, pet_avatar = null) {
+    showMonitoringForm(
+      pet_name,
+      lodging_id,
+      pet_avatar = null,
+      add_monitoring = true
+    ) {
       this.pet_name = pet_name;
       this.pet_avatar = pet_avatar;
       this.lodging_id = lodging_id;
+      this.add_monitoring = add_monitoring;
       this.getMonitoryByPetLodging(lodging_id).then((result) => {
         if (result) {
           // search follow up by the last lodging by pet
           this.dialogMonitoring = true;
         }
       });
+    },
+
+    showEditEntryForm(item) {
+      this.SET_ENTRY_DATA(item);
+      this.dialogEntry = true;
     },
 
     deleteItem(id, name) {
@@ -330,6 +341,14 @@ export default {
         }
       });
     },
+  },
+
+  components: {
+    EntryForm,
+    OutputForm,
+    MonitoringForm,
+    EntryPetDetails,
+    HistoryLodgingTable,
   },
 };
 </script>

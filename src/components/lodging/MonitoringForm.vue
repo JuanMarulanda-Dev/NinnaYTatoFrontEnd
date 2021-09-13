@@ -16,6 +16,7 @@
               icon
               v-bind="attrs"
               v-on="on"
+              v-show="add_monitoring"
             >
               <v-icon>mdi-plus-thick</v-icon>
             </v-btn>
@@ -47,7 +48,7 @@
                       <template v-slot:activator="{ on, attrs }">
                         <v-text-field
                           v-model="monitoring.date"
-                          label="Fecha de salida*"
+                          label="Fecha del evento*"
                           prepend-icon="mdi-calendar"
                           readonly
                           v-bind="attrs"
@@ -238,6 +239,7 @@
                               x-small
                               fab
                               color="error"
+                              v-show="add_monitoring"
                             >
                               <v-icon x-small>mdi-close-thick</v-icon>
                             </v-btn>
@@ -311,6 +313,10 @@ export default {
     },
     lodging_id: {
       type: String,
+      required: true,
+    },
+    add_monitoring: {
+      type: Boolean,
       required: true,
     },
   },

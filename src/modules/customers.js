@@ -59,6 +59,8 @@ export default {
       social_network: "",
       how_contact_id: null,
     },
+
+    customer_plans: [],
   },
   mutations: {
     SET_PERMISSIONS(state, permissions) {
@@ -94,6 +96,9 @@ export default {
     },
     SET_HOW_CONTACT(state, how_contact) {
       state.how_contact = how_contact;
+    },
+    SET_CUSTOMER_PLANS(state, customer_plans) {
+      state.customer_plans = customer_plans;
     },
   },
   actions: {
@@ -268,6 +273,14 @@ export default {
         .finally(() => {
           commit("SET_OVERLAY_LOADING", false, { root: true });
         });
+    },
+    getAllCustomersPlans({ commit }, id) {
+      axios
+        .get(`/api/customers/${id}/plans`)
+        .then((result) => {
+          commit("SET_CUSTOMER_PLANS", result.data.customerPlans);
+        })
+        .catch(() => {});
     },
   },
   getters: {},
