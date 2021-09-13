@@ -18,26 +18,26 @@
               <v-dialog
                 ref="dialog"
                 v-model="modalDatePicker"
-                :return-value.sync="formData.date"
+                :return-value.sync="outputData.date"
                 persistent
                 width="290px"
               >
                 <template v-slot:activator="{ on, attrs }">
                   <v-text-field
-                    v-model="formData.date"
+                    v-model="outputData.date"
                     label="Fecha de salida*"
                     prepend-icon="mdi-calendar"
                     readonly
                     v-bind="attrs"
                     v-on="on"
                     :error-messages="dateErrors"
-                    @input="$v.formData.date.$touch()"
-                    @blur="$v.formData.date.$touch()"
+                    @input="$v.outputData.date.$touch()"
+                    @blur="$v.outputData.date.$touch()"
                   ></v-text-field>
                 </template>
                 <v-date-picker
                   :max="maxDate"
-                  v-model="formData.date"
+                  v-model="outputData.date"
                   scrollable
                 >
                   <v-spacer></v-spacer>
@@ -47,7 +47,7 @@
                   <v-btn
                     text
                     color="primary"
-                    @click="$refs.dialog.save(formData.date)"
+                    @click="$refs.dialog.save(outputData.date)"
                   >
                     OK
                   </v-btn>
@@ -60,26 +60,26 @@
               <v-dialog
                 ref="time"
                 v-model="modalTimePicker"
-                :return-value.sync="formData.time"
+                :return-value.sync="outputData.time"
                 persistent
                 width="290px"
               >
                 <template v-slot:activator="{ on, attrs }">
                   <v-text-field
-                    v-model="formData.time"
+                    v-model="outputData.time"
                     label="hora"
                     prepend-icon="mdi-clock-time-four-outline"
                     readonly
                     v-bind="attrs"
                     v-on="on"
                     :error-messages="timeErrors"
-                    @input="$v.formData.time.$touch()"
-                    @blur="$v.formData.time.$touch()"
+                    @input="$v.outputData.time.$touch()"
+                    @blur="$v.outputData.time.$touch()"
                   ></v-text-field>
                 </template>
                 <v-time-picker
                   v-if="modalTimePicker"
-                  v-model="formData.time"
+                  v-model="outputData.time"
                   full-width
                 >
                   <v-spacer></v-spacer>
@@ -89,7 +89,7 @@
                   <v-btn
                     text
                     color="primary"
-                    @click="$refs.time.save(formData.time)"
+                    @click="$refs.time.save(outputData.time)"
                   >
                     OK
                   </v-btn>
@@ -110,11 +110,12 @@
             <v-col cols="12" sm="6" md="6">
               <!-- plans -->
               <v-select
-                v-model="formData.plan_customer_id"
+                v-model="outputData.plan_customer_id"
                 :items="customer_plans"
                 label="Planes cliente"
                 item-text="name"
                 item-value="id"
+                @change="clean_field_default_plan()"
               >
                 <template v-slot:item="{ item }">
                   <span class="mr-1">
@@ -140,19 +141,20 @@
                         <v-col cols="12" sm="6" md="6">
                           <!-- plans -->
                           <v-select
-                            v-model="formData.plan_default_id"
+                            v-model="outputData.plan_default_id"
                             :items="default_plans_details"
                             label="Planes"
                             item-text="name"
                             item-value="id"
                             dense
+                            @change="clean_field_customer_plan()"
                           >
                           </v-select>
                         </v-col>
                         <v-col cols="12" sm="6" md="6">
                           <!-- cajas -->
                           <v-select
-                            v-model="formData.cash_register_id"
+                            v-model="outputData.cash_register_id"
                             :items="cash_registers"
                             label="Cajas"
                             item-text="name"
@@ -163,14 +165,19 @@
                         <v-col cols="12" sm="6" md="6">
                           <!-- Dinero ingresado -->
                           <vuetify-money
-                            v-model="formData.payment"
+                            v-model="outputData.payment"
                             label="Dinero ingresado"
                             dense
                           />
                         </v-col>
                         <v-col cols="12" sm="6" md="6">
                           <!-- Total -->
-                          <vuetify-money label="Total" readonly dense />
+                          <vuetify-money
+                            :value="total"
+                            label="Total"
+                            readonly
+                            dense
+                          />
                         </v-col>
                       </v-row>
                     </v-container>
@@ -204,14 +211,6 @@ export default {
       modalDatePicker: false,
       modalTimePicker: false,
       maxDate: new Date().toISOString().substr(0, 10),
-      formData: {
-        date: "",
-        time: "",
-        plan_customer_id: "",
-        plan_defult_id: "",
-        payment: "",
-        cash_register_id: "",
-      },
     };
   },
   model: { prop: "value", event: "input" },
@@ -224,10 +223,6 @@ export default {
       type: String,
       required: true,
     },
-    pet_id: {
-      type: String,
-      required: true,
-    },
     lodging_id: {
       type: String,
       required: true,
@@ -236,10 +231,14 @@ export default {
       type: String,
       required: true,
     },
+    is_close: {
+      type: Boolean,
+      required: true,
+    },
   },
   mixins: [validationMixin],
   validations: {
-    formData: {
+    outputData: {
       date: { required },
       time: { required },
     },
@@ -248,18 +247,45 @@ export default {
     VuetifyMoney,
   },
   computed: {
-    ...mapState("lodging", ["default_plans_details"]),
+    ...mapState("lodging", ["default_plans_details", "outputData"]),
     ...mapState("customers", ["customer_plans"]),
     ...mapState("cash_registers", ["cash_registers"]),
     calculateHours() {
       let hours = 0;
-      if (this.formData.date !== "" && this.formData.time !== "") {
+      if (this.outputData.date !== "" && this.outputData.time !== "") {
         let startTime = Date.parse(this.arrival_date);
-        let endTime = Date.parse(`${this.formData.date} ${this.formData.time}`);
+        let endTime = Date.parse(
+          `${this.outputData.date} ${this.outputData.time}`
+        );
         let difference = endTime - startTime; // This will give difference in milliseconds
         hours = Math.ceil((difference % 86400000) / 3600000);
       }
       return hours;
+    },
+    total() {
+      let total = 0;
+      if (
+        this.outputData.plan_default_id !== "" &&
+        this.outputData !== "" &&
+        this.outputData.time !== ""
+      ) {
+        let plan_default_id = this.outputData.plan_default_id;
+        let plan = this.default_plans_details.find(
+          (item) => item.id === plan_default_id
+        );
+        let hours = this.calculateHours;
+        let quantity = Math.ceil(hours / (plan.quantity * plan.equivalence));
+        let price = plan.full_value * quantity;
+
+        let default_discount = plan.discount;
+        let quantity_discount = this.findDiscountToQuantity(
+          quantity,
+          plan.discounts
+        );
+
+        total = price - price * ((quantity_discount + default_discount) / 100);
+      }
+      return total;
     },
     dialogOutput: {
       get: function () {
@@ -271,14 +297,14 @@ export default {
     },
     dateErrors() {
       const errors = [];
-      if (!this.$v.formData.date.$dirty) return errors;
-      !this.$v.formData.date.required && errors.push("La fecha es requerida");
+      if (!this.$v.outputData.date.$dirty) return errors;
+      !this.$v.outputData.date.required && errors.push("La fecha es requerida");
       return errors;
     },
     timeErrors() {
       const errors = [];
-      if (!this.$v.formData.time.$dirty) return errors;
-      !this.$v.formData.time.required && errors.push("La hora es requerida");
+      if (!this.$v.outputData.time.$dirty) return errors;
+      !this.$v.outputData.time.required && errors.push("La hora es requerida");
       return errors;
     },
   },
@@ -292,17 +318,42 @@ export default {
       this.dialogOutput = false;
     },
 
+    clean_field_customer_plan() {
+      this.outputData.plan_customer_id = "";
+    },
+
+    clean_field_default_plan() {
+      this.outputData.plan_default_id = "";
+      this.outputData.payment = "";
+      this.outputData.cash_register_id = "";
+    },
+
+    findDiscountToQuantity(quantity, discounts = []) {
+      let discount = 0;
+      if (discounts.length > 0) {
+        // Find discount to quantity
+        let itemDiscount = discounts.find(
+          (element) => element.quantity === quantity
+        );
+        if (itemDiscount) {
+          discount = itemDiscount.discount ?? 0;
+        }
+      }
+      return discount;
+    },
+
     save() {
       // Save depure
       this.storeLodgingDeparture({
         data: {
-          departure_date: `${this.formData.date} ${this.formData.time}`,
-          plan_customer_id: this.formData.plan_customer_id,
-          plan_default_id: this.formData.plan_default_id,
-          payment: this.formData.payment,
-          cash_register_id: this.formData.cash_register_id,
+          departure_date: `${this.outputData.date} ${this.outputData.time}`,
+          plan_customer_id: this.outputData.plan_customer_id,
+          plan_default_id: this.outputData.plan_default_id,
+          payment: this.outputData.payment,
+          cash_register_id: this.outputData.cash_register_id,
         },
         id: this.lodging_id,
+        is_close: this.is_close,
       }).then((result) => {
         if (result) {
           this.close();

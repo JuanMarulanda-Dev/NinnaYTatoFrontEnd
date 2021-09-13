@@ -199,6 +199,10 @@ export default {
       type: Boolean,
       required: true,
     },
+    lodging_id: {
+      type: String,
+      required: true,
+    },
   },
   mixins: [validationMixin],
   validations: {
@@ -241,9 +245,9 @@ export default {
 
   methods: {
     ...mapActions("lodging", ["storeLodging", "updateLodging"]),
-    ...mapMutations("lodging", ["SET_DEFAULT_DATAENTRY"]),
+    ...mapMutations("lodging", ["SET_DEFAULT_DATA_ENTRY"]),
     close() {
-      this.SET_DEFAULT_DATAENTRY();
+      this.SET_DEFAULT_DATA_ENTRY();
       // Reset vuelidate rules
       this.$v.$reset();
       // Close modal
@@ -261,12 +265,21 @@ export default {
         day_instructions: this.entryData.day_instructions,
       };
 
-      // Save entry
-      this.storeLodging(data).then((result) => {
-        if (result) {
-          this.close();
-        }
-      });
+      if (this.lodging_id !== "") {
+        // Update entry
+        this.updateLodging({ data, id: this.lodging_id }).then((result) => {
+          if (result) {
+            this.close();
+          }
+        });
+      } else {
+        // Save entry
+        this.storeLodging(data).then((result) => {
+          if (result) {
+            this.close();
+          }
+        });
+      }
     },
   },
 };

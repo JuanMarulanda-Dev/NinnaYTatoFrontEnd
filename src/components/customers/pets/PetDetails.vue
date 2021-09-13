@@ -160,14 +160,14 @@
                     <small>Dueño </small><br />
                     <v-avatar color="grey lighten-1">
                       <img
-                        v-if="additional_information.customer_avatar"
-                        :src="additional_information.customer_avatar"
-                        :alt="personal_infomation.first_name"
+                        v-if="pet.customer_avatar"
+                        :src="pet.customer_avatar"
+                        :alt="pet.customer_name"
                       />
                       <v-icon v-else dark> mdi-account-circle </v-icon>
                     </v-avatar>
                     <br />
-                    <label> {{ personal_infomation.first_name }} </label>
+                    <label> {{ pet.customer_name }} </label>
                   </v-col>
                 </v-row>
                 <v-row>
@@ -364,11 +364,7 @@ export default {
   },
   computed: {
     ...mapState("pets", ["pet", "vet_information", "pet_behavior"]),
-    ...mapState("customers", [
-      "personal_infomation",
-      "additional_information",
-      "permissions",
-    ]),
+    ...mapState("customers", ["personal_infomation", "permissions"]),
   },
   methods: {
     goBack() {

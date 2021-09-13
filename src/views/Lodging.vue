@@ -78,7 +78,9 @@
               color="info mr-1"
               v-bind="attrs"
               v-on="on"
-              @click="showPetDetails(item.customer_id, item.pet_id)"
+              @click="
+                showPetDetails(item.customer_id, item.arrival_data.pet_id)
+              "
             >
               <v-icon> mdi-paw</v-icon>
             </v-btn>
@@ -114,7 +116,7 @@
               color="secondary mr-1"
               v-bind="attrs"
               v-on="on"
-              @click="showEditEntryForm(item)"
+              @click="showEditEntryForm(item.arrival_data, item.id)"
               v-show="permissions.update"
             >
               <v-icon> {{ editIcon }} </v-icon>
@@ -137,9 +139,8 @@
                 showOutputForm(
                   item.id,
                   item.customer_id,
-                  item.arrival_date_no_format,
-                  item.name,
-                  item.id
+                  item.arrival_no_format,
+                  item.name
                 )
               "
               v-show="permissions.create"
@@ -171,14 +172,14 @@
       </template>
     </v-data-table>
 
-    <entry-form v-model="dialogEntry"></entry-form>
+    <entry-form :lodging_id="lodging_id" v-model="dialogEntry"></entry-form>
 
     <output-form
       v-model="dialogOutput"
       :lodging_id="lodging_id"
       :arrival_date="arrival_date"
       :pet_name="pet_name"
-      :pet_id="pet_id"
+      :is_close="is_close"
     ></output-form>
 
     <monitoring-form
@@ -189,17 +190,21 @@
       :add_monitoring="add_monitoring"
     ></monitoring-form>
 
-    <entry-pet-details
-      v-model="dialogPetDetails"
-      :pet="entry_pet_details"
-    ></entry-pet-details>
-
     <history-lodging-table
       @showMonitoring="
         showMonitoringForm($event.name, $event.id, $event.pet_avatar, false)
       "
       @showPetDetails="showPetDetails($event.customer_id, $event.pet_id)"
-      showMonitoringForm
+      @showOutputForm="
+        showOutputForm(
+          $event.id,
+          $event.customer_id,
+          $event.arrival_no_format,
+          $event.name,
+          $event.departure_data,
+          $event.departure_data.date ? true : false
+        )
+      "
       v-model="dialogHistoryLodgingTable"
     >
     </history-lodging-table>
@@ -211,7 +216,6 @@ import { mapState, mapActions, mapMutations } from "vuex";
 import EntryForm from "@/components/lodging/EntryForm.vue";
 import OutputForm from "@/components/lodging/OutputForm.vue";
 import MonitoringForm from "@/components/lodging/MonitoringForm.vue";
-import EntryPetDetails from "@/components/lodging/EntryPetDetails.vue";
 import HistoryLodgingTable from "@/components/lodging/HistoryLodgingTable.vue";
 
 export default {
@@ -224,6 +228,7 @@ export default {
     dialogHistoryLodgingTable: false,
     pet_name: "",
     add_monitoring: false,
+    is_close: false,
     pet_avatar: "",
     pet_id: "",
     lodging_id: "",
@@ -254,6 +259,27 @@ export default {
       val || this.close();
       this.$v.$reset();
     },
+    dialogEntry(newValue) {
+      if (!newValue) {
+        this.lodging_id = "";
+      }
+    },
+    dialogOutput(newValue) {
+      if (!newValue) {
+        this.SET_DEFAULT_DATA_OUTPUT();
+        this.lodging_id = "";
+      }
+    },
+    dialogMonitoring(newValue) {
+      if (!newValue) {
+        this.lodging_id = "";
+      }
+    },
+    dialogHistoryLodgingTable(newValue) {
+      if (!newValue) {
+        this.lodging_id = "";
+      }
+    },
     mainBranchOffice() {
       if (this.permissions.read) {
         this.initialize();
@@ -277,14 +303,20 @@ export default {
       "getAllLodging",
       "getAllAccessories",
       "getAllCustomersPets",
-      "getAllMonitoringTypes",
-      "getMonitoryByPetLodging",
       "getAllDefaultPlans",
       "deleteEntry",
     ]),
+    ...mapActions("monitorings", [
+      "getMonitoryByPetLodging",
+      "getAllMonitoringTypes",
+    ]),
     ...mapActions("customers", ["getAllCustomersPlans"]),
     ...mapActions("cash_registers", ["getAllCashRegisters"]),
-    ...mapMutations("lodging", ["SET_ENTRY_DATA"]),
+    ...mapMutations("lodging", [
+      "SET_ENTRY_DATA",
+      "SET_DEFAULT_DATA_OUTPUT",
+      "SET_OUTPUT_DATA",
+    ]),
     initialize() {
       this.getAllLodging({ status: 1 });
       this.getAllAccessories();
@@ -300,15 +332,27 @@ export default {
       });
     },
 
-    showOutputForm(lodging_id, customer_id, arrival_date, pet_name, pet_id) {
+    showOutputForm(
+      lodging_id,
+      customer_id,
+      arrival_date,
+      pet_name,
+      output_data = {},
+      is_close = false
+    ) {
       this.getAllCustomersPlans(customer_id);
+      if (!this.isObjEmpty(output_data)) {
+        this.SET_OUTPUT_DATA(output_data);
+      }
       this.lodging_id = lodging_id;
       this.arrival_date = arrival_date;
       this.pet_name = pet_name;
-      this.pet_id = pet_id;
+      this.is_close = is_close;
       this.dialogOutput = true;
     },
-
+    isObjEmpty(obj) {
+      return Object.keys(obj).length === 0;
+    },
     showMonitoringForm(
       pet_name,
       lodging_id,
@@ -327,8 +371,9 @@ export default {
       });
     },
 
-    showEditEntryForm(item) {
+    showEditEntryForm(item, lodging_id) {
       this.SET_ENTRY_DATA(item);
+      this.lodging_id = lodging_id;
       this.dialogEntry = true;
     },
 
@@ -347,7 +392,6 @@ export default {
     EntryForm,
     OutputForm,
     MonitoringForm,
-    EntryPetDetails,
     HistoryLodgingTable,
   },
 };

@@ -329,7 +329,7 @@ export default {
     },
   },
   computed: {
-    ...mapState("lodging", ["monitorings", "monitoring_types"]),
+    ...mapState("monitorings", ["monitorings", "monitoring_types"]),
     monitoringsFormat() {
       let lastDate = null;
       let timeline = [];
@@ -402,7 +402,7 @@ export default {
   },
 
   methods: {
-    ...mapActions("lodging", [
+    ...mapActions("monitorings", [
       "storeMonitoring",
       "deleteMonitoringPet",
       "getMonitoryByPetLodging",

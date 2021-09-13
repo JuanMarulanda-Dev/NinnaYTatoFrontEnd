@@ -13,8 +13,6 @@ export default {
     accessories: [],
     default_accessories: [],
     pets: [],
-    monitorings: [],
-    monitoring_types: [],
     entryData: {
       pet_id: "",
       accessories: [],
@@ -23,6 +21,22 @@ export default {
       date: "",
       time: "",
       day_instructions: "",
+    },
+    outputData: {
+      date: "",
+      time: "",
+      plan_customer_id: "",
+      plan_default_id: "",
+      payment: "",
+      cash_register_id: "",
+    },
+    outputDefaultData: {
+      date: "",
+      time: "",
+      plan_customer_id: "",
+      plan_default_id: "",
+      payment: "",
+      cash_register_id: "",
     },
     entryDataDefault: {
       pet_id: "",
@@ -57,20 +71,20 @@ export default {
     SET_PETS(state, pets) {
       state.pets = pets;
     },
-    SET_MONITORINGS(state, monitorings) {
-      state.monitorings = monitorings;
-    },
-    SET_MONITORING_TYPE(state, monitoring_types) {
-      state.monitoring_types = monitoring_types;
-    },
     SET_DEFAULT_PLANS_DETAILS(state, default_plans_details) {
       state.default_plans_details = default_plans_details;
     },
-    SET_DEFAULT_DATAENTRY(state) {
+    SET_DEFAULT_DATA_ENTRY(state) {
       state.entryData = Object.assign({}, state.entryDataDefault);
     },
     SET_ENTRY_DATA(state, entryData) {
       state.entryData = entryData;
+    },
+    SET_DEFAULT_DATA_OUTPUT(state) {
+      state.outputData = Object.assign({}, state.outputDefaultData);
+    },
+    SET_OUTPUT_DATA(state, outputData) {
+      state.outputData = outputData;
     },
   },
   actions: {
@@ -139,41 +153,6 @@ export default {
         .catch(() => {});
     },
 
-    getAllMonitoringTypes({ commit }) {
-      axios
-        .get(`/api/monitoring-types`)
-        .then((result) => {
-          commit("SET_MONITORING_TYPE", result.data.monitoringTypes);
-        })
-        .catch(() => {});
-    },
-
-    getMonitoryByPetLodging({ commit }, id) {
-      commit("SET_OVERLAY_LOADING", true, { root: true });
-      return axios
-        .get(`/api/lodgings/${id}/monitorings`)
-        .then((result) => {
-          if (result.status === 200) {
-            // save all
-            commit("SET_MONITORINGS", result.data.monitorings);
-            // Result
-            return true;
-          }
-          return false;
-        })
-        .catch((errors) => {
-          // show error message
-          this._vm.showToastMessage(
-            errors.response.status,
-            this._vm.createMessageError(errors.response.data.errors)
-          );
-          return false;
-        })
-        .finally(() => {
-          commit("SET_OVERLAY_LOADING", false, { root: true });
-        });
-    },
-
     storeLodging({ commit, dispatch, rootState }, data) {
       commit("SET_OVERLAY_LOADING", true, { root: true });
       data.branch_office_id = rootState.mainBranchOffice;
@@ -235,7 +214,7 @@ export default {
         });
     },
 
-    storeLodgingDeparture({ commit, dispatch }, { data, id }) {
+    storeLodgingDeparture({ commit, dispatch }, { data, id, is_close }) {
       commit("SET_OVERLAY_LOADING", true, { root: true });
       return axios
         .post(`/api/lodgings/${id}/departures`, data)
@@ -246,57 +225,9 @@ export default {
               result.status,
               "Salida registrada exitosamente."
             );
+            let status = is_close ? 0 : 1;
             // Reload cash registers
-            dispatch("getAllLodging", { status: 1 });
-
-            return true;
-          }
-        })
-        .catch((errors) => {
-          // show error message
-          this._vm.showToastMessage(
-            errors.response.status,
-            this._vm.createMessageError(errors.response.data.errors)
-          );
-          return false;
-        })
-        .finally(() => {
-          commit("SET_OVERLAY_LOADING", false, { root: true });
-        });
-    },
-
-    storeMonitoring({ commit, dispatch }, { id, form }) {
-      commit("SET_OVERLAY_LOADING", true, { root: true });
-
-      let data = {
-        monitoring_type_id: form.monitoring_type_id,
-        date: `${form.date} ${form.time}`,
-        image: form.image,
-        description: form.description,
-      };
-
-      let formData = new FormData();
-      for (var key in data) {
-        if (data[key] == null) {
-          formData.append(key, "");
-        } else if (typeof data[key] === "boolean") {
-          formData.append(key, data[key] ? "1" : "0");
-        } else {
-          formData.append(key, data[key]);
-        }
-      }
-
-      return axios
-        .post(`/api/lodgings/${id}/monitorings`, formData)
-        .then((result) => {
-          if (result.status == 201) {
-            // show message
-            this._vm.showToastMessage(
-              result.status,
-              "Seguimiento registrado exitosamente."
-            );
-            // Reload cash registers
-            dispatch("getMonitoryByPetLodging", id);
+            dispatch("getAllLodging", { status });
 
             return true;
           }
@@ -325,34 +256,6 @@ export default {
             // Reload cash registers
             dispatch("getAllLodging", { status: 1 });
 
-            return true;
-          }
-        })
-        .catch((errors) => {
-          // show error message
-          this._vm.showToastMessage(
-            errors.response.status,
-            this._vm.createMessageError(errors.response.data.errors)
-          );
-          return false;
-        })
-        .finally(() => {
-          commit("SET_OVERLAY_LOADING", false, { root: true });
-        });
-    },
-
-    deleteMonitoringPet({ commit }, id) {
-      commit("SET_OVERLAY_LOADING", true, { root: true });
-      return axios
-        .delete(`/api/monitorings/${id}`)
-        .then((result) => {
-          if (result.status == 204) {
-            // show message
-            this._vm.showToastMessage(
-              result.status,
-              "Seguimiento eliminado exitosamente"
-            );
-            // Reload cash registers
             return true;
           }
         })

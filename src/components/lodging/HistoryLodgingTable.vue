@@ -125,23 +125,6 @@
                 <span>Seguimiento</span>
               </v-tooltip>
 
-              <!-- Edit in-->
-              <v-tooltip bottom>
-                <template v-slot:activator="{ on, attrs }">
-                  <v-btn
-                    fab
-                    x-small
-                    dark
-                    color="secondary mr-1"
-                    v-bind="attrs"
-                    v-on="on"
-                  >
-                    <v-icon> {{ editIcon }} </v-icon>
-                  </v-btn>
-                </template>
-                <span>Editar ingreso</span>
-              </v-tooltip>
-
               <!-- Out -->
               <v-tooltip bottom>
                 <template v-slot:activator="{ on, attrs }">
@@ -152,15 +135,7 @@
                     color="accent mr-1"
                     v-bind="attrs"
                     v-on="on"
-                    @click="
-                      showOutputForm(
-                        item.id,
-                        item.customer_id,
-                        item.arrival_date_no_format,
-                        item.name,
-                        item.id
-                      )
-                    "
+                    @click="showOutputForm(item)"
                   >
                     <v-icon> mdi-home-import-outline </v-icon>
                   </v-btn>
@@ -192,11 +167,14 @@ export default {
           align: "start",
           value: "name",
         },
-        { text: "Desayuno", align: "center", value: "breakfast" },
-        { text: "Almuerzo", align: "center", value: "lunch" },
-        { text: "Cena", align: "center", value: "dinner" },
         { text: "Ingreso", align: "center", value: "arrival_date" },
         { text: "Salida", align: "center", value: "departure_date" },
+        { text: "Horas", align: "center", value: "departure_data.hours" },
+        {
+          text: "Nombre del plan",
+          align: "center",
+          value: "departure_data.plan_name",
+        },
         {
           text: "Acciones",
           align: "center",
@@ -226,8 +204,10 @@ export default {
     },
   },
   watch: {
-    startDate() {
-      this.searchLodgingHistory();
+    startDate(newValue) {
+      if (newValue !== "") {
+        this.searchLodgingHistory();
+      }
     },
   },
   methods: {
@@ -243,6 +223,9 @@ export default {
     },
     showPetDetails(item) {
       this.$emit("showPetDetails", item);
+    },
+    showOutputForm(item) {
+      this.$emit("showOutputForm", item);
     },
   },
 };
