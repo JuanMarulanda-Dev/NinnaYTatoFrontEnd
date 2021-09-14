@@ -206,7 +206,9 @@ export default {
     ]),
     ...mapMutations("products", ["SET_EDIT_ITEM"]),
     initialize() {
-      this.getAllProducts();
+      if (this.products.length === 0) {
+        this.getAllProducts();
+      }
     },
 
     changeStateProduct(item) {

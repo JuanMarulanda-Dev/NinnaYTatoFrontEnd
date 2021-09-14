@@ -233,7 +233,7 @@ export default {
   }),
   created() {
     // Validar si existe la info del usuario
-    if (Object.keys(this.user).length) {
+    if (Object.keys(this.user).length === 0) {
       this.getUserLocalStorage();
     }
     // Validar si existe la info del menu
@@ -241,7 +241,7 @@ export default {
       this.getMenuLocalStorage();
     }
 
-    if (Object.keys(this.user).length) {
+    if (Object.keys(this.user).length === 0) {
       if (this.user.is_admin) {
         this.getAllBranchOffices();
       }

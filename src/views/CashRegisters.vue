@@ -203,7 +203,9 @@ export default {
     ]),
     ...mapMutations("cash_registers", ["SET_EDIT_ITEM"]),
     initialize() {
-      this.getAllCashRegisters();
+      if (this.cash_registers.length === 0) {
+        this.getAllCashRegisters();
+      }
     },
 
     changeStateCashRegister(item) {
@@ -228,9 +230,8 @@ export default {
 
     rollbackStateCahsRegister(item) {
       let cashRegisterIndex = this.cash_registers.indexOf(item);
-      this.cash_registers[cashRegisterIndex].state = !this.cash_registers[
-        cashRegisterIndex
-      ].state;
+      this.cash_registers[cashRegisterIndex].state =
+        !this.cash_registers[cashRegisterIndex].state;
     },
 
     editItem(item) {
