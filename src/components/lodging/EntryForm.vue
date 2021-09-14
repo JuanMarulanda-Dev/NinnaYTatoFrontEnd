@@ -113,33 +113,31 @@
             </v-col>
 
             <v-col cols="12" md="6" sm="6">
-              <v-autocomplete
+              <v-select
                 label="Accesorios"
                 multiple
                 chips
-                :items="accessories"
+                :items="accesoriesRender"
                 item-text="name"
-                return-object
+                item-id="item.id"
                 v-model="entryData.accessories"
+                return-object
+                item-color="secondary"
               >
                 <template v-slot:item="data">
                   <template>
                     <v-list-item-content>
-                      <!-- <v-checkbox
-                        :input-value="data.attrs"
-                        color="secondary"
-                        class="mx-2"
-                        dense
-                      ></v-checkbox> -->
                       <v-text-field
+                        color="secondary"
                         :label="data.item.name"
+                        :value="data.item.description"
                         v-model="data.item.description"
                         dense
                       ></v-text-field>
                     </v-list-item-content>
                   </template>
                 </template>
-              </v-autocomplete>
+              </v-select>
             </v-col>
 
             <v-col cols="6" md="6" sm="6" class="py-0">
@@ -214,6 +212,16 @@ export default {
   },
   computed: {
     ...mapState("lodging", ["pets", "accessories", "entryData"]),
+    accesoriesRender() {
+      let items = this.accessories.slice();
+      this.entryData.accessories.map((accessory) => {
+        let index = items.findIndex((item) => item.id === accessory.id);
+        if (index > -1) {
+          items[index].description = accessory.description;
+        }
+      });
+      return items;
+    },
     dialogEntry: {
       get: function () {
         return this.value;
@@ -245,8 +253,9 @@ export default {
 
   methods: {
     ...mapActions("lodging", ["storeLodging", "updateLodging"]),
-    ...mapMutations("lodging", ["SET_DEFAULT_DATA_ENTRY"]),
+    ...mapMutations("lodging", ["SET_DEFAULT_DATA_ENTRY", "SET_ACCESORIES"]),
     close() {
+      this.SET_ACCESORIES();
       this.SET_DEFAULT_DATA_ENTRY();
       // Reset vuelidate rules
       this.$v.$reset();
@@ -255,30 +264,35 @@ export default {
     },
 
     save() {
-      // Validar si es un guardar o actualizar
-      let data = {
-        pet_id: this.entryData.pet_id,
-        accessories: this.entryData.accessories,
-        prize: this.entryData.prize,
-        walk: this.entryData.walk,
-        arrival_date: `${this.entryData.date} ${this.entryData.time}`,
-        day_instructions: this.entryData.day_instructions,
-      };
+      // activate validations form
+      this.$v.$touch();
+      // Correct validations
+      if (!this.$v.$invalid) {
+        // Validar si es un guardar o actualizar
+        let data = {
+          pet_id: this.entryData.pet_id,
+          accessories: this.entryData.accessories,
+          prize: this.entryData.prize,
+          walk: this.entryData.walk,
+          arrival_date: `${this.entryData.date} ${this.entryData.time}`,
+          day_instructions: this.entryData.day_instructions,
+        };
 
-      if (this.lodging_id !== "") {
-        // Update entry
-        this.updateLodging({ data, id: this.lodging_id }).then((result) => {
-          if (result) {
-            this.close();
-          }
-        });
-      } else {
-        // Save entry
-        this.storeLodging(data).then((result) => {
-          if (result) {
-            this.close();
-          }
-        });
+        if (this.lodging_id !== "") {
+          // Update entry
+          this.updateLodging({ data, id: this.lodging_id }).then((result) => {
+            if (result) {
+              this.close();
+            }
+          });
+        } else {
+          // Save entry
+          this.storeLodging(data).then((result) => {
+            if (result) {
+              this.close();
+            }
+          });
+        }
       }
     },
   },

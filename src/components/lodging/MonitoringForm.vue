@@ -438,15 +438,20 @@ export default {
     },
 
     save() {
-      // Save entry
-      this.storeMonitoring({
-        id: this.lodging_id,
-        form: this.monitoring,
-      }).then((result) => {
-        if (result) {
-          this.closeFormMonitoring();
-        }
-      });
+      // activate validations form
+      this.$v.$touch();
+      // Correct validations
+      if (!this.$v.$invalid) {
+        // Save entry
+        this.storeMonitoring({
+          id: this.lodging_id,
+          form: this.monitoring,
+        }).then((result) => {
+          if (result) {
+            this.closeFormMonitoring();
+          }
+        });
+      }
     },
   },
 };

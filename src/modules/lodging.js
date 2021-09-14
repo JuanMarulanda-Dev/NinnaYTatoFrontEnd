@@ -27,7 +27,7 @@ export default {
       time: "",
       plan_customer_id: "",
       plan_default_id: "",
-      payment: "",
+      payment: 0,
       cash_register_id: "",
     },
     outputDefaultData: {
@@ -35,7 +35,7 @@ export default {
       time: "",
       plan_customer_id: "",
       plan_default_id: "",
-      payment: "",
+      payment: 0,
       cash_register_id: "",
     },
     entryDataDefault: {
@@ -75,10 +75,10 @@ export default {
       state.default_plans_details = default_plans_details;
     },
     SET_DEFAULT_DATA_ENTRY(state) {
-      state.entryData = Object.assign({}, state.entryDataDefault);
+      state.entryData = JSON.parse(JSON.stringify(state.entryDataDefault));
     },
     SET_ENTRY_DATA(state, entryData) {
-      state.entryData = entryData;
+      state.entryData = JSON.parse(JSON.stringify(entryData));
     },
     SET_DEFAULT_DATA_OUTPUT(state) {
       state.outputData = Object.assign({}, state.outputDefaultData);

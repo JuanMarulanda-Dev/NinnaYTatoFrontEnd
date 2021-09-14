@@ -343,22 +343,27 @@ export default {
     },
 
     save() {
-      // Save depure
-      this.storeLodgingDeparture({
-        data: {
-          departure_date: `${this.outputData.date} ${this.outputData.time}`,
-          plan_customer_id: this.outputData.plan_customer_id,
-          plan_default_id: this.outputData.plan_default_id,
-          payment: this.outputData.payment,
-          cash_register_id: this.outputData.cash_register_id,
-        },
-        id: this.lodging_id,
-        is_close: this.is_close,
-      }).then((result) => {
-        if (result) {
-          this.close();
-        }
-      });
+      // activate validations form
+      this.$v.$touch();
+      // Correct validations
+      if (!this.$v.$invalid) {
+        // Save depure
+        this.storeLodgingDeparture({
+          data: {
+            departure_date: `${this.outputData.date} ${this.outputData.time}`,
+            plan_customer_id: this.outputData.plan_customer_id,
+            plan_default_id: this.outputData.plan_default_id,
+            payment: this.outputData.payment,
+            cash_register_id: this.outputData.cash_register_id,
+          },
+          id: this.lodging_id,
+          is_close: this.is_close,
+        }).then((result) => {
+          if (result) {
+            this.close();
+          }
+        });
+      }
     },
   },
 };

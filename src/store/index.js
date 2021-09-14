@@ -32,7 +32,7 @@ export default new Vuex.Store({
     loadingLogin: false,
 
     // Dashboard
-    user: null,
+    user: {},
     isAuthenticated: false,
     menu: [],
     notifications: [
