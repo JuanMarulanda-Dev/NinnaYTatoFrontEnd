@@ -194,7 +194,9 @@
       @showMonitoring="
         showMonitoringForm($event.name, $event.id, $event.pet_avatar, false)
       "
-      @showPetDetails="showPetDetails($event.customer_id, $event.pet_id)"
+      @showPetDetails="
+        showPetDetails($event.customer_id, $event.arrival_data.pet_id)
+      "
       @showOutputForm="
         showOutputForm(
           $event.id,

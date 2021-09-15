@@ -84,7 +84,7 @@ export default {
       state.outputData = Object.assign({}, state.outputDefaultData);
     },
     SET_OUTPUT_DATA(state, outputData) {
-      state.outputData = outputData;
+      state.outputData = JSON.parse(JSON.stringify(outputData));
     },
   },
   actions: {

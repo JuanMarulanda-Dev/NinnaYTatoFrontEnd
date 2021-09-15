@@ -203,9 +203,7 @@ export default {
     ]),
     ...mapMutations("cash_registers", ["SET_EDIT_ITEM"]),
     initialize() {
-      if (this.cash_registers.length === 0) {
-        this.getAllCashRegisters();
-      }
+      this.getAllCashRegisters();
     },
 
     changeStateCashRegister(item) {

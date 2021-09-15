@@ -266,7 +266,8 @@ export default {
       let total = 0;
       if (
         this.outputData.plan_default_id !== "" &&
-        this.outputData !== "" &&
+        this.outputData.plan_default_id !== undefined &&
+        this.outputData.date !== "" &&
         this.outputData.time !== ""
       ) {
         let plan_default_id = this.outputData.plan_default_id;

@@ -241,10 +241,9 @@ export default {
       this.getMenuLocalStorage();
     }
 
-    if (Object.keys(this.user).length === 0) {
-      if (this.user.is_admin) {
-        this.getAllBranchOffices();
-      }
+    if (this.user.is_admin) {
+      console.log(1);
+      this.getAllBranchOffices();
     }
   },
   computed: {
