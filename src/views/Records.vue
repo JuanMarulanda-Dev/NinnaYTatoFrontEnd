@@ -75,8 +75,8 @@ export default {
   data: () => ({
     permissions: {},
     dialog: false,
-    maxDate: new Date().toISOString().substr(0, 10),
-    date: new Date().toISOString().substr(0, 10),
+    maxDate: this.getNowDate(),
+    date: this.getNowDate(),
     headers: [
       {
         text: "Numero",

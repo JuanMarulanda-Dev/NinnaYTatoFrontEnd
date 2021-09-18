@@ -202,7 +202,7 @@ import SaleDetails from "@/components/sales/SaleDetails.vue";
 export default {
   name: "sales-data-table",
   data: () => ({
-    maxDate: new Date().toISOString().substr(0, 10),
+    maxDate: this.getNowDate(),
     time: "",
     dialogDate: false,
     payment_proof: 0,

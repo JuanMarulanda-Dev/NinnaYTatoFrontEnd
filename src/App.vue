@@ -242,7 +242,6 @@ export default {
     }
 
     if (this.user.is_admin) {
-      console.log(1);
       this.getAllBranchOffices();
     }
   },

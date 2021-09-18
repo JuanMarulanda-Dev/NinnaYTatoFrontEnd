@@ -87,6 +87,31 @@
               </v-toolbar>
             </template>
 
+            <!-- Avatar + nombre -->
+            <template v-slot:[`item.name`]="{ item }">
+              <!-- Image profile -->
+              <v-tooltip right v-if="item.pet_avatar">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-avatar v-bind="attrs" v-on="on" class="my-2 mr-1">
+                    <img :src="item.pet_avatar" :alt="item.name" />
+                  </v-avatar>
+                </template>
+                <span>
+                  <v-avatar size="200">
+                    <img :src="item.pet_avatar" :alt="item.name" />
+                  </v-avatar>
+                </span>
+              </v-tooltip>
+
+              <!-- Icon profile -->
+              <v-avatar v-else color="grey lighten-1" class="my-2 mr-1">
+                <v-icon dark> mdi-dog-side </v-icon>
+              </v-avatar>
+              <span>
+                {{ item.name }}
+              </span>
+            </template>
+
             <!-- Actions -->
             <template v-slot:[`item.actions`]="{ item }">
               <!-- Details -->

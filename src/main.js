@@ -12,6 +12,7 @@ import axios from "axios";
 import VueAxios from "vue-axios";
 import Vuelidate from "vuelidate";
 import showMessageMixin from "@/mixins/showMessageMixin.js"; // my own helper
+import dateMixin from "@/mixins/dateMixin.js"; // my own helper
 
 import Toast from "vue-toastification";
 // Import the CSS or use your own!
@@ -32,6 +33,7 @@ Vue.use(VuetifyConfirm, { vuetify });
 
 // My helpers
 Vue.use(showMessageMixin);
+Vue.use(dateMixin);
 
 new Vue({
   router,

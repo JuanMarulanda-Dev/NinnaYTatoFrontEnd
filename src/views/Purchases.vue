@@ -253,7 +253,7 @@ export default {
     dialog: false,
     modalDatePicker: false,
     modalTimePicker: false,
-    maxDate: new Date().toISOString().substr(0, 10),
+    maxDate: this.getNowDate(),
     date: "",
     time: "",
     headers: [
@@ -396,8 +396,8 @@ export default {
 
     rollbackStatePurchases(item) {
       let purchasesIndex = this.purchases.indexOf(item);
-      this.purchases[purchasesIndex].state = !this.purchases[purchasesIndex]
-        .state;
+      this.purchases[purchasesIndex].state =
+        !this.purchases[purchasesIndex].state;
     },
 
     close() {

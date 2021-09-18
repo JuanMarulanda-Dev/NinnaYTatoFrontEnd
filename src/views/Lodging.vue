@@ -66,6 +66,43 @@
         </v-toolbar>
       </template>
 
+      <!-- Avatar + nombre -->
+      <template v-slot:[`item.name`]="{ item }">
+        <!-- Image profile -->
+        <v-tooltip right v-if="item.pet_avatar">
+          <template v-slot:activator="{ on, attrs }">
+            <v-avatar v-bind="attrs" v-on="on" class="my-2 mr-1">
+              <img :src="item.pet_avatar" :alt="item.name" />
+            </v-avatar>
+          </template>
+          <span>
+            <v-avatar size="200">
+              <img :src="item.pet_avatar" :alt="item.name" />
+            </v-avatar>
+          </span>
+        </v-tooltip>
+
+        <!-- Icon profile -->
+        <v-avatar v-else color="grey lighten-1" class="my-2 mr-1">
+          <v-icon dark> mdi-dog-side </v-icon>
+        </v-avatar>
+        <span>
+          {{ item.name }}
+        </span>
+      </template>
+
+      <!-- walks -->
+      <template v-slot:[`item.arrival_data.walk`]="{ item }">
+        <v-badge :color="item.arrival_data.walk ? 'success' : 'error'">
+        </v-badge>
+      </template>
+
+      <!-- prizes -->
+      <template v-slot:[`item.arrival_data.prize`]="{ item }">
+        <v-badge :color="item.arrival_data.prize ? 'success' : 'error'">
+        </v-badge>
+      </template>
+
       <!-- Actions -->
       <template v-slot:[`item.actions`]="{ item }">
         <!-- Details -->
@@ -242,11 +279,12 @@ export default {
         align: "start",
         value: "name",
       },
+      { text: "Premios", align: "center", value: "arrival_data.prize" },
+      { text: "Paseos", align: "center", value: "arrival_data.walk" },
       { text: "Desayuno", align: "center", value: "breakfast" },
       { text: "Almuerzo", align: "center", value: "lunch" },
       { text: "Cena", align: "center", value: "dinner" },
       { text: "Ingreso", align: "center", value: "arrival_date" },
-      { text: "Salida", align: "center", value: "departure_date" },
       { text: "Acciones", align: "center", value: "actions", sortable: false },
     ],
     entry_pet_details: {},

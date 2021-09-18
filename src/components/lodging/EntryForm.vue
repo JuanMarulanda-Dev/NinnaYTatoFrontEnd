@@ -1,11 +1,11 @@
 <template>
-  <v-dialog v-model="dialogEntry" persistent max-width="700px">
+  <v-dialog v-model="dialogEntry" persistent scrollable max-width="700px">
     <!-- Modal Form -->
     <v-card>
       <v-card-title>
         <span class="headline">
           <v-icon large>mdi-transit-transfer</v-icon>
-          Registrar ingreso de mascota
+          {{ formTittle }} ingreso de mascota
         </span>
         <v-spacer></v-spacer>
       </v-card-title>
@@ -13,11 +13,27 @@
       <v-card-text>
         <v-container>
           <v-row>
+            <v-col cols="12" class="d-flex justify-center">
+              <v-avatar
+                tile
+                size="160"
+                color="grey lighten-1"
+                class="my-2 mr-1"
+              >
+                <img
+                  v-if="entryData.pet_id !== ''"
+                  :src="findPetAvatar"
+                  alt="avatar"
+                />
+                <v-icon v-else dark x-large> mdi-dog-side </v-icon>
+              </v-avatar>
+            </v-col>
             <v-col cols="12" md="6" sm="6">
               <!-- entry date -->
               <v-dialog
                 ref="dialog"
                 v-model="modalDatePicker"
+                :disabled="!user.is_admin"
                 :return-value.sync="entryData.date"
                 persistent
                 width="290px"
@@ -60,6 +76,7 @@
               <v-dialog
                 ref="time"
                 v-model="modalTimePicker"
+                :disabled="!user.is_admin"
                 :return-value.sync="entryData.time"
                 persistent
                 width="290px"
@@ -109,7 +126,23 @@
                 :error-messages="petErrors"
                 @input="$v.entryData.pet_id.$touch()"
                 @blur="$v.entryData.pet_id.$touch()"
-              ></v-autocomplete>
+              >
+                <template v-slot:selection="{ item }">
+                  <v-chip>
+                    <span>
+                      {{ item.name }}
+                      <v-badge dot class="mx-1" color="success"></v-badge>
+                    </span>
+                  </v-chip>
+                </template>
+
+                <template v-slot:item="{ item }">
+                  <span>
+                    {{ item.name }}
+                    <v-badge class="ml-1" color="success"></v-badge>
+                  </span>
+                </template>
+              </v-autocomplete>
             </v-col>
 
             <v-col cols="12" md="6" sm="6">
@@ -140,7 +173,31 @@
               </v-select>
             </v-col>
 
-            <v-col cols="6" md="6" sm="6" class="py-0">
+            <v-col cols="6" md="4" sm="6" class="py-0">
+              <v-switch
+                :input-value="entryData.breakfast"
+                v-model="entryData.breakfast"
+                label="Desayuno"
+              ></v-switch>
+            </v-col>
+
+            <v-col cols="6" md="4" sm="6" class="py-0">
+              <v-switch
+                :input-value="entryData.lunch"
+                v-model="entryData.lunch"
+                label="Almuerzo"
+              ></v-switch>
+            </v-col>
+
+            <v-col cols="6" md="4" sm="6" class="py-0">
+              <v-switch
+                :input-value="entryData.dinner"
+                v-model="entryData.dinner"
+                label="Comida"
+              ></v-switch>
+            </v-col>
+
+            <v-col cols="6" md="4" sm="6" class="py-0">
               <v-switch
                 :input-value="entryData.prize"
                 v-model="entryData.prize"
@@ -148,7 +205,7 @@
               ></v-switch>
             </v-col>
 
-            <v-col cols="6" md="6" sm="6" class="py-0">
+            <v-col cols="6" md="4" sm="6" class="py-0">
               <v-switch
                 :input-value="entryData.walk"
                 v-model="entryData.walk"
@@ -188,7 +245,7 @@ export default {
     return {
       modalDatePicker: false,
       modalTimePicker: false,
-      maxDate: new Date().toISOString().substr(0, 10),
+      maxDate: this.getNowDate(),
     };
   },
   model: { prop: "value", event: "input" },
@@ -211,7 +268,19 @@ export default {
     },
   },
   computed: {
+    ...mapState(["user"]),
     ...mapState("lodging", ["pets", "accessories", "entryData"]),
+    formTittle() {
+      return this.lodging_id !== "" ? "Editar" : "Registrar";
+    },
+
+    findPetAvatar() {
+      let index = this.pets.findIndex(
+        (pet) => pet.id === this.entryData.pet_id
+      );
+      let avatar = index === -1 ? "" : this.pets[index].avatar;
+      return avatar;
+    },
     accesoriesRender() {
       let items = this.accessories.slice();
       this.entryData.accessories.map((accessory) => {
@@ -251,6 +320,17 @@ export default {
     },
   },
 
+  watch: {
+    dialogEntry(newValue) {
+      if (newValue) {
+        if (this.lodging_id === "") {
+          this.entryData.date = this.getNowDate();
+          this.entryData.time = this.getNowTime();
+        }
+      }
+    },
+  },
+
   methods: {
     ...mapActions("lodging", ["storeLodging", "updateLodging"]),
     ...mapMutations("lodging", ["SET_DEFAULT_DATA_ENTRY", "SET_ACCESORIES"]),
@@ -274,6 +354,9 @@ export default {
           accessories: this.entryData.accessories,
           prize: this.entryData.prize,
           walk: this.entryData.walk,
+          breakfast: this.entryData.breakfast,
+          lunch: this.entryData.lunch,
+          dinner: this.entryData.dinner,
           arrival_date: `${this.entryData.date} ${this.entryData.time}`,
           day_instructions: this.entryData.day_instructions,
         };

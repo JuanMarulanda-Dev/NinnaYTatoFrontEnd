@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialogOutput" scrollable persistent max-width="700px">
+  <v-dialog v-model="dialogMonitoring" scrollable persistent max-width="700px">
     <!-- Modal Form -->
     <v-card>
       <v-card-title>
@@ -280,7 +280,7 @@ export default {
       dialogAddMonitoring: false,
       modalDatePicker: false,
       modalTimePicker: false,
-      maxDate: new Date().toISOString().substr(0, 10),
+      maxDate: this.getNowDate(),
       monitoring: {
         monitoring_type_id: "",
         date: "",
@@ -371,7 +371,7 @@ export default {
 
       return timeline;
     },
-    dialogOutput: {
+    dialogMonitoring: {
       get: function () {
         return this.value;
       },
@@ -401,6 +401,15 @@ export default {
     },
   },
 
+  watch: {
+    dialogAddMonitoring(newValue) {
+      if (newValue) {
+        this.monitoring.date = this.getNowDate();
+        this.monitoring.time = this.getNowTime();
+      }
+    },
+  },
+
   methods: {
     ...mapActions("monitorings", [
       "storeMonitoring",
@@ -410,7 +419,7 @@ export default {
 
     close() {
       // Close modal
-      this.dialogOutput = false;
+      this.dialogMonitoring = false;
     },
 
     closeFormMonitoring() {

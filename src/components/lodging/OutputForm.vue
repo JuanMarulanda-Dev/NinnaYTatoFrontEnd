@@ -18,6 +18,7 @@
               <v-dialog
                 ref="dialog"
                 v-model="modalDatePicker"
+                :disabled="!user.is_admin"
                 :return-value.sync="outputData.date"
                 persistent
                 width="290px"
@@ -60,6 +61,7 @@
               <v-dialog
                 ref="time"
                 v-model="modalTimePicker"
+                :disabled="!user.is_admin"
                 :return-value.sync="outputData.time"
                 persistent
                 width="290px"
@@ -210,7 +212,7 @@ export default {
     return {
       modalDatePicker: false,
       modalTimePicker: false,
-      maxDate: new Date().toISOString().substr(0, 10),
+      maxDate: this.getNowDate(),
     };
   },
   model: { prop: "value", event: "input" },
@@ -247,6 +249,7 @@ export default {
     VuetifyMoney,
   },
   computed: {
+    ...mapState(["user"]),
     ...mapState("lodging", ["default_plans_details", "outputData"]),
     ...mapState("customers", ["customer_plans"]),
     ...mapState("cash_registers", ["cash_registers"]),
@@ -307,6 +310,17 @@ export default {
       if (!this.$v.outputData.time.$dirty) return errors;
       !this.$v.outputData.time.required && errors.push("La hora es requerida");
       return errors;
+    },
+  },
+
+  watch: {
+    dialogOutput(newValue) {
+      if (newValue) {
+        if (this.outputData.date === "" && this.outputData.time === "") {
+          this.outputData.date = this.getNowDate();
+          this.outputData.time = this.getNowTime();
+        }
+      }
     },
   },
 
