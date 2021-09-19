@@ -21,7 +21,7 @@
                 class="my-2 mr-1"
               >
                 <img
-                  v-if="entryData.pet_id !== ''"
+                  v-if="entryData.pet_id !== '' && findPetAvatar !== null"
                   :src="findPetAvatar"
                   alt="avatar"
                 />

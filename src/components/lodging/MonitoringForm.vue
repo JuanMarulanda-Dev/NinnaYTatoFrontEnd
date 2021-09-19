@@ -153,6 +153,21 @@
                   </v-col>
 
                   <v-col cols="12">
+                    <v-radio-group
+                      v-model="monitoring.option_id"
+                      row
+                      class="d-flex justify-space-around"
+                    >
+                      <v-radio
+                        v-for="(item, index) in monitoring_options"
+                        :key="index"
+                        :label="item.name"
+                        :value="item.id"
+                      ></v-radio>
+                    </v-radio-group>
+                  </v-col>
+
+                  <v-col cols="12">
                     <!-- description -->
                     <v-textarea
                       outlined
@@ -228,7 +243,12 @@
                     <v-card-text>
                       <v-row justify="space-between">
                         <v-col cols="7">
-                          <h4>{{ event.type }}</h4>
+                          <h4>
+                            {{ event.type }}
+                            <small v-show="event.option_name !== null"
+                              >({{ event.option_name }})</small
+                            >
+                          </h4>
                           <p>{{ event.description }}</p>
                         </v-col>
                         <v-col class="text-right" cols="5">
@@ -283,6 +303,7 @@ export default {
       maxDate: this.getNowDate(),
       monitoring: {
         monitoring_type_id: "",
+        option_id: "",
         date: "",
         time: "",
         image: null,
@@ -290,6 +311,7 @@ export default {
       },
       monitoring_default: {
         monitoring_type_id: "",
+        option_id: "",
         date: "",
         time: "",
         image: null,
@@ -329,7 +351,11 @@ export default {
     },
   },
   computed: {
-    ...mapState("monitorings", ["monitorings", "monitoring_types"]),
+    ...mapState("monitorings", [
+      "monitorings",
+      "monitoring_types",
+      "monitoring_options",
+    ]),
     monitoringsFormat() {
       let lastDate = null;
       let timeline = [];
@@ -348,6 +374,8 @@ export default {
           type: event.type,
           color: event.color,
           icon: event.icon,
+          option_color: event.option_color,
+          option_name: event.option_name,
         };
       }
 
@@ -417,6 +445,8 @@ export default {
       "getMonitoryByPetLodging",
     ]),
 
+    ...mapActions("lodging", ["getAllLodging"]),
+
     close() {
       // Close modal
       this.dialogMonitoring = false;
@@ -440,6 +470,7 @@ export default {
           this.deleteMonitoringPet(id).then((result) => {
             if (result) {
               this.getMonitoryByPetLodging(this.lodging_id);
+              this.getAllLodging({ status: 1 });
             }
           });
         }
@@ -454,10 +485,17 @@ export default {
         // Save entry
         this.storeMonitoring({
           id: this.lodging_id,
-          form: this.monitoring,
+          data: {
+            monitoring_type_id: this.monitoring.monitoring_type_id,
+            date: `${this.monitoring.date} ${this.monitoring.time}`,
+            image: this.monitoring.image,
+            description: this.monitoring.description,
+            option_id: this.monitoring.option_id,
+          },
         }).then((result) => {
           if (result) {
             this.closeFormMonitoring();
+            this.getAllLodging({ status: 1 });
           }
         });
       }

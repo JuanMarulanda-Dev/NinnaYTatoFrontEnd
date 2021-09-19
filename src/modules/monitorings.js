@@ -9,6 +9,7 @@ export default {
     dialogEntry: false,
     monitorings: [],
     monitoring_types: [],
+    monitoring_options: [],
   },
   mutations: {
     SET_MONITORINGS(state, monitorings) {
@@ -17,6 +18,9 @@ export default {
     SET_MONITORING_TYPE(state, monitoring_types) {
       state.monitoring_types = monitoring_types;
     },
+    SET_MONITORING_OPTIONS(state, monitoring_options) {
+      state.monitoring_options = monitoring_options;
+    },
   },
   actions: {
     getAllMonitoringTypes({ commit }) {
@@ -24,6 +28,15 @@ export default {
         .get(`/api/monitoring-types`)
         .then((result) => {
           commit("SET_MONITORING_TYPE", result.data.monitoringTypes);
+        })
+        .catch(() => {});
+    },
+
+    getAllMonitoringOptions({ commit }) {
+      axios
+        .get(`/api/monitorings/options`)
+        .then((result) => {
+          commit("SET_MONITORING_OPTIONS", result.data.options);
         })
         .catch(() => {});
     },
@@ -54,15 +67,8 @@ export default {
         });
     },
 
-    storeMonitoring({ commit, dispatch }, { id, form }) {
+    storeMonitoring({ commit, dispatch }, { id, data }) {
       commit("SET_OVERLAY_LOADING", true, { root: true });
-
-      let data = {
-        monitoring_type_id: form.monitoring_type_id,
-        date: `${form.date} ${form.time}`,
-        image: form.image,
-        description: form.description,
-      };
 
       let formData = new FormData();
       for (var key in data) {

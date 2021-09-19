@@ -93,14 +93,58 @@
 
       <!-- walks -->
       <template v-slot:[`item.arrival_data.walk`]="{ item }">
-        <v-badge :color="item.arrival_data.walk ? 'success' : 'error'">
-        </v-badge>
+        <v-icon :color="item.arrival_data.walk ? 'success' : 'error'">
+          mdi-circle-slice-8</v-icon
+        >
       </template>
 
       <!-- prizes -->
       <template v-slot:[`item.arrival_data.prize`]="{ item }">
-        <v-badge :color="item.arrival_data.prize ? 'success' : 'error'">
-        </v-badge>
+        <v-icon :color="item.arrival_data.prize ? 'success' : 'error'">
+          mdi-circle-slice-8</v-icon
+        >
+      </template>
+
+      <!-- breakfast -->
+      <template v-slot:[`item.breakfast`]="{ item }">
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-icon v-on="on" v-bind="attrs" :color="item.breakfast.color">
+              mdi-{{
+                item.arrival_data.breakfast ? "check-circle" : "close-circle"
+              }}
+            </v-icon>
+          </template>
+          <span>{{ item.breakfast.option_name }}</span>
+        </v-tooltip>
+      </template>
+
+      <!-- lunch -->
+      <template v-slot:[`item.lunch`]="{ item }">
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-icon v-on="on" v-bind="attrs" :color="item.lunch.color">
+              mdi-{{
+                item.arrival_data.lunch ? "check-circle" : "close-circle"
+              }}
+            </v-icon>
+          </template>
+          <span>{{ item.lunch.option_name }}</span>
+        </v-tooltip>
+      </template>
+
+      <!-- dinner -->
+      <template v-slot:[`item.dinner`]="{ item }">
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-icon v-on="on" v-bind="attrs" :color="item.dinner.color">
+              mdi-{{
+                item.arrival_data.dinner ? "check-circle" : "close-circle"
+              }}
+            </v-icon>
+          </template>
+          <span>{{ item.dinner.option_name }}</span>
+        </v-tooltip>
       </template>
 
       <!-- Actions -->
@@ -349,6 +393,7 @@ export default {
     ...mapActions("monitorings", [
       "getMonitoryByPetLodging",
       "getAllMonitoringTypes",
+      "getAllMonitoringOptions",
     ]),
     ...mapActions("customers", ["getAllCustomersPlans"]),
     ...mapActions("cash_registers", ["getAllCashRegisters"]),
@@ -362,6 +407,7 @@ export default {
       this.getAllAccessories();
       this.getAllCustomersPets();
       this.getAllMonitoringTypes();
+      this.getAllMonitoringOptions();
     },
 
     showPetDetails(customer_id, pet_id) {
