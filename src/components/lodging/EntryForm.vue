@@ -16,7 +16,7 @@
             <v-col cols="12" class="d-flex justify-center">
               <v-avatar
                 tile
-                size="160"
+                size="250"
                 color="grey lighten-1"
                 class="my-2 mr-1"
               >
@@ -131,7 +131,11 @@
                   <v-chip>
                     <span>
                       {{ item.name }}
-                      <v-badge dot class="mx-1" color="success"></v-badge>
+                      <v-badge
+                        dot
+                        class="mx-1"
+                        :color="item.state ? 'success' : 'error'"
+                      ></v-badge>
                     </span>
                   </v-chip>
                 </template>
@@ -139,7 +143,10 @@
                 <template v-slot:item="{ item }">
                   <span>
                     {{ item.name }}
-                    <v-badge class="ml-1" color="success"></v-badge>
+                    <v-badge
+                      class="ml-1"
+                      :color="item.state ? 'success' : 'error'"
+                    ></v-badge>
                   </span>
                 </template>
               </v-autocomplete>
@@ -238,6 +245,13 @@
 import { mapActions, mapState, mapMutations } from "vuex";
 import { validationMixin } from "vuelidate";
 import { required } from "vuelidate/lib/validators";
+function petAvaliable() {
+  let result = false;
+  if (this.pets.find((pet) => pet.id === this.entryData.pet_id && pet.state)) {
+    result = true;
+  }
+  return result;
+}
 
 export default {
   name: "entry-form",
@@ -264,7 +278,7 @@ export default {
     entryData: {
       date: { required },
       time: { required },
-      pet_id: { required },
+      pet_id: { required, petAvaliable },
     },
   },
   computed: {
@@ -304,6 +318,8 @@ export default {
       if (!this.$v.entryData.pet_id.$dirty) return errors;
       !this.$v.entryData.pet_id.required &&
         errors.push("La mascota es requerida");
+      !this.$v.entryData.pet_id.petAvaliable &&
+        errors.push("La mascota seleccionada no esta activa.");
       return errors;
     },
     dateErrors() {

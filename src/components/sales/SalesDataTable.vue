@@ -202,7 +202,6 @@ import SaleDetails from "@/components/sales/SaleDetails.vue";
 export default {
   name: "sales-data-table",
   data: () => ({
-    maxDate: this.getNowDate(),
     time: "",
     dialogDate: false,
     payment_proof: 0,
@@ -230,6 +229,9 @@ export default {
       set(value) {
         this.$store.commit("sales/SET_DATESALES", value);
       },
+    },
+    maxDate() {
+      return this.getNowDate();
     },
   },
 

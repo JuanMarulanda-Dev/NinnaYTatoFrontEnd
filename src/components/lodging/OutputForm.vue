@@ -129,6 +129,25 @@
             </v-col>
 
             <v-col cols="12">
+              <v-simple-table fixed-header height="150px">
+                <template v-slot:default>
+                  <thead>
+                    <tr>
+                      <th class="text-left">Accesorio</th>
+                      <th class="text-left">Descripción</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(accessory, index) in accessories" :key="index">
+                      <td>{{ accessory.name }}</td>
+                      <td>{{ accessory.description }}</td>
+                    </tr>
+                  </tbody>
+                </template>
+              </v-simple-table>
+            </v-col>
+
+            <v-col cols="12">
               <v-expansion-panels>
                 <v-expansion-panel>
                   <v-expansion-panel-header>
@@ -223,6 +242,10 @@ export default {
     },
     pet_name: {
       type: String,
+      required: true,
+    },
+    accessories: {
+      type: Array,
       required: true,
     },
     lodging_id: {

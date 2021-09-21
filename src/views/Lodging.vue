@@ -18,6 +18,7 @@
             <v-icon large>mdi-home-heart</v-icon> Ingresos y salidas
           </v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
+          <h2>{{ quantityLodgings }}</h2>
           <v-spacer></v-spacer>
           <v-text-field
             v-model="search"
@@ -221,7 +222,8 @@
                   item.id,
                   item.customer_id,
                   item.arrival_no_format,
-                  item.name
+                  item.name,
+                  item.arrival_data.accessories
                 )
               "
               v-show="permissions.create"
@@ -261,6 +263,7 @@
       :arrival_date="arrival_date"
       :pet_name="pet_name"
       :is_close="is_close"
+      :accessories="accessories"
     ></output-form>
 
     <monitoring-form
@@ -284,6 +287,7 @@
           $event.customer_id,
           $event.arrival_no_format,
           $event.name,
+          $event.arrival_data.accessories,
           $event.departure_data,
           $event.departure_data.date ? true : false
         )
@@ -310,6 +314,7 @@ export default {
     dialogMonitoring: false,
     dialogHistoryLodgingTable: false,
     pet_name: "",
+    accessories: [],
     add_monitoring: false,
     is_close: false,
     pet_avatar: "",
@@ -337,6 +342,9 @@ export default {
     ...mapState(["editIcon", "loadingText", "mainBranchOffice"]),
     ...mapState("lodging", ["lodgings", "loading"]),
     ...mapState("customers", ["personal_infomation"]),
+    quantityLodgings() {
+      return this.lodgings.length;
+    },
   },
   watch: {
     dialog(val) {
@@ -423,6 +431,7 @@ export default {
       customer_id,
       arrival_date,
       pet_name,
+      accessories,
       output_data = {},
       is_close = false
     ) {
@@ -434,6 +443,7 @@ export default {
       this.arrival_date = arrival_date;
       this.pet_name = pet_name;
       this.is_close = is_close;
+      this.accessories = accessories;
       this.dialogOutput = true;
     },
     isObjEmpty(obj) {
