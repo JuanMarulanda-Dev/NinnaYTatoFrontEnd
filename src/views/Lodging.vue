@@ -107,7 +107,7 @@
       </template>
 
       <!-- breakfast -->
-      <template v-slot:[`item.breakfast`]="{ item }">
+      <template v-slot:[`item.arrival_data.breakfast`]="{ item }">
         <v-tooltip bottom>
           <template v-slot:activator="{ on, attrs }">
             <v-icon v-on="on" v-bind="attrs" :color="item.breakfast.color">
@@ -121,7 +121,7 @@
       </template>
 
       <!-- lunch -->
-      <template v-slot:[`item.lunch`]="{ item }">
+      <template v-slot:[`item.arrival_data.lunch`]="{ item }">
         <v-tooltip bottom>
           <template v-slot:activator="{ on, attrs }">
             <v-icon v-on="on" v-bind="attrs" :color="item.lunch.color">
@@ -135,7 +135,7 @@
       </template>
 
       <!-- dinner -->
-      <template v-slot:[`item.dinner`]="{ item }">
+      <template v-slot:[`item.arrival_data.dinner`]="{ item }">
         <v-tooltip bottom>
           <template v-slot:activator="{ on, attrs }">
             <v-icon v-on="on" v-bind="attrs" :color="item.dinner.color">
@@ -330,9 +330,9 @@ export default {
       },
       { text: "Premios", align: "center", value: "arrival_data.prize" },
       { text: "Paseos", align: "center", value: "arrival_data.walk" },
-      { text: "Desayuno", align: "center", value: "breakfast" },
-      { text: "Almuerzo", align: "center", value: "lunch" },
-      { text: "Cena", align: "center", value: "dinner" },
+      { text: "Desayuno", align: "center", value: "arrival_data.breakfast" },
+      { text: "Almuerzo", align: "center", value: "arrival_data.lunch" },
+      { text: "Cena", align: "center", value: "arrival_data.dinner" },
       { text: "Ingreso", align: "center", value: "arrival_date" },
       { text: "Acciones", align: "center", value: "actions", sortable: false },
     ],
