@@ -47,7 +47,7 @@
                   <template v-slot:activator="{ on, attrs }">
                     <v-text-field
                       v-model="startDate"
-                      label="Fecha inicio"
+                      label="Fecha de llegada"
                       prepend-icon="mdi-calendar"
                       readonly
                       v-bind="attrs"
@@ -232,6 +232,7 @@ export default {
   watch: {
     startDate(newValue) {
       if (newValue !== "") {
+        this.$emit("date", this.startDate);
         this.searchLodgingHistory();
       }
     },

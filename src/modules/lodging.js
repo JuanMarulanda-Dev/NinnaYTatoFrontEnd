@@ -220,7 +220,10 @@ export default {
         });
     },
 
-    storeLodgingDeparture({ commit, dispatch }, { data, id, is_close }) {
+    storeLodgingDeparture(
+      { commit, dispatch },
+      { data, id, is_close, date_search = "" }
+    ) {
       commit("SET_OVERLAY_LOADING", true, { root: true });
       return axios
         .post(`/api/lodgings/${id}/departures`, data)
@@ -233,7 +236,7 @@ export default {
             );
             let status = is_close ? 0 : 1;
             // Reload cash registers
-            dispatch("getAllLodging", { status });
+            dispatch("getAllLodging", { status, date: date_search });
 
             return true;
           }

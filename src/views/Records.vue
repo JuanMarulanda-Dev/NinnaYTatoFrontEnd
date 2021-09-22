@@ -75,7 +75,6 @@ export default {
   data: () => ({
     permissions: {},
     dialog: false,
-    date: this.getNowDate(),
     headers: [
       {
         text: "Numero",
@@ -92,6 +91,9 @@ export default {
   computed: {
     ...mapState(["loadingText"]),
     ...mapState("records", ["records", "loading"]),
+    date() {
+      return this.getNowDate();
+    },
     maxDate() {
       return this.getNowDate();
     },

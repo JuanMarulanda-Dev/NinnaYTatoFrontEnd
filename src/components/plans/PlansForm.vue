@@ -191,7 +191,12 @@
 <script>
 import { validationMixin } from "vuelidate";
 import { moneyFormatMixin } from "@/mixins/moneyFormatMixin.js";
-import { required, maxLength, numeric } from "vuelidate/lib/validators";
+import {
+  required,
+  maxLength,
+  numeric,
+  minValue,
+} from "vuelidate/lib/validators";
 import { mapState, mapMutations, mapActions } from "vuex";
 import VuetifyMoney from "@/components/vuetifyMoney.vue";
 
@@ -221,7 +226,12 @@ export default {
   validations: {
     editedItem: {
       name: { required, maxLength: maxLength(255) },
-      equivalence: { required, maxLength: maxLength(255), numeric },
+      equivalence: {
+        required,
+        maxLength: maxLength(255),
+        minValue: minValue(1),
+        numeric,
+      },
       type_id: { required },
     },
   },
@@ -264,6 +274,9 @@ export default {
         errors.push("La equivalencia debe ser un numero");
       !this.$v.editedItem.equivalence.maxLength &&
         errors.push("Longitud no permitida");
+      !this.$v.editedItem.equivalence.minValue &&
+        errors.push("Valor no permitido");
+
       return errors;
     },
   },

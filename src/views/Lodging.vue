@@ -271,6 +271,7 @@
       :pet_name="pet_name"
       :is_close="is_close"
       :accessories="accessories"
+      :date_search="date"
     ></output-form>
 
     <monitoring-form
@@ -306,6 +307,7 @@
           $event.departure_data.date ? true : false
         )
       "
+      @date="date = $event"
       v-model="dialogHistoryLodgingTable"
     >
     </history-lodging-table>
@@ -334,6 +336,7 @@ export default {
     pet_avatar: "",
     pet_id: "",
     lodging_id: "",
+    date: "",
     day_instructions: "",
     arrival_date: "",
     search: "",

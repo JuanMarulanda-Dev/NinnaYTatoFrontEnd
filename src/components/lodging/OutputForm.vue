@@ -161,6 +161,9 @@
                             label="Cajas"
                             item-text="name"
                             item-value="id"
+                            :error-messages="cashRegisterErrors"
+                            @input="$v.outputData.cash_register_id.$touch()"
+                            @blur="$v.outputData.cash_register_id.$touch()"
                             dense
                           ></v-select>
                         </v-col>
@@ -224,6 +227,20 @@ import { mapState, mapActions } from "vuex";
 import { validationMixin } from "vuelidate";
 import { required } from "vuelidate/lib/validators";
 import VuetifyMoney from "@/components/vuetifyMoney.vue";
+function validateSettlement() {
+  let result = false;
+  if (this.outputData.plan_customer_id !== "") {
+    result = true;
+  } else {
+    if (
+      this.outputData.plan_default_id !== "" &&
+      this.outputData.cash_register_id !== ""
+    ) {
+      result = true;
+    }
+  }
+  return result;
+}
 
 export default {
   name: "output-form",
@@ -259,12 +276,17 @@ export default {
       type: Boolean,
       required: true,
     },
+    date_search: {
+      type: String,
+      required: true,
+    },
   },
   mixins: [validationMixin],
   validations: {
     outputData: {
       date: { required },
       time: { required },
+      cash_register_id: { validateSettlement },
     },
   },
   components: {
@@ -283,7 +305,7 @@ export default {
           `${this.outputData.date} ${this.outputData.time}`
         );
         let difference = endTime - startTime; // This will give difference in milliseconds
-        hours = Math.ceil((difference % 86400000) / 3600000);
+        hours = Math.ceil(difference / 3600000);
       }
       return hours;
     },
@@ -336,6 +358,13 @@ export default {
       !this.$v.outputData.time.required && errors.push("La hora es requerida");
       return errors;
     },
+    cashRegisterErrors() {
+      const errors = [];
+      if (!this.$v.outputData.cash_register_id.$dirty) return errors;
+      !this.$v.outputData.cash_register_id.validateSettlement &&
+        errors.push("La caja es requerida");
+      return errors;
+    },
   },
 
   watch: {
@@ -364,7 +393,7 @@ export default {
 
     clean_field_default_plan() {
       this.outputData.plan_default_id = "";
-      this.outputData.payment = "";
+      this.outputData.payment = 0;
       this.outputData.cash_register_id = "";
     },
 
@@ -398,6 +427,7 @@ export default {
           },
           id: this.lodging_id,
           is_close: this.is_close,
+          date_search: this.date_search,
         }).then((result) => {
           if (result) {
             this.close();
