@@ -160,6 +160,7 @@
                     color="accent mr-1"
                     v-bind="attrs"
                     v-on="on"
+                    v-show="user.is_admin"
                     @click="showOutputForm(item)"
                   >
                     <v-icon> mdi-home-import-outline </v-icon>
@@ -217,7 +218,7 @@ export default {
     },
   },
   computed: {
-    ...mapState(["loadingText", "editIcon"]),
+    ...mapState(["user", "loadingText", "editIcon"]),
     ...mapState("lodging", ["lodgings_history", "loading"]),
     dialogHistoryLodging: {
       get: function () {

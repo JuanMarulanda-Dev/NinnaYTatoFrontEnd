@@ -180,7 +180,14 @@
               color="warning mr-1"
               v-bind="attrs"
               v-on="on"
-              @click="showMonitoringForm(item.name, item.id, item.pet_avatar)"
+              @click="
+                showMonitoringForm(
+                  item.name,
+                  item.id,
+                  item.pet_avatar,
+                  item.arrival_data.day_instructions
+                )
+              "
             >
               <v-icon>mdi-timeline</v-icon>
             </v-btn>
@@ -271,12 +278,19 @@
       :pet_name="pet_name"
       :pet_avatar="pet_avatar"
       :lodging_id="lodging_id"
+      :day_instructions="day_instructions"
       :add_monitoring="add_monitoring"
     ></monitoring-form>
 
     <history-lodging-table
       @showMonitoring="
-        showMonitoringForm($event.name, $event.id, $event.pet_avatar, false)
+        showMonitoringForm(
+          $event.name,
+          $event.id,
+          $event.pet_avatar,
+          $event.arrival_data.day_instructions,
+          false
+        )
       "
       @showPetDetails="
         showPetDetails($event.customer_id, $event.arrival_data.pet_id)
@@ -320,6 +334,7 @@ export default {
     pet_avatar: "",
     pet_id: "",
     lodging_id: "",
+    day_instructions: "",
     arrival_date: "",
     search: "",
     headers: [
@@ -453,11 +468,13 @@ export default {
       pet_name,
       lodging_id,
       pet_avatar = null,
+      day_instructions = null,
       add_monitoring = true
     ) {
       this.pet_name = pet_name;
       this.pet_avatar = pet_avatar;
       this.lodging_id = lodging_id;
+      this.day_instructions = day_instructions ?? "";
       this.add_monitoring = add_monitoring;
       this.getMonitoryByPetLodging(lodging_id).then((result) => {
         if (result) {

@@ -253,7 +253,6 @@ export default {
     dialog: false,
     modalDatePicker: false,
     modalTimePicker: false,
-    maxDate: this.getNowDate(),
     date: "",
     time: "",
     headers: [
@@ -294,6 +293,9 @@ export default {
     ...mapState("suppliers", ["suppliers"]),
     ...mapState("products", ["products"]),
     ...mapState("cash_registers", ["cash_registers"]),
+    maxDate() {
+      return this.getNowDate();
+    },
     quantityErrors() {
       const errors = [];
       if (!this.$v.editedItem.quantity.$dirty) return errors;

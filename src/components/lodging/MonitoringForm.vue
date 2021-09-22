@@ -207,6 +207,15 @@
                   <v-icon v-else dark x-large> mdi-dog-side </v-icon>
                 </v-avatar>
               </template>
+              <template v-slot:default>
+                <v-textarea
+                  height="100"
+                  class="mt-3 ml-2"
+                  :value="day_instructions"
+                  label="Instrucciones del día"
+                  readonly
+                ></v-textarea>
+              </template>
             </v-timeline-item>
 
             <!-- Timeline -->
@@ -300,7 +309,6 @@ export default {
       dialogAddMonitoring: false,
       modalDatePicker: false,
       modalTimePicker: false,
-      maxDate: this.getNowDate(),
       monitoring: {
         monitoring_type_id: "",
         option_id: "",
@@ -337,6 +345,10 @@ export default {
       type: String,
       required: true,
     },
+    day_instructions: {
+      type: String,
+      required: true,
+    },
     add_monitoring: {
       type: Boolean,
       required: true,
@@ -356,6 +368,9 @@ export default {
       "monitoring_types",
       "monitoring_options",
     ]),
+    maxDate() {
+      return this.getNowDate();
+    },
     monitoringsFormat() {
       let lastDate = null;
       let timeline = [];

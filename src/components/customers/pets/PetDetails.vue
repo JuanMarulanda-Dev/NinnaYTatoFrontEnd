@@ -374,6 +374,8 @@ export default {
     },
     ...mapActions("pets", ["getDetailsPet", "changeStatusPet"]),
     ...mapMutations("pets", ["SET_PET_DEFAULT"]),
+    ...mapMutations("customers", ["SET_PERMISSIONS"]),
+
     goToEditPetForm() {
       this.$router.push({
         path: `${this.petId}/editar`,
@@ -407,6 +409,10 @@ export default {
     },
   },
   created() {
+    if (Object.keys(this.permissions).length === 0) {
+      // Obtener los permisos
+      this.SET_PERMISSIONS(this.$route.meta.permissions);
+    }
     //take id customer details
     if (this.personal_infomation.id == 0) {
       this.$router.push({
