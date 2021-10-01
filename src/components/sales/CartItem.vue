@@ -11,6 +11,7 @@
         controls
         center
         size="small"
+        :disabled="item.item_type === 3"
       ></vue-number-input>
     </th>
     <th class="text-center">

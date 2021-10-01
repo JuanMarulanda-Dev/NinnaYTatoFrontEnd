@@ -16,6 +16,8 @@ export default {
     saleDetails: {},
     sales: [],
     sale: {
+      sale_id: "",
+      lodging_id: "",
       customer_id: "",
       print: true,
       send: false,
@@ -24,6 +26,8 @@ export default {
       cart: [],
     },
     saleDefault: {
+      sale_id: "",
+      lodging_id: "",
       customer_id: "",
       print: true,
       send: false,
@@ -38,6 +42,12 @@ export default {
     },
     SET_SALE_ID(state, saleId) {
       state.saleId = saleId;
+    },
+    SET_CUSTOMER_ID(state, customer_id) {
+      state.sale.customer_id = customer_id;
+    },
+    SET_LODGING_ID(state, lodging_id) {
+      state.sale.lodging_id = lodging_id;
     },
     SET_PAYMENTS(state, payments) {
       state.payments = payments;

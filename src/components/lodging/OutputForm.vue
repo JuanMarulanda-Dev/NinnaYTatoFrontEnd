@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialogOutput" persistent max-width="700px">
+  <v-dialog v-model="dialogOutput" persistent scrollable max-width="700px">
     <!-- Modal Form -->
     <v-card>
       <v-card-title>
@@ -192,22 +192,77 @@
             </v-col>
 
             <v-col cols="12">
-              <v-simple-table fixed-header height="150px">
-                <template v-slot:default>
-                  <thead>
-                    <tr>
-                      <th class="text-left">Accesorio</th>
-                      <th class="text-left">Descripción</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="(accessory, index) in accessories" :key="index">
-                      <td>{{ accessory.name }}</td>
-                      <td>{{ accessory.description }}</td>
-                    </tr>
-                  </tbody>
-                </template>
-              </v-simple-table>
+              <v-expansion-panels>
+                <v-expansion-panel>
+                  <v-expansion-panel-header>
+                    <span>
+                      <v-icon>mdi-basket</v-icon>
+                      &nbsp;Accesorios
+                    </span>
+                  </v-expansion-panel-header>
+                  <v-expansion-panel-content>
+                    <v-container>
+                      <v-row>
+                        <v-col>
+                          <v-simple-table fixed-header height="150px">
+                            <template v-slot:default>
+                              <thead>
+                                <tr>
+                                  <th class="text-left">Accesorio</th>
+                                  <th class="text-left">Descripción</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr
+                                  v-for="(accessory, index) in accessories"
+                                  :key="index"
+                                >
+                                  <td>{{ accessory.name }}</td>
+                                  <td>{{ accessory.description }}</td>
+                                </tr>
+                              </tbody>
+                            </template>
+                          </v-simple-table>
+                        </v-col>
+                      </v-row>
+                    </v-container>
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
+              </v-expansion-panels>
+            </v-col>
+
+            <v-col cols="12">
+              <v-expansion-panels>
+                <v-expansion-panel>
+                  <v-expansion-panel-header>
+                    <span>
+                      <v-icon>mdi-cart</v-icon>
+                      &nbsp;Costos adicionales
+                    </span>
+                  </v-expansion-panel-header>
+                  <v-expansion-panel-content>
+                    <v-container>
+                      <v-row>
+                        <v-col>
+                          <v-simple-table fixed-header height="150px">
+                            <template v-slot:default>
+                              <thead>
+                                <tr>
+                                  <th class="text-left">Nombre</th>
+                                  <th class="text-left">Cantidad</th>
+                                  <th class="text-left">valor</th>
+                                  <th class="text-left">descuento</th>
+                                </tr>
+                              </thead>
+                              <tbody></tbody>
+                            </template>
+                          </v-simple-table>
+                        </v-col>
+                      </v-row>
+                    </v-container>
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
+              </v-expansion-panels>
             </v-col>
           </v-row>
         </v-container>

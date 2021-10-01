@@ -259,6 +259,24 @@
           </template>
           <span>Eliminar</span>
         </v-tooltip>
+
+        <!-- Additional charge -->
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              fab
+              x-small
+              dark
+              color="primary mr-1"
+              v-bind="attrs"
+              v-on="on"
+              @click="showAdditionalChargeForm(item.id, item.customer_id)"
+            >
+              <v-icon> mdi-ballot </v-icon>
+            </v-btn>
+          </template>
+          <span>Costos adicionales</span>
+        </v-tooltip>
       </template>
     </v-data-table>
 
@@ -311,6 +329,10 @@
       v-model="dialogHistoryLodgingTable"
     >
     </history-lodging-table>
+
+    <additional-charge-form
+      v-model="dialogAdditionalCharge"
+    ></additional-charge-form>
   </div>
 </template>
 
@@ -320,6 +342,7 @@ import EntryForm from "@/components/lodging/EntryForm.vue";
 import OutputForm from "@/components/lodging/OutputForm.vue";
 import MonitoringForm from "@/components/lodging/MonitoringForm.vue";
 import HistoryLodgingTable from "@/components/lodging/HistoryLodgingTable.vue";
+import AdditionalChargeForm from "@/components/lodging/AdditionalChargeForm.vue";
 
 export default {
   data: () => ({
@@ -329,6 +352,7 @@ export default {
     dialogOutput: false,
     dialogMonitoring: false,
     dialogHistoryLodgingTable: false,
+    dialogAdditionalCharge: false,
     pet_name: "",
     accessories: [],
     add_monitoring: false,
@@ -428,6 +452,7 @@ export default {
       "SET_DEFAULT_DATA_OUTPUT",
       "SET_OUTPUT_DATA",
     ]),
+    ...mapMutations("sales", ["SET_CUSTOMER_ID", "SET_LODGING_ID"]),
     initialize() {
       this.getAllLodging({ status: 1 });
       this.getAllAccessories();
@@ -442,6 +467,13 @@ export default {
       this.$router.push({
         path: `/clientes/detalles/${customer_id}/mascota/${pet_id}`,
       });
+    },
+
+    showAdditionalChargeForm(lodging_id, customer_id) {
+      this.SET_LODGING_ID(lodging_id);
+      this.SET_CUSTOMER_ID(customer_id);
+      // Consultar los detalles de la venta si es que existen.
+      this.dialogAdditionalCharge = true;
     },
 
     showOutputForm(
@@ -509,6 +541,7 @@ export default {
     OutputForm,
     MonitoringForm,
     HistoryLodgingTable,
+    AdditionalChargeForm,
   },
 };
 </script>
