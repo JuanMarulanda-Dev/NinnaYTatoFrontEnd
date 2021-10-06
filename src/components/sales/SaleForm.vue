@@ -244,7 +244,6 @@ export default {
     },
   },
   created() {
-    this.SET_SALE_DEFAULT();
     this.getAllCustomers(1);
     this.getAllCashRegisters(1);
     this.getAllProducts(1);

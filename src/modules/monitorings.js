@@ -23,22 +23,26 @@ export default {
     },
   },
   actions: {
-    getAllMonitoringTypes({ commit }) {
-      axios
-        .get(`/api/monitoring-types`)
-        .then((result) => {
-          commit("SET_MONITORING_TYPE", result.data.monitoringTypes);
-        })
-        .catch(() => {});
+    getAllMonitoringTypes({ state, commit }) {
+      if (state.monitoring_types.length === 0) {
+        axios
+          .get(`/api/monitoring-types`)
+          .then((result) => {
+            commit("SET_MONITORING_TYPE", result.data.monitoringTypes);
+          })
+          .catch(() => {});
+      }
     },
 
-    getAllMonitoringOptions({ commit }) {
-      axios
-        .get(`/api/monitorings/options`)
-        .then((result) => {
-          commit("SET_MONITORING_OPTIONS", result.data.options);
-        })
-        .catch(() => {});
+    getAllMonitoringOptions({ state, commit }) {
+      if (state.monitoring_options.length === 0) {
+        axios
+          .get(`/api/monitorings/options`)
+          .then((result) => {
+            commit("SET_MONITORING_OPTIONS", result.data.options);
+          })
+          .catch(() => {});
+      }
     },
 
     getMonitoryByPetLodging({ commit }, id) {

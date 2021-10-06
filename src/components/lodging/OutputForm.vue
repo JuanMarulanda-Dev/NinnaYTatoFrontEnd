@@ -128,6 +128,19 @@
               </v-select>
             </v-col>
 
+            <v-col cols="12" md="4">
+              <!-- Debitacion de plan -->
+              <v-text-field label="Tikets a debitar" readonly> </v-text-field>
+            </v-col>
+            <v-col cols="12" md="4">
+              <!-- Dias a debitar -->
+              <v-text-field label="Días" readonly> </v-text-field>
+            </v-col>
+            <v-col cols="12" md="4">
+              <!-- Horas a debitar -->
+              <v-text-field label="Horas" readonly> </v-text-field>
+            </v-col>
+
             <v-col cols="12">
               <v-expansion-panels>
                 <v-expansion-panel>
@@ -244,19 +257,65 @@
                     <v-container>
                       <v-row>
                         <v-col>
-                          <v-simple-table fixed-header height="150px">
-                            <template v-slot:default>
-                              <thead>
-                                <tr>
-                                  <th class="text-left">Nombre</th>
-                                  <th class="text-left">Cantidad</th>
-                                  <th class="text-left">valor</th>
-                                  <th class="text-left">descuento</th>
-                                </tr>
-                              </thead>
-                              <tbody></tbody>
+                          <v-data-table
+                            :headers="salesHeaders"
+                            :items="sales"
+                            :single-expand="false"
+                            :expanded.sync="expanded"
+                            :hide-default-footer="true"
+                            :disable-sort="true"
+                            item-key="sale_id"
+                            show-expand
+                            class="elevation-1"
+                          >
+                            <template v-slot:[`item.total`]="{ item }">
+                              <v-icon>{{ moneyIcon }}</v-icon>
+                              {{ currencyFormat(item.total) }}
                             </template>
-                          </v-simple-table>
+
+                            <template v-slot:[`item.payment`]="{ item }">
+                              <vuetify-money
+                                class="mt-4"
+                                v-model="item.payment"
+                                label="Pago"
+                                dense
+                              />
+                            </template>
+
+                            <template v-slot:expanded-item="{ headers, item }">
+                              <td class="pa-0" :colspan="headers.length">
+                                <v-simple-table fixed-header height="150px">
+                                  <template v-slot:default>
+                                    <thead>
+                                      <tr>
+                                        <th class="text-left">Nombre</th>
+                                        <th class="text-center">Cantidad</th>
+                                        <th class="text-center">valor</th>
+                                        <th class="text-center">descuento</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      <tr
+                                        v-for="(detail, index) in item.detail"
+                                        :key="index"
+                                      >
+                                        <td>{{ detail.name }}</td>
+                                        <td class="text-center">
+                                          {{ detail.quantity }}
+                                        </td>
+                                        <td class="text-center">
+                                          {{ currencyFormat(detail.price) }}
+                                        </td>
+                                        <td class="text-center">
+                                          {{ detail.discount }}
+                                        </td>
+                                      </tr>
+                                    </tbody>
+                                  </template>
+                                </v-simple-table>
+                              </td>
+                            </template>
+                          </v-data-table>
                         </v-col>
                       </v-row>
                     </v-container>
@@ -282,6 +341,8 @@ import { mapState, mapActions } from "vuex";
 import { validationMixin } from "vuelidate";
 import { required } from "vuelidate/lib/validators";
 import VuetifyMoney from "@/components/vuetifyMoney.vue";
+import { moneyFormatMixin } from "@/mixins/moneyFormatMixin.js";
+
 function validateSettlement() {
   let result = false;
   if (this.outputData.plan_customer_id !== "") {
@@ -303,6 +364,47 @@ export default {
     return {
       modalDatePicker: false,
       modalTimePicker: false,
+      expanded: [],
+      salesHeaders: [
+        {
+          text: "C.V",
+          align: "start",
+          value: "sale_id",
+        },
+        { text: "total", align: "center", value: "total" },
+        { text: "pago", align: "center", value: "payment" },
+        { text: "", value: "data-table-expand" },
+      ],
+      sales: [
+        {
+          sale_id: "PE",
+          total: "4000.00",
+          payment: "",
+          detail: [
+            {
+              name: "Adicional",
+              total: 4000,
+              quantity: 1,
+              price: "4000.00",
+              discount: 0,
+            },
+          ],
+        },
+        {
+          sale_id: "nV",
+          total: "3000.00",
+          payment: "",
+          detail: [
+            {
+              name: "1 - Hora",
+              total: 3000,
+              quantity: 1,
+              price: "3000.00",
+              discount: 0,
+            },
+          ],
+        },
+      ],
     };
   },
   model: { prop: "value", event: "input" },
@@ -336,7 +438,7 @@ export default {
       required: true,
     },
   },
-  mixins: [validationMixin],
+  mixins: [validationMixin, moneyFormatMixin],
   validations: {
     outputData: {
       date: { required },

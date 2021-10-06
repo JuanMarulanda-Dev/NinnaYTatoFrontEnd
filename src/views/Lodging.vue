@@ -423,7 +423,7 @@ export default {
   created() {
     // Obtener los permisos
     this.permissions = this.$route.meta.permissions;
-
+    this.SET_SALE_DEFAULT();
     this.getAllDefaultPlans();
     this.getAllCashRegisters(1);
 
@@ -452,7 +452,11 @@ export default {
       "SET_DEFAULT_DATA_OUTPUT",
       "SET_OUTPUT_DATA",
     ]),
-    ...mapMutations("sales", ["SET_CUSTOMER_ID", "SET_LODGING_ID"]),
+    ...mapMutations("sales", [
+      "SET_CUSTOMER_ID",
+      "SET_LODGING_ID",
+      "SET_SALE_DEFAULT",
+    ]),
     initialize() {
       this.getAllLodging({ status: 1 });
       this.getAllAccessories();
@@ -496,9 +500,11 @@ export default {
       this.accessories = accessories;
       this.dialogOutput = true;
     },
+
     isObjEmpty(obj) {
       return Object.keys(obj).length === 0;
     },
+
     showMonitoringForm(
       pet_name,
       lodging_id,

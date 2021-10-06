@@ -54,10 +54,14 @@ export default {
       day_instructions: "",
     },
     default_plans_details: [],
+    sales_details: [],
   },
   mutations: {
     SET_LODGINGS(state, lodgings) {
       state.lodgings = lodgings;
+    },
+    SET_SALE_DETAILS_LODGING(state, sales_details) {
+      state.sales_details = sales_details;
     },
     SET_LODGINGS_HISTORY(state, lodgings_history) {
       state.lodgings_history = lodgings_history;
@@ -119,7 +123,19 @@ export default {
         });
     },
 
-    getAllAccessories({ commit }) {
+    getAllAccessories({ state, commit }) {
+      if (state.accessories.length === 0) {
+        axios
+          .get("/api/lodgings/accessories")
+          .then((result) => {
+            commit("SET_DEFAULT_ACCESORIES", result.data.accessories);
+            commit("SET_ACCESORIES");
+          })
+          .catch(() => {});
+      }
+    },
+
+    getAllCustomerPlans({ commit }) {
       axios
         .get("/api/lodgings/accessories")
         .then((result) => {
@@ -129,12 +145,11 @@ export default {
         .catch(() => {});
     },
 
-    getAllCustomerPlans({ commit }) {
+    getAllSaleDetailsByLodging({ commit }, id) {
       axios
-        .get("/api/lodgings/accessories")
+        .get(`/api/lodgings/sale_details?id=${id}`)
         .then((result) => {
-          commit("SET_DEFAULT_ACCESORIES", result.data.accessories);
-          commit("SET_ACCESORIES");
+          commit("SET_SALE_DETAILS_LODGING", result.data.details);
         })
         .catch(() => {});
     },
