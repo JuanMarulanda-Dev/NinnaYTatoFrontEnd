@@ -22,6 +22,7 @@
             :readonlyCustomer="true"
             lg="12"
             :showAdditionalForm="true"
+            @closeDialog="dialogAdditionalCharge = false"
           ></sale-form>
         </v-container>
       </v-card-text>

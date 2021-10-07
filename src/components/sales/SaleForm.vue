@@ -312,6 +312,8 @@ export default {
             this.storeSale().then((result) => {
               if (result) {
                 this.$v.$reset();
+                // close dialog additional charge form
+                this.$emit("closeDialog");
                 // Download payment proof
                 if (result.print) {
                   this.downloadPaymentProof({

@@ -555,6 +555,10 @@ export default {
             plan_default_id: this.outputData.plan_default_id,
             payment: this.outputData.payment,
             cash_register_id: this.outputData.cash_register_id,
+            sales_payments: this.sales_lodging.map((obj) => ({
+              sale_id: obj.sale_id,
+              payment: obj.payment,
+            })),
           },
           id: this.lodging_id,
           is_close: this.is_close,
