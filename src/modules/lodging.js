@@ -54,14 +54,17 @@ export default {
       day_instructions: "",
     },
     default_plans_details: [],
-    sales_details: [],
+    sales_lodging: [],
   },
   mutations: {
     SET_LODGINGS(state, lodgings) {
       state.lodgings = lodgings;
     },
-    SET_SALE_DETAILS_LODGING(state, sales_details) {
-      state.sales_details = sales_details;
+    SET_SALE_DETAILS_LODGING(state, sales_lodging) {
+      state.sales_lodging = sales_lodging.map((obj) => ({
+        ...obj,
+        payment: "",
+      }));
     },
     SET_LODGINGS_HISTORY(state, lodgings_history) {
       state.lodgings_history = lodgings_history;
@@ -147,9 +150,9 @@ export default {
 
     getAllSaleDetailsByLodging({ commit }, id) {
       axios
-        .get(`/api/lodgings/sale_details?id=${id}`)
+        .get(`/api/lodgings/${id}/sales`)
         .then((result) => {
-          commit("SET_SALE_DETAILS_LODGING", result.data.details);
+          commit("SET_SALE_DETAILS_LODGING", result.data.lodgingSales);
         })
         .catch(() => {});
     },

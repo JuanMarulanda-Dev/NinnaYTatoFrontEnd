@@ -439,6 +439,7 @@ export default {
       "getAllCustomersPets",
       "getAllDefaultPlans",
       "deleteEntry",
+      "getAllSaleDetailsByLodging",
     ]),
     ...mapActions("monitorings", [
       "getMonitoryByPetLodging",
@@ -490,6 +491,7 @@ export default {
       is_close = false
     ) {
       this.getAllCustomersPlans(customer_id);
+      this.getAllSaleDetailsByLodging(lodging_id);
       if (!this.isObjEmpty(output_data)) {
         this.SET_OUTPUT_DATA(output_data);
       }

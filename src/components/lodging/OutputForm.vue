@@ -259,7 +259,7 @@
                         <v-col>
                           <v-data-table
                             :headers="salesHeaders"
-                            :items="sales"
+                            :items="sales_lodging"
                             :single-expand="false"
                             :expanded.sync="expanded"
                             :hide-default-footer="true"
@@ -369,41 +369,11 @@ export default {
         {
           text: "C.V",
           align: "start",
-          value: "sale_id",
+          value: "id",
         },
         { text: "total", align: "center", value: "total" },
         { text: "pago", align: "center", value: "payment" },
         { text: "", value: "data-table-expand" },
-      ],
-      sales: [
-        {
-          sale_id: "PE",
-          total: "4000.00",
-          payment: "",
-          detail: [
-            {
-              name: "Adicional",
-              total: 4000,
-              quantity: 1,
-              price: "4000.00",
-              discount: 0,
-            },
-          ],
-        },
-        {
-          sale_id: "nV",
-          total: "3000.00",
-          payment: "",
-          detail: [
-            {
-              name: "1 - Hora",
-              total: 3000,
-              quantity: 1,
-              price: "3000.00",
-              discount: 0,
-            },
-          ],
-        },
       ],
     };
   },
@@ -451,7 +421,11 @@ export default {
   },
   computed: {
     ...mapState(["user"]),
-    ...mapState("lodging", ["default_plans_details", "outputData"]),
+    ...mapState("lodging", [
+      "default_plans_details",
+      "outputData",
+      "sales_lodging",
+    ]),
     ...mapState("customers", ["customer_plans"]),
     ...mapState("cash_registers", ["cash_registers"]),
     calculateHours() {
