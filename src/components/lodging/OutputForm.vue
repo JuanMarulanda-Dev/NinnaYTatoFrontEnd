@@ -140,6 +140,14 @@
               <!-- Horas a debitar -->
               <v-text-field label="Horas" readonly> </v-text-field>
             </v-col>
+            <v-col cols="12" md="6">
+              <!-- Total -->
+              <v-text-field label="Total" readonly> </v-text-field>
+            </v-col>
+            <v-col cols="12" md="6">
+              <!-- Pago -->
+              <v-text-field label="Pago"> </v-text-field>
+            </v-col>
 
             <v-col cols="12">
               <v-expansion-panels>

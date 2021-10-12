@@ -33,6 +33,19 @@
                 >
                   Inactivo
                 </v-chip>
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on, attrs }">
+                    <small
+                      class="font-weight-light"
+                      v-bind="attrs"
+                      v-on="on"
+                      v-show="pet.pet_days_last_lodging > 0"
+                    >
+                      ({{ pet.pet_days_last_lodging }})
+                    </small>
+                  </template>
+                  <span>Días que a dejado de asistir</span>
+                </v-tooltip>
               </h3>
               <v-tooltip bottom v-show="permissions.update">
                 <template v-slot:activator="{ on, attrs }">

@@ -342,6 +342,10 @@ export default {
     dialog(val) {
       val || this.close();
       this.$v.$reset();
+      if (val) {
+        this.date = this.getNowDate();
+        this.time = this.getNowTime();
+      }
     },
     mainBranchOffice() {
       if (this.permissions.read) {
@@ -368,7 +372,7 @@ export default {
     ...mapActions("suppliers", ["getAllSuppliers"]),
     ...mapActions("products", ["getAllProducts"]),
     ...mapActions("cash_registers", ["getAllCashRegisters"]),
-    ...mapMutations("users", ["SET_EDIT_ITEM"]),
+    ...mapMutations("purchases", ["SET_EDIT_ITEM"]),
     initialize() {
       this.getAllCashRegisters(1);
       this.getAllProducts(1);
