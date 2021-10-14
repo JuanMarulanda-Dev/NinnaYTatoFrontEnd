@@ -128,25 +128,37 @@
               </v-select>
             </v-col>
 
-            <v-col cols="12" md="4">
+            <v-col cols="12" md="6">
               <!-- Debitacion de plan -->
-              <v-text-field label="Tikets a debitar" readonly> </v-text-field>
+              <v-text-field
+                label="Tikets a debitar"
+                readonly
+                dense
+                :value="usedTikets"
+              >
+              </v-text-field>
             </v-col>
-            <v-col cols="12" md="4">
-              <!-- Dias a debitar -->
-              <v-text-field label="Días" readonly> </v-text-field>
-            </v-col>
-            <v-col cols="12" md="4">
+            <v-col cols="12" md="6">
               <!-- Horas a debitar -->
-              <v-text-field label="Horas" readonly> </v-text-field>
+              <v-text-field label="Horas" readonly dense :value="excess_hours">
+              </v-text-field>
             </v-col>
             <v-col cols="12" md="6">
               <!-- Total -->
-              <v-text-field label="Total" readonly> </v-text-field>
+              <vuetify-money
+                v-model="calculateTotalExcessHours"
+                label="Total"
+                readonly
+                dense
+              />
             </v-col>
             <v-col cols="12" md="6">
               <!-- Pago -->
-              <v-text-field label="Pago"> </v-text-field>
+              <vuetify-money
+                v-model="outputData.excess_hours_payment"
+                label="Dinero ingresado"
+                dense
+              />
             </v-col>
 
             <v-col cols="12">
@@ -373,6 +385,7 @@ export default {
       modalDatePicker: false,
       modalTimePicker: false,
       expanded: [],
+      excess_hours: 0,
       salesHeaders: [
         {
           text: "C.V",
@@ -436,6 +449,7 @@ export default {
     ]),
     ...mapState("customers", ["customer_plans"]),
     ...mapState("cash_registers", ["cash_registers"]),
+
     calculateHours() {
       let hours = 0;
       if (this.outputData.date !== "" && this.outputData.time !== "") {
@@ -448,9 +462,18 @@ export default {
       }
       return hours;
     },
+
+    usedTikets() {
+      let used_tikets = 0;
+      used_tikets = this.calculateUsedTikets();
+
+      return used_tikets;
+    },
+
     maxDate() {
       return this.getNowDate();
     },
+
     total() {
       let total = 0;
       if (
@@ -477,6 +500,12 @@ export default {
       }
       return total;
     },
+
+    calculateTotalExcessHours() {
+      // Get total plan horas
+      return 3000 * this.excess_hours;
+    },
+
     dialogOutput: {
       get: function () {
         return this.value;
@@ -485,18 +514,21 @@ export default {
         this.$emit("input", newValue);
       },
     },
+
     dateErrors() {
       const errors = [];
       if (!this.$v.outputData.date.$dirty) return errors;
       !this.$v.outputData.date.required && errors.push("La fecha es requerida");
       return errors;
     },
+
     timeErrors() {
       const errors = [];
       if (!this.$v.outputData.time.$dirty) return errors;
       !this.$v.outputData.time.required && errors.push("La hora es requerida");
       return errors;
     },
+
     cashRegisterErrors() {
       const errors = [];
       if (!this.$v.outputData.cash_register_id.$dirty) return errors;
@@ -519,6 +551,80 @@ export default {
 
   methods: {
     ...mapActions("lodging", ["storeLodgingDeparture"]),
+
+    diffHours(end, start) {
+      let time_start = new Date();
+      let time_end = new Date();
+      let value_start = start.split(":");
+      let value_end = end.split(":");
+
+      time_start.setHours(
+        value_start[0],
+        value_start[1],
+        value_start[2] ?? "00",
+        0
+      );
+      time_end.setHours(value_end[0], value_end[1], value_end[2] ?? "00", 0);
+
+      let milliseconds = time_end - time_start; // millisecond
+
+      return milliseconds / 3600000; // Hours
+    },
+
+    calculateUsedTikets() {
+      let used_tikets = 0;
+      let used_hours = 0;
+      this.excess_hours = 0;
+
+      if (
+        this.outputData.plan_customer_id != "" &&
+        this.outputData.date != "" &&
+        this.outputData.time != ""
+      ) {
+        let plan = this.customer_plans.find(
+          (plan) => plan.id === this.outputData.plan_customer_id
+        );
+        // Is it a plan with equivalence ?
+        if (plan.equivalence > 0) {
+          used_hours = this.calculateHours / plan.equivalence;
+          used_tikets = Math.floor(used_hours);
+          // Apply validation ?
+          if (plan.day_change === 1) {
+            // get diif only hours between arrival date and departure date
+            let date = this.arrival_date.split(" "); // 0 date - 1 time
+            let diff = this.diffHours(this.outputData.time, date[1]);
+            //
+            if (diff > 0) {
+              let day_out = new Date(this.outputData.date).getUTCDate();
+              let day_in = new Date(date[0]).getUTCDate();
+
+              if (used_tikets == 0 && day_out != day_in) {
+                used_tikets = 1;
+              } else {
+                this.excess_hours = Math.ceil(diff);
+              }
+            } else if (diff < 0) {
+              used_tikets += 1;
+            }
+          } else {
+            this.excess_hours = Math.ceil(
+              (used_hours - used_tikets) * plan.equivalence
+            );
+          }
+
+          if (plan.tickets < used_tikets) {
+            let excess_tikets = used_tikets - plan.tickets;
+            // Convert excess tikets in hours
+            this.excess_hours += excess_tikets * plan.equivalence;
+            //
+            used_tikets = plan.tickets;
+          }
+        }
+      }
+
+      return used_tikets;
+    },
+
     close() {
       // Reset vuelidate rules
       this.$v.$reset();

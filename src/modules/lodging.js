@@ -32,6 +32,7 @@ export default {
       plan_default_id: "",
       payment: 0,
       cash_register_id: "",
+      excess_hours_payment: "",
     },
     outputDefaultData: {
       date: "",
@@ -40,6 +41,7 @@ export default {
       plan_default_id: "",
       payment: 0,
       cash_register_id: "",
+      excess_hours_payment: "",
     },
     entryDataDefault: {
       pet_id: "",

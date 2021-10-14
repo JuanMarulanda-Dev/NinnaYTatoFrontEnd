@@ -231,12 +231,76 @@
           </v-container>
         </v-card>
       </v-col>
+      <v-col cols="12">
+        <v-card>
+          <v-container class="pa-6">
+            <v-row justify="space-between">
+              <h3><v-icon>mdi-note-outline</v-icon>&nbsp;Planes activos</h3>
+              <v-tooltip bottom v-show="permissions.create">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    color="secondary"
+                    icon
+                    v-bind="attrs"
+                    v-on="on"
+                    @click="saveCustomersPlan()"
+                    class="mb-1"
+                  >
+                    <v-icon>mdi-check-bold</v-icon>
+                  </v-btn>
+                </template>
+                <span>Guardar</span>
+              </v-tooltip>
+            </v-row>
+            <v-row>
+              <v-divider></v-divider>
+            </v-row>
+            <v-row>
+              <v-col cols="12">
+                <v-simple-table height="230px" fixed-header dense>
+                  <template v-slot:default>
+                    <thead>
+                      <tr>
+                        <th class="text-center">Nombre</th>
+                        <th class="text-center">Tikets / Servicios</th>
+                        <th class="text-center">Tipo</th>
+                        <th class="text-center">Inicio</th>
+                        <th class="text-center">Fin</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="plan in customer_plans" :key="plan.id">
+                        <td class="text-center">{{ plan.name }}</td>
+                        <td class="text-center">
+                          <vue-number-input
+                            v-model="plan.tickets"
+                            :min="0"
+                            inline
+                            controls
+                            center
+                            size="small"
+                            class="mt-1"
+                          ></vue-number-input>
+                        </td>
+                        <td class="text-center">1</td>
+                        <td class="text-center">{{ plan.initial_date }}</td>
+                        <td class="text-center">{{ plan.final_date }}</td>
+                      </tr>
+                    </tbody>
+                  </template>
+                </v-simple-table>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card>
+      </v-col>
     </v-row>
   </div>
 </template>
 
 <script>
 import { mapState, mapActions } from "vuex";
+import vueNumberInput from "@/components/vueNumberInput.vue";
 
 export default {
   data() {
@@ -250,6 +314,7 @@ export default {
       "contact_information",
       "additional_information",
       "pets",
+      "customer_plans",
       "permissions",
     ]),
   },
@@ -264,7 +329,7 @@ export default {
         path: `/clientes`,
       });
     },
-    ...mapActions("customers", ["getDetailsCustomer"]),
+    ...mapActions("customers", ["getDetailsCustomer", "updateCustomerPlans"]),
     goToShowPet(petId) {
       this.$router.push({
         path: `${this.customerId}/mascota/${petId}`,
@@ -280,6 +345,19 @@ export default {
         path: `${this.customerId}/mascota`,
       });
     },
+    saveCustomersPlan() {
+      this.$confirm("¿Quieres guardar estos cambios?", {
+        title: "Advertencia",
+      }).then((res) => {
+        if (res) {
+          // Make to change status to backend
+          this.updateCustomerPlans(this.customerId);
+        }
+      });
+    },
+  },
+  components: {
+    vueNumberInput,
   },
 };
 </script>
