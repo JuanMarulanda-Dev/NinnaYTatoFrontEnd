@@ -566,9 +566,9 @@ export default {
       );
       time_end.setHours(value_end[0], value_end[1], value_end[2] ?? "00", 0);
 
-      let milliseconds = time_end - time_start; // millisecond
+      let diffInMilliSeconds = time_end - time_start; // millisecond
 
-      return milliseconds / 3600000; // Hours
+      return Math.ceil(diffInMilliSeconds / 3600000); // Hours
     },
 
     calculateUsedTikets() {

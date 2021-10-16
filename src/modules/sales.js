@@ -17,8 +17,8 @@ export default {
     sales: [],
     sale: {
       sale_id: "",
-      lodging_id: "",
-      customer_id: "",
+      lodging_id: null,
+      customer_id: null,
       print: true,
       send: false,
       cash_register_id: "",
@@ -27,8 +27,8 @@ export default {
     },
     saleDefault: {
       sale_id: "",
-      lodging_id: "",
-      customer_id: "",
+      lodging_id: null,
+      customer_id: null,
       print: true,
       send: false,
       cash_register_id: "",
