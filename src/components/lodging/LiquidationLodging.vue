@@ -93,12 +93,12 @@
       <!-- Over time liquidation -->
       <v-tooltip bottom>
         <template v-slot:activator="{ on }">
-          <v-simple-checkbox
+          <v-checkbox
             v-on="on"
             class="mt-0"
             v-model="outputData.overtime_liquidity_option"
             @click="liquidation()"
-          ></v-simple-checkbox>
+          ></v-checkbox>
         </template>
         <span>Las horas extras de un tickets del plan</span>
       </v-tooltip>
