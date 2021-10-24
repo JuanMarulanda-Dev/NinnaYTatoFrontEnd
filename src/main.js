@@ -13,6 +13,8 @@ import VueAxios from "vue-axios";
 import Vuelidate from "vuelidate";
 import showMessageMixin from "@/mixins/showMessageMixin.js"; // my own helper
 import dateMixin from "@/mixins/dateMixin.js"; // my own helper
+import moment from "moment";
+import VueMoment from "vue-moment";
 
 import Toast from "vue-toastification";
 // Import the CSS or use your own!
@@ -30,6 +32,11 @@ Vue.config.productionTip = false;
 Vue.use(VueAxios, axios);
 Vue.use(Vuelidate);
 Vue.use(VuetifyConfirm, { vuetify });
+
+// moment configuration
+require("moment/locale/es");
+moment.locale("es");
+Vue.use(VueMoment, { moment });
 
 // My helpers
 Vue.use(showMessageMixin);

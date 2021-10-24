@@ -98,7 +98,13 @@ export default {
       state.how_contact = how_contact;
     },
     SET_CUSTOMER_PLANS(state, customer_plans) {
-      state.customer_plans = customer_plans;
+      state.customer_plans = [
+        { header: "Planes del cliente" },
+        ...customer_plans.map((obj) => ({
+          ...obj,
+          type: 1, //PlanCustomer
+        })),
+      ];
     },
   },
   actions: {

@@ -99,250 +99,140 @@
               </v-dialog>
             </v-col>
 
-            <v-col cols="12" sm="6" md="6">
-              <!-- Horas debitadas -->
-              <v-text-field
-                label="Tiempo debitado (H)"
-                readonly
-                v-model="calculateHours"
-              >
-              </v-text-field>
-            </v-col>
+            <v-tabs v-model="tab" color="primary" icons-and-text grow>
+              <v-tabs-slider></v-tabs-slider>
 
-            <v-col cols="12" sm="6" md="6">
-              <!-- plans -->
-              <v-select
-                v-model="outputData.plan_customer_id"
-                :items="customer_plans"
-                label="Planes cliente"
-                item-text="name"
-                item-value="id"
-                @change="clean_field_default_plan()"
-              >
-                <template v-slot:item="{ item }">
-                  <span class="mr-1">
-                    {{ item.name }}
-                  </span>
-                  <small> (saldo: {{ item.tickets }}) </small>
-                </template>
-              </v-select>
-            </v-col>
+              <v-tab href="#liquidacion">
+                Liquidación
+                <v-icon>mdi-phone</v-icon>
+              </v-tab>
 
-            <v-col cols="12" md="6">
-              <!-- Debitacion de plan -->
-              <v-text-field
-                label="Tikets a debitar"
-                readonly
-                dense
-                :value="usedTikets"
-              >
-              </v-text-field>
-            </v-col>
-            <v-col cols="12" md="6">
-              <!-- Horas a debitar -->
-              <v-text-field label="Horas" readonly dense :value="excess_hours">
-              </v-text-field>
-            </v-col>
-            <v-col cols="12" md="6">
-              <!-- Total -->
-              <vuetify-money
-                v-model="calculateTotalExcessHours"
-                label="Total"
-                readonly
-                dense
-              />
-            </v-col>
-            <v-col cols="12" md="6">
-              <!-- Pago -->
-              <vuetify-money
-                v-model="outputData.excess_hours_payment"
-                label="Dinero ingresado"
-                dense
-              />
-            </v-col>
+              <v-tab href="#accesorios">
+                Accesorios
+                <v-icon>mdi-basket</v-icon>
+              </v-tab>
 
-            <v-col cols="12">
-              <v-expansion-panels>
-                <v-expansion-panel>
-                  <v-expansion-panel-header>
-                    <span>
-                      <v-icon>mdi-account-cash-outline</v-icon>
-                      &nbsp;Liquidación
-                    </span>
-                  </v-expansion-panel-header>
-                  <v-expansion-panel-content>
-                    <v-container>
-                      <v-row>
-                        <v-col cols="12" sm="6" md="6">
-                          <!-- plans -->
-                          <v-select
-                            v-model="outputData.plan_default_id"
-                            :items="default_plans_details"
-                            label="Planes"
-                            item-text="name"
-                            item-value="id"
-                            dense
-                            @change="clean_field_customer_plan()"
-                          >
-                          </v-select>
-                        </v-col>
-                        <v-col cols="12" sm="6" md="6">
-                          <!-- cajas -->
-                          <v-select
-                            v-model="outputData.cash_register_id"
-                            :items="cash_registers"
-                            label="Cajas"
-                            item-text="name"
-                            item-value="id"
-                            :error-messages="cashRegisterErrors"
-                            @input="$v.outputData.cash_register_id.$touch()"
-                            @blur="$v.outputData.cash_register_id.$touch()"
-                            dense
-                          ></v-select>
-                        </v-col>
-                        <v-col cols="12" sm="6" md="6">
-                          <!-- Dinero ingresado -->
-                          <vuetify-money
-                            v-model="outputData.payment"
-                            label="Dinero ingresado"
-                            dense
-                          />
-                        </v-col>
-                        <v-col cols="12" sm="6" md="6">
-                          <!-- Total -->
-                          <vuetify-money
-                            :value="total"
-                            label="Total"
-                            readonly
-                            dense
-                          />
-                        </v-col>
-                      </v-row>
-                    </v-container>
-                  </v-expansion-panel-content>
-                </v-expansion-panel>
-              </v-expansion-panels>
-            </v-col>
+              <v-tab href="#costos-adicionales">
+                Costos Adicionales
+                <v-icon>mdi-cart</v-icon>
+              </v-tab>
+            </v-tabs>
 
-            <v-col cols="12">
-              <v-expansion-panels>
-                <v-expansion-panel>
-                  <v-expansion-panel-header>
-                    <span>
-                      <v-icon>mdi-basket</v-icon>
-                      &nbsp;Accesorios
-                    </span>
-                  </v-expansion-panel-header>
-                  <v-expansion-panel-content>
-                    <v-container>
-                      <v-row>
-                        <v-col>
-                          <v-simple-table fixed-header height="150px">
-                            <template v-slot:default>
-                              <thead>
-                                <tr>
-                                  <th class="text-left">Accesorio</th>
-                                  <th class="text-left">Descripción</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                <tr
-                                  v-for="(accessory, index) in accessories"
-                                  :key="index"
-                                >
-                                  <td>{{ accessory.name }}</td>
-                                  <td>{{ accessory.description }}</td>
-                                </tr>
-                              </tbody>
-                            </template>
-                          </v-simple-table>
-                        </v-col>
-                      </v-row>
-                    </v-container>
-                  </v-expansion-panel-content>
-                </v-expansion-panel>
-              </v-expansion-panels>
-            </v-col>
+            <v-tabs-items v-model="tab">
+              <v-tab-item value="liquidacion">
+                <v-card flat>
+                  <v-card-text>
+                    <liquidation-lodging
+                      :arrival_date="arrival_date"
+                    ></liquidation-lodging>
+                  </v-card-text>
+                </v-card>
+              </v-tab-item>
 
-            <v-col cols="12">
-              <v-expansion-panels>
-                <v-expansion-panel>
-                  <v-expansion-panel-header>
-                    <span>
-                      <v-icon>mdi-cart</v-icon>
-                      &nbsp;Costos adicionales
-                    </span>
-                  </v-expansion-panel-header>
-                  <v-expansion-panel-content>
-                    <v-container>
-                      <v-row>
-                        <v-col>
-                          <v-data-table
-                            :headers="salesHeaders"
-                            :items="sales_lodging"
-                            :single-expand="false"
-                            :expanded.sync="expanded"
-                            :hide-default-footer="true"
-                            :disable-sort="true"
-                            item-key="sale_id"
-                            show-expand
-                            class="elevation-1"
-                          >
-                            <template v-slot:[`item.total`]="{ item }">
-                              <v-icon>{{ moneyIcon }}</v-icon>
-                              {{ currencyFormat(item.total) }}
-                            </template>
+              <v-tab-item value="accesorios">
+                <v-card width="100vw">
+                  <v-card-text>
+                    <v-row>
+                      <v-col cols="12">
+                        <v-simple-table>
+                          <template v-slot:default>
+                            <thead>
+                              <tr>
+                                <th class="text-center">Accesorio</th>
+                                <th class="text-center">Descripción</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr
+                                v-for="(accessory, index) in accessories"
+                                :key="index"
+                              >
+                                <td class="text-center">
+                                  {{ accessory.name }}
+                                </td>
+                                <td class="text-center">
+                                  {{ accessory.description }}
+                                </td>
+                              </tr>
+                            </tbody>
+                          </template>
+                        </v-simple-table>
+                      </v-col>
+                    </v-row>
+                  </v-card-text>
+                </v-card>
+              </v-tab-item>
 
-                            <template v-slot:[`item.payment`]="{ item }">
-                              <vuetify-money
-                                class="mt-4"
-                                v-model="item.payment"
-                                label="Pago"
-                                dense
-                              />
-                            </template>
+              <v-tab-item value="costos-adicionales">
+                <v-card flat width="100vw">
+                  <v-card-text>
+                    <v-row>
+                      <v-col cols="12">
+                        <v-data-table
+                          :headers="salesHeaders"
+                          :items="sales_lodging"
+                          :single-expand="false"
+                          :expanded.sync="expanded"
+                          :hide-default-footer="true"
+                          :disable-sort="true"
+                          item-key="sale_id"
+                          show-expand
+                          class="elevation-1"
+                        >
+                          <template v-slot:[`item.total`]="{ item }">
+                            <v-icon>{{ moneyIcon }}</v-icon>
+                            {{ currencyFormat(item.total) }}
+                          </template>
 
-                            <template v-slot:expanded-item="{ headers, item }">
-                              <td class="pa-0" :colspan="headers.length">
-                                <v-simple-table fixed-header height="150px">
-                                  <template v-slot:default>
-                                    <thead>
-                                      <tr>
-                                        <th class="text-left">Nombre</th>
-                                        <th class="text-center">Cantidad</th>
-                                        <th class="text-center">valor</th>
-                                        <th class="text-center">descuento</th>
-                                      </tr>
-                                    </thead>
-                                    <tbody>
-                                      <tr
-                                        v-for="(detail, index) in item.detail"
-                                        :key="index"
-                                      >
-                                        <td>{{ detail.name }}</td>
-                                        <td class="text-center">
-                                          {{ detail.quantity }}
-                                        </td>
-                                        <td class="text-center">
-                                          {{ currencyFormat(detail.price) }}
-                                        </td>
-                                        <td class="text-center">
-                                          {{ detail.discount }}
-                                        </td>
-                                      </tr>
-                                    </tbody>
-                                  </template>
-                                </v-simple-table>
-                              </td>
-                            </template>
-                          </v-data-table>
-                        </v-col>
-                      </v-row>
-                    </v-container>
-                  </v-expansion-panel-content>
-                </v-expansion-panel>
-              </v-expansion-panels>
-            </v-col>
+                          <template v-slot:[`item.payment`]="{ item }">
+                            <vuetify-money
+                              class="mt-4"
+                              v-model="item.payment"
+                              label="Pago"
+                              dense
+                            />
+                          </template>
+
+                          <template v-slot:expanded-item="{ headers, item }">
+                            <td class="pa-0" :colspan="headers.length">
+                              <v-simple-table fixed-header height="150px">
+                                <template v-slot:default>
+                                  <thead>
+                                    <tr>
+                                      <th class="text-left">Nombre</th>
+                                      <th class="text-center">Cantidad</th>
+                                      <th class="text-center">valor</th>
+                                      <th class="text-center">descuento</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    <tr
+                                      v-for="(detail, index) in item.detail"
+                                      :key="index"
+                                    >
+                                      <td>{{ detail.name }}</td>
+                                      <td class="text-center">
+                                        {{ detail.quantity }}
+                                      </td>
+                                      <td class="text-center">
+                                        {{ currencyFormat(detail.price) }}
+                                      </td>
+                                      <td class="text-center">
+                                        {{ detail.discount }}
+                                      </td>
+                                    </tr>
+                                  </tbody>
+                                </template>
+                              </v-simple-table>
+                            </td>
+                          </template>
+                        </v-data-table>
+                      </v-col>
+                    </v-row>
+                  </v-card-text>
+                </v-card>
+              </v-tab-item>
+            </v-tabs-items>
           </v-row>
         </v-container>
       </v-card-text>
@@ -362,26 +252,13 @@ import { validationMixin } from "vuelidate";
 import { required } from "vuelidate/lib/validators";
 import VuetifyMoney from "@/components/vuetifyMoney.vue";
 import { moneyFormatMixin } from "@/mixins/moneyFormatMixin.js";
-
-function validateSettlement() {
-  let result = false;
-  if (this.outputData.plan_customer_id !== "") {
-    result = true;
-  } else {
-    if (
-      this.outputData.plan_default_id !== "" &&
-      this.outputData.cash_register_id !== ""
-    ) {
-      result = true;
-    }
-  }
-  return result;
-}
+import LiquidationLodging from "@/components/lodging/LiquidationLodging.vue";
 
 export default {
   name: "output-form",
   data() {
     return {
+      tab: null,
       modalDatePicker: false,
       modalTimePicker: false,
       expanded: [],
@@ -434,11 +311,7 @@ export default {
     outputData: {
       date: { required },
       time: { required },
-      cash_register_id: { validateSettlement },
     },
-  },
-  components: {
-    VuetifyMoney,
   },
   computed: {
     ...mapState(["user"]),
@@ -447,28 +320,6 @@ export default {
       "outputData",
       "sales_lodging",
     ]),
-    ...mapState("customers", ["customer_plans"]),
-    ...mapState("cash_registers", ["cash_registers"]),
-
-    calculateHours() {
-      let hours = 0;
-      if (this.outputData.date !== "" && this.outputData.time !== "") {
-        let startTime = Date.parse(this.arrival_date);
-        let endTime = Date.parse(
-          `${this.outputData.date} ${this.outputData.time}`
-        );
-        let difference = endTime - startTime; // This will give difference in milliseconds
-        hours = Math.ceil(difference / 3600000);
-      }
-      return hours;
-    },
-
-    usedTikets() {
-      let used_tikets = 0;
-      used_tikets = this.calculateUsedTikets();
-
-      return used_tikets;
-    },
 
     maxDate() {
       return this.getNowDate();
@@ -501,11 +352,6 @@ export default {
       return total;
     },
 
-    calculateTotalExcessHours() {
-      // Get total plan horas
-      return 3000 * this.excess_hours;
-    },
-
     dialogOutput: {
       get: function () {
         return this.value;
@@ -528,14 +374,6 @@ export default {
       !this.$v.outputData.time.required && errors.push("La hora es requerida");
       return errors;
     },
-
-    cashRegisterErrors() {
-      const errors = [];
-      if (!this.$v.outputData.cash_register_id.$dirty) return errors;
-      !this.$v.outputData.cash_register_id.validateSettlement &&
-        errors.push("La caja es requerida");
-      return errors;
-    },
   },
 
   watch: {
@@ -552,108 +390,11 @@ export default {
   methods: {
     ...mapActions("lodging", ["storeLodgingDeparture"]),
 
-    diffHours(end, start) {
-      let time_start = new Date();
-      let time_end = new Date();
-      let value_start = start.split(":");
-      let value_end = end.split(":");
-
-      time_start.setHours(
-        value_start[0],
-        value_start[1],
-        value_start[2] ?? "00",
-        0
-      );
-      time_end.setHours(value_end[0], value_end[1], value_end[2] ?? "00", 0);
-
-      let diffInMilliSeconds = time_end - time_start; // millisecond
-
-      return Math.ceil(diffInMilliSeconds / 3600000); // Hours
-    },
-
-    calculateUsedTikets() {
-      let used_tikets = 0;
-      let used_hours = 0;
-      this.excess_hours = 0;
-
-      if (
-        this.outputData.plan_customer_id != "" &&
-        this.outputData.date != "" &&
-        this.outputData.time != ""
-      ) {
-        let plan = this.customer_plans.find(
-          (plan) => plan.id === this.outputData.plan_customer_id
-        );
-        // Is it a plan with equivalence ?
-        if (plan.equivalence > 0) {
-          used_hours = this.calculateHours / plan.equivalence;
-          used_tikets = Math.floor(used_hours);
-          // Apply validation ?
-          if (plan.day_change === 1) {
-            // get diif only hours between arrival date and departure date
-            let date = this.arrival_date.split(" "); // 0 date - 1 time
-            let diff = this.diffHours(this.outputData.time, date[1]);
-            //
-            if (diff > 0) {
-              let day_out = new Date(this.outputData.date).getUTCDate();
-              let day_in = new Date(date[0]).getUTCDate();
-
-              if (used_tikets == 0 && day_out != day_in) {
-                used_tikets = 1;
-              } else {
-                this.excess_hours = Math.ceil(diff);
-              }
-            } else if (diff < 0) {
-              used_tikets += 1;
-            }
-          } else {
-            this.excess_hours = Math.ceil(
-              (used_hours - used_tikets) * plan.equivalence
-            );
-          }
-
-          if (plan.tickets < used_tikets) {
-            let excess_tikets = used_tikets - plan.tickets;
-            // Convert excess tikets in hours
-            this.excess_hours += excess_tikets * plan.equivalence;
-            //
-            used_tikets = plan.tickets;
-          }
-        }
-      }
-
-      return used_tikets;
-    },
-
     close() {
       // Reset vuelidate rules
       this.$v.$reset();
       // Close modal
       this.dialogOutput = false;
-    },
-
-    clean_field_customer_plan() {
-      this.outputData.plan_customer_id = "";
-    },
-
-    clean_field_default_plan() {
-      this.outputData.plan_default_id = "";
-      this.outputData.payment = 0;
-      this.outputData.cash_register_id = "";
-    },
-
-    findDiscountToQuantity(quantity, discounts = []) {
-      let discount = 0;
-      if (discounts.length > 0) {
-        // Find discount to quantity
-        let itemDiscount = discounts.find(
-          (element) => element.quantity === quantity
-        );
-        if (itemDiscount) {
-          discount = itemDiscount.discount ?? 0;
-        }
-      }
-      return discount;
     },
 
     save() {
@@ -684,6 +425,11 @@ export default {
         });
       }
     },
+  },
+
+  components: {
+    VuetifyMoney,
+    LiquidationLodging,
   },
 };
 </script>

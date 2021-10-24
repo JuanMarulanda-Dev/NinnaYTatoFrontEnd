@@ -28,20 +28,18 @@ export default {
     outputData: {
       date: "",
       time: "",
-      plan_customer_id: "",
-      plan_default_id: "",
+      plan: null,
       payment: 0,
       cash_register_id: "",
-      excess_hours_payment: "",
+      overtime_liquidity_option: false,
     },
     outputDefaultData: {
       date: "",
       time: "",
-      plan_customer_id: "",
-      plan_default_id: "",
+      plan: null,
       payment: 0,
       cash_register_id: "",
-      excess_hours_payment: "",
+      overtime_liquidity_option: false,
     },
     entryDataDefault: {
       pet_id: "",
@@ -87,7 +85,13 @@ export default {
       state.pets = pets;
     },
     SET_DEFAULT_PLANS_DETAILS(state, default_plans_details) {
-      state.default_plans_details = default_plans_details;
+      state.default_plans_details = [
+        { header: "Planes para liquidar" },
+        ...default_plans_details.map((obj) => ({
+          ...obj,
+          type: 2, //PlanDetail
+        })),
+      ];
     },
     SET_DEFAULT_DATA_ENTRY(state) {
       state.entryData = JSON.parse(JSON.stringify(state.entryDataDefault));
