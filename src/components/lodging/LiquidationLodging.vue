@@ -50,6 +50,7 @@
         @blur="$v.outputData.cash_register_id.$touch()"
         dense
       ></v-select>
+      <!-- :disabled="avaliableFieldCashRegister" -->
     </v-col>
 
     <v-col cols="12" md="6">
@@ -106,18 +107,28 @@
 
     <v-col cols="12" md="4">
       <!-- Total -->
-      <vuetify-money :value="0" label="Total" readonly dense />
+      <vuetify-money v-model="totalTimeExtra" label="Total" readonly dense />
     </v-col>
 
     <v-col cols="12" md="4">
       <!-- Descuento tickets extra -->
-      <v-text-field label="Descuento tickets extras (%)" readonly dense>
+      <v-text-field
+        label="Descuento tickets extras (%)"
+        v-model="calculateDiscountTicketsExtra"
+        readonly
+        dense
+      >
       </v-text-field>
     </v-col>
 
     <v-col cols="12" md="4">
       <!-- Descuento tickets extra -->
-      <v-text-field label="Descuento horas extras (%)" readonly dense>
+      <v-text-field
+        label="Descuento horas extras (%)"
+        v-model="calculateDiscountHourEstraExtra"
+        readonly
+        dense
+      >
       </v-text-field>
     </v-col>
   </v-row>
@@ -127,19 +138,16 @@
 import { mapState } from "vuex";
 import VuetifyMoney from "@/components/vuetifyMoney.vue";
 import { moneyFormatMixin } from "@/mixins/moneyFormatMixin.js";
+import { liquidationItemSaleMixin } from "@/mixins/sales/liquidationItemSaleMixin.js";
 import moment from "moment";
 
 function validateSettlement() {
   let result = false;
-  if (this.outputData.plan_customer_id !== "") {
-    result = true;
-  } else {
-    if (
-      this.outputData.plan_default_id !== "" &&
-      this.outputData.cash_register_id !== ""
-    ) {
-      result = true;
-    }
+  // Is it a plan customer?
+  if (this.outputData.plan) {
+    return (
+      this.outputData.plan.type === 2 && this.outputData.cash_register_id !== ""
+    );
   }
   return result;
 }
@@ -161,7 +169,7 @@ export default {
       required: true,
     },
   },
-  mixins: [moneyFormatMixin],
+  mixins: [moneyFormatMixin, liquidationItemSaleMixin],
   validations: {
     outputData: {
       cash_register_id: { validateSettlement },
@@ -180,11 +188,6 @@ export default {
       return [...this.customer_plans, ...this.default_plans_details];
     },
 
-    calculateTotalExcessHours() {
-      // Get total plan horas
-      return 3000 * this.excess_hours;
-    },
-
     calculateHours() {
       let hours = 0;
       if (this.outputData.date !== "" && this.outputData.time !== "") {
@@ -196,13 +199,57 @@ export default {
       return hours;
     },
 
-    //
     cashRegisterErrors() {
       const errors = [];
       if (!this.$v.outputData.cash_register_id.$dirty) return errors;
       !this.$v.outputData.cash_register_id.validateSettlement &&
         errors.push("La caja es requerida");
       return errors;
+    },
+
+    calculateDiscountTicketsExtra() {
+      let discount = 0;
+      if (this.ticketsExtras > 0) {
+        discount =
+          this.outputData.plan.discount +
+          this.findDiscountToQuantity(
+            this.ticketsExtras,
+            this.outputData.plan.discounts
+          );
+      }
+      return discount;
+    },
+
+    calculateDiscountHourEstraExtra() {
+      let discount = 0;
+      if (this.hoursExtra > 0) {
+        discount =
+          this.outputData.plan.discount + // plan 1 - hour
+          this.findDiscountToQuantity(
+            this.ticketsExtras,
+            this.outputData.plan.discounts
+          );
+      }
+      return discount;
+    },
+
+    totalTimeExtra() {
+      let total = 0;
+      if (this.ticketsExtras > 0) {
+        total = this.calculatePriceTotalCartItem(
+          this.ticketsExtras,
+          this.outputData.plan.full_value,
+          this.calculateDiscountTicketsExtra
+        );
+      }
+      return total;
+    },
+
+    avaliableFieldCashRegister() {
+      if (this.outputData.plan) {
+        return this.outputData.plan.type === 1;
+      }
+      return true;
     },
   },
   methods: {
@@ -245,6 +292,10 @@ export default {
           this.avaliableTicketsDiscountCustomerPlan();
 
           this.hoursExtraDiscountHasATicketCustomerPlan();
+        } else {
+          // Liquidation by plan detail
+          this.ticketsExtras = this.tickets;
+          this.tickets = 0;
         }
         // ...
       } else {
@@ -312,73 +363,6 @@ export default {
     },
 
     // ---
-    calculateUsedTikets() {
-      let used_tikets = 0;
-      let used_hours = 0;
-      this.excess_hours = 0;
-
-      if (
-        this.outputData.plan_customer_id != "" &&
-        this.outputData.date != "" &&
-        this.outputData.time != ""
-      ) {
-        let plan = this.customer_plans.find(
-          (plan) => plan.id === this.outputData.plan_customer_id
-        );
-        // Is it a plan with equivalence ?
-        if (plan.equivalence > 0) {
-          used_hours = this.calculateHours / plan.equivalence;
-          used_tikets = Math.floor(used_hours);
-          // Apply validation ?
-          if (plan.day_change === 1) {
-            // get diif only hours between arrival date and departure date
-            let date = this.arrival_date.split(" "); // 0 date - 1 time
-            let diff = this.diffHours(this.outputData.time, date[1]);
-            //
-            if (diff > 0) {
-              let day_out = new Date(this.outputData.date).getUTCDate();
-              let day_in = new Date(date[0]).getUTCDate();
-
-              if (used_tikets == 0 && day_out != day_in) {
-                used_tikets = 1;
-              } else {
-                this.excess_hours = Math.ceil(diff);
-              }
-            } else if (diff < 0) {
-              used_tikets += 1;
-            }
-          } else {
-            this.excess_hours = Math.ceil(
-              (used_hours - used_tikets) * plan.equivalence
-            );
-          }
-
-          if (plan.tickets < used_tikets) {
-            let excess_tikets = used_tikets - plan.tickets;
-            // Convert excess tikets in hours
-            this.excess_hours += excess_tikets * plan.equivalence;
-            //
-            used_tikets = plan.tickets;
-          }
-        }
-      }
-
-      return used_tikets;
-    },
-
-    findDiscountToQuantity(quantity, discounts = []) {
-      let discount = 0;
-      if (discounts.length > 0) {
-        // Find discount to quantity
-        let itemDiscount = discounts.find(
-          (element) => element.quantity === quantity
-        );
-        if (itemDiscount) {
-          discount = itemDiscount.discount ?? 0;
-        }
-      }
-      return discount;
-    },
   },
   watch: {
     "outputData.time": function () {

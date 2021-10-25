@@ -33,6 +33,7 @@
 import { mapState, mapMutations } from "vuex";
 import VueNumberInput from "@/components/vueNumberInput.vue";
 import { moneyFormatMixin } from "@/mixins/moneyFormatMixin.js";
+import { liquidationItemSaleMixin } from "@/mixins/sales/liquidationItemSaleMixin.js";
 export default {
   name: "cart-item",
   props: {
@@ -41,7 +42,7 @@ export default {
       required: true,
     },
   },
-  mixins: [moneyFormatMixin],
+  mixins: [moneyFormatMixin, liquidationItemSaleMixin],
   computed: {
     ...mapState("products", ["products"]),
     discount() {
@@ -105,25 +106,6 @@ export default {
         status = quantity <= product.stock;
       }
       return status;
-    },
-
-    calculatePriceTotalCartItem(quantity, unit_price, discount = 0) {
-      let total = unit_price * quantity;
-      return total - total * (discount / 100);
-    },
-
-    findDiscountToQuantity(quantity, discounts = []) {
-      let discount = 0;
-      if (discounts.length > 0) {
-        // Find discount to quantity
-        let itemDiscount = discounts.find(
-          (element) => element.quantity === quantity
-        );
-        if (itemDiscount) {
-          discount = itemDiscount.discount ?? 0;
-        }
-      }
-      return discount;
     },
 
     deleteCartItem() {

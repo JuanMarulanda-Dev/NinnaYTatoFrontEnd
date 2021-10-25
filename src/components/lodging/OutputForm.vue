@@ -311,6 +311,7 @@ export default {
     outputData: {
       date: { required },
       time: { required },
+      // cash_register_id: { required },
     },
   },
   computed: {
@@ -406,9 +407,13 @@ export default {
         this.storeLodgingDeparture({
           data: {
             departure_date: `${this.outputData.date} ${this.outputData.time}`,
-            plan_customer_id: this.outputData.plan_customer_id,
-            plan_default_id: this.outputData.plan_default_id,
+            plan: {
+              id: this.outputData.plan.id,
+              type: this.outputData.plan.type,
+            },
             payment: this.outputData.payment,
+            overtime_liquidity_option:
+              this.outputData.overtime_liquidity_option,
             cash_register_id: this.outputData.cash_register_id,
             sales_payments: this.sales_lodging.map((obj) => ({
               sale_id: obj.sale_id,
