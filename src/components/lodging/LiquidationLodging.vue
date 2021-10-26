@@ -50,7 +50,6 @@
         @blur="$v.outputData.cash_register_id.$touch()"
         dense
       ></v-select>
-      <!-- :disabled="avaliableFieldCashRegister" -->
     </v-col>
 
     <v-col cols="12" md="6">
@@ -75,12 +74,7 @@
 
     <v-col cols="12" md="4">
       <!-- Tickets extras -->
-      <v-text-field
-        label="Tickets extras"
-        :value="ticketsExtras"
-        readonly
-        dense
-      >
+      <v-text-field label="Tickets extras" :value="ticketsExtra" readonly dense>
       </v-text-field>
     </v-col>
 
@@ -136,28 +130,19 @@
 
 <script>
 import { mapState } from "vuex";
+import { validationMixin } from "vuelidate";
+import { required } from "vuelidate/lib/validators";
 import VuetifyMoney from "@/components/vuetifyMoney.vue";
 import { moneyFormatMixin } from "@/mixins/moneyFormatMixin.js";
 import { liquidationItemSaleMixin } from "@/mixins/sales/liquidationItemSaleMixin.js";
 import moment from "moment";
-
-function validateSettlement() {
-  let result = false;
-  // Is it a plan customer?
-  if (this.outputData.plan) {
-    return (
-      this.outputData.plan.type === 2 && this.outputData.cash_register_id !== ""
-    );
-  }
-  return result;
-}
 
 export default {
   name: "liquidation-lodging",
   data() {
     return {
       tickets: 0,
-      ticketsExtras: 0,
+      ticketsExtra: 0,
       hoursExtra: 0,
       ticketsExtraDiscount: 0,
       hoursExtraDiscount: 0,
@@ -169,10 +154,10 @@ export default {
       required: true,
     },
   },
-  mixins: [moneyFormatMixin, liquidationItemSaleMixin],
+  mixins: [validationMixin, moneyFormatMixin, liquidationItemSaleMixin],
   validations: {
     outputData: {
-      cash_register_id: { validateSettlement },
+      cash_register_id: { required },
     },
   },
   computed: {
@@ -180,12 +165,18 @@ export default {
       "default_plans_details",
       "outputData",
       "sales_lodging",
+      "default_liquidation_plan",
     ]),
     ...mapState("customers", ["customer_plans"]),
     ...mapState("cash_registers", ["cash_registers"]),
 
     plans() {
-      return [...this.customer_plans, ...this.default_plans_details];
+      return [
+        { header: "Planes del cliente" },
+        ...this.customer_plans,
+        { header: "Planes para liquidar" },
+        ...this.default_plans_details,
+      ];
     },
 
     calculateHours() {
@@ -202,18 +193,18 @@ export default {
     cashRegisterErrors() {
       const errors = [];
       if (!this.$v.outputData.cash_register_id.$dirty) return errors;
-      !this.$v.outputData.cash_register_id.validateSettlement &&
+      !this.$v.outputData.cash_register_id.required &&
         errors.push("La caja es requerida");
       return errors;
     },
 
     calculateDiscountTicketsExtra() {
       let discount = 0;
-      if (this.ticketsExtras > 0) {
+      if (this.ticketsExtra > 0) {
         discount =
           this.outputData.plan.discount +
           this.findDiscountToQuantity(
-            this.ticketsExtras,
+            this.ticketsExtra,
             this.outputData.plan.discounts
           );
       }
@@ -224,10 +215,10 @@ export default {
       let discount = 0;
       if (this.hoursExtra > 0) {
         discount =
-          this.outputData.plan.discount + // plan 1 - hour
+          this.default_liquidation_plan.discount + // plan 1 - hour
           this.findDiscountToQuantity(
-            this.ticketsExtras,
-            this.outputData.plan.discounts
+            this.hoursExtra,
+            this.default_liquidation_plan.discounts
           );
       }
       return discount;
@@ -235,21 +226,24 @@ export default {
 
     totalTimeExtra() {
       let total = 0;
-      if (this.ticketsExtras > 0) {
-        total = this.calculatePriceTotalCartItem(
-          this.ticketsExtras,
+
+      if (this.ticketsExtra > 0) {
+        total += this.calculatePriceTotalCartItem(
+          this.ticketsExtra,
           this.outputData.plan.full_value,
           this.calculateDiscountTicketsExtra
         );
       }
-      return total;
-    },
 
-    avaliableFieldCashRegister() {
-      if (this.outputData.plan) {
-        return this.outputData.plan.type === 1;
+      if (this.hoursExtra > 0) {
+        total += this.calculatePriceTotalCartItem(
+          this.hoursExtra,
+          this.default_liquidation_plan.full_value,
+          this.calculateDiscountHourEstraExtra
+        );
       }
-      return true;
+
+      return total;
     },
   },
   methods: {
@@ -287,17 +281,16 @@ export default {
 
         // is it a customer plan? 1 = customerplan
         if (this.outputData.plan.type === 1) {
-          this.calculateDiscountCustomerPlan();
+          this.calculateDiscountTicketsByCustomerPlanDayChange();
 
           this.avaliableTicketsDiscountCustomerPlan();
 
           this.hoursExtraDiscountHasATicketCustomerPlan();
         } else {
           // Liquidation by plan detail
-          this.ticketsExtras = this.tickets;
+          this.ticketsExtra = this.tickets;
           this.tickets = 0;
         }
-        // ...
       } else {
         this.clearFilds();
       }
@@ -319,12 +312,12 @@ export default {
     avaliableTicketsDiscountCustomerPlan() {
       // The customer have avaliable tickets to rest?
       if (this.outputData.plan.tickets < this.tickets) {
-        this.ticketsExtras = this.tickets - this.outputData.plan.tickets;
-        this.tickets -= this.ticketsExtras;
+        this.ticketsExtra = this.tickets - this.outputData.plan.tickets;
+        this.tickets -= this.ticketsExtra;
       }
     },
 
-    calculateDiscountCustomerPlan() {
+    calculateDiscountTicketsByCustomerPlanDayChange() {
       // Apply day change for this customerplan?
       if (this.outputData.plan.day_change === 1) {
         let diffHours = this.diffHours(
@@ -350,7 +343,7 @@ export default {
 
     clearFilds() {
       this.tickets = 0;
-      this.ticketsExtras = 0;
+      this.ticketsExtra = 0;
       this.hoursExtra = 0;
       this.ticketsExtraDiscount = 0;
       this.hoursExtraDiscount = 0;
@@ -361,8 +354,6 @@ export default {
       let diffInMilliSeconds = end.diff(start, "seconds");
       return Math.ceil(diffInMilliSeconds / 3600); // Hours
     },
-
-    // ---
   },
   watch: {
     "outputData.time": function () {

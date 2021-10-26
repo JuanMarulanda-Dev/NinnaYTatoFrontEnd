@@ -149,25 +149,6 @@
                 </template>
                 <span>Seguimiento</span>
               </v-tooltip>
-
-              <!-- Out -->
-              <v-tooltip bottom>
-                <template v-slot:activator="{ on, attrs }">
-                  <v-btn
-                    fab
-                    x-small
-                    dark
-                    color="accent mr-1"
-                    v-bind="attrs"
-                    v-on="on"
-                    v-show="user.is_admin"
-                    @click="showOutputForm(item)"
-                  >
-                    <v-icon> mdi-home-import-outline </v-icon>
-                  </v-btn>
-                </template>
-                <span>Editar salida</span>
-              </v-tooltip>
             </template>
           </v-data-table>
         </v-container>
@@ -250,9 +231,6 @@ export default {
     },
     showPetDetails(item) {
       this.$emit("showPetDetails", item);
-    },
-    showOutputForm(item) {
-      this.$emit("showOutputForm", item);
     },
   },
 };

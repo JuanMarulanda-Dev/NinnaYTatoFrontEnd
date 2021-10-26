@@ -314,17 +314,6 @@
       @showPetDetails="
         showPetDetails($event.customer_id, $event.arrival_data.pet_id)
       "
-      @showOutputForm="
-        showOutputForm(
-          $event.id,
-          $event.customer_id,
-          $event.arrival_no_format,
-          $event.name,
-          $event.arrival_data.accessories,
-          $event.departure_data,
-          $event.departure_data.date ? true : false
-        )
-      "
       @date="date = $event"
       v-model="dialogHistoryLodgingTable"
     >
@@ -426,6 +415,7 @@ export default {
     this.SET_SALE_DEFAULT();
     this.getAllDefaultPlans();
     this.getAllCashRegisters(1);
+    this.getPlaDetailDefaultToLiquidationHoursExtra();
 
     // Acciones que debe realizar el componente una vez creado
     if (this.permissions.read) {
@@ -440,6 +430,7 @@ export default {
       "getAllDefaultPlans",
       "deleteEntry",
       "getAllSaleDetailsByLodging",
+      "getPlaDetailDefaultToLiquidationHoursExtra",
     ]),
     ...mapActions("monitorings", [
       "getMonitoryByPetLodging",

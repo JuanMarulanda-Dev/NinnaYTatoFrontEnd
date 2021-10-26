@@ -311,7 +311,7 @@ export default {
     outputData: {
       date: { required },
       time: { required },
-      // cash_register_id: { required },
+      cash_register_id: { required },
     },
   },
   computed: {
@@ -403,29 +403,35 @@ export default {
       this.$v.$touch();
       // Correct validations
       if (!this.$v.$invalid) {
-        // Save depure
-        this.storeLodgingDeparture({
-          data: {
-            departure_date: `${this.outputData.date} ${this.outputData.time}`,
-            plan: {
-              id: this.outputData.plan.id,
-              type: this.outputData.plan.type,
-            },
-            payment: this.outputData.payment,
-            overtime_liquidity_option:
-              this.outputData.overtime_liquidity_option,
-            cash_register_id: this.outputData.cash_register_id,
-            sales_payments: this.sales_lodging.map((obj) => ({
-              sale_id: obj.sale_id,
-              payment: obj.payment,
-            })),
-          },
-          id: this.lodging_id,
-          is_close: this.is_close,
-          date_search: this.date_search,
-        }).then((result) => {
-          if (result) {
-            this.close();
+        this.$confirm("¿Seguro quieres dar salida a esta mascota?", {
+          title: "Advertencia",
+        }).then((res) => {
+          if (res) {
+            // Save depure
+            this.storeLodgingDeparture({
+              data: {
+                departure_date: `${this.outputData.date} ${this.outputData.time}`,
+                plan: {
+                  id: this.outputData.plan.id,
+                  type: this.outputData.plan.type,
+                },
+                payment: this.outputData.payment,
+                overtime_liquidity_option:
+                  this.outputData.overtime_liquidity_option,
+                cash_register_id: this.outputData.cash_register_id,
+                sales_payments: this.sales_lodging.map((obj) => ({
+                  sale_id: obj.sale_id,
+                  payment: obj.payment,
+                })),
+              },
+              id: this.lodging_id,
+              is_close: this.is_close,
+              date_search: this.date_search,
+            }).then((result) => {
+              if (result) {
+                this.close();
+              }
+            });
           }
         });
       }

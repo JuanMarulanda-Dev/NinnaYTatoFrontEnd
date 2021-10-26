@@ -13,6 +13,7 @@ export default {
     accessories: [],
     default_accessories: [],
     pets: [],
+    default_liquidation_plan: null,
     entryData: {
       pet_id: "",
       accessories: [],
@@ -85,13 +86,10 @@ export default {
       state.pets = pets;
     },
     SET_DEFAULT_PLANS_DETAILS(state, default_plans_details) {
-      state.default_plans_details = [
-        { header: "Planes para liquidar" },
-        ...default_plans_details.map((obj) => ({
-          ...obj,
-          type: 2, //PlanDetail
-        })),
-      ];
+      state.default_plans_details = default_plans_details.map((obj) => ({
+        ...obj,
+        type: 2, //PlanDetail
+      }));
     },
     SET_DEFAULT_DATA_ENTRY(state) {
       state.entryData = JSON.parse(JSON.stringify(state.entryDataDefault));
@@ -105,8 +103,24 @@ export default {
     SET_OUTPUT_DATA(state, outputData) {
       state.outputData = JSON.parse(JSON.stringify(outputData));
     },
+    SET_DEFAULT_PLAN_DETAIL_TO_LIQUIDATION(state, default_liquidation_plan) {
+      state.default_liquidation_plan = default_liquidation_plan;
+    },
   },
   actions: {
+    getPlaDetailDefaultToLiquidationHoursExtra({ commit }) {
+      axios
+        .get(`/api/lodgings/departures/default-liquidity-hours-extra`)
+        .then((result) => {
+          // save all
+          commit(
+            "SET_DEFAULT_PLAN_DETAIL_TO_LIQUIDATION",
+            result.data.defaultLiquidityHoursExtra
+          );
+        })
+        .catch(() => {});
+    },
+
     getAllLodging({ commit, rootState }, { status = 0, date = "" }) {
       commit("SET_LOADING_DATATABLE", true);
       axios
