@@ -202,10 +202,10 @@ export default {
       let discount = 0;
       if (this.ticketsExtra > 0) {
         discount =
-          this.outputData.plan.discount +
+          this.outputData.plan.unit_plan_detail.discount +
           this.findDiscountToQuantity(
             this.ticketsExtra,
-            this.outputData.plan.discounts
+            this.outputData.plan.unit_plan_detail.discounts
           );
       }
       return discount;
@@ -226,11 +226,11 @@ export default {
 
     totalTimeExtra() {
       let total = 0;
-
+      console.log(1);
       if (this.ticketsExtra > 0) {
         total += this.calculatePriceTotalCartItem(
           this.ticketsExtra,
-          this.outputData.plan.full_value,
+          this.outputData.plan.unit_plan_detail.unit_value,
           this.calculateDiscountTicketsExtra
         );
       }
@@ -238,7 +238,7 @@ export default {
       if (this.hoursExtra > 0) {
         total += this.calculatePriceTotalCartItem(
           this.hoursExtra,
-          this.default_liquidation_plan.full_value,
+          this.default_liquidation_plan.unit_value,
           this.calculateDiscountHourEstraExtra
         );
       }
@@ -279,10 +279,9 @@ export default {
           this.outputData.plan.equivalence
         );
 
+        this.calculateDiscountTicketsByCustomerPlanDayChange();
         // is it a customer plan? 1 = customerplan
         if (this.outputData.plan.type === 1) {
-          this.calculateDiscountTicketsByCustomerPlanDayChange();
-
           this.avaliableTicketsDiscountCustomerPlan();
 
           this.hoursExtraDiscountHasATicketCustomerPlan();
@@ -352,7 +351,7 @@ export default {
     diffHours(start, end) {
       end = this.roundDateTime(end);
       let diffInMilliSeconds = end.diff(start, "seconds");
-      return Math.ceil(diffInMilliSeconds / 3600); // Hours
+      return Math.round(diffInMilliSeconds / 3600); // Hours
     },
   },
   watch: {

@@ -20,6 +20,7 @@ import records from "@/modules/records.js";
 import sales from "@/modules/sales.js";
 import lodging from "@/modules/lodging.js";
 import monitorings from "@/modules/monitorings.js";
+import notes from "@/modules/notes.js";
 
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL = process.env.VUE_APP_API_URL;
@@ -198,5 +199,6 @@ export default new Vuex.Store({
     sales,
     lodging,
     monitorings,
+    notes,
   },
 });

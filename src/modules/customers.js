@@ -278,9 +278,9 @@ export default {
           commit("SET_OVERLAY_LOADING", false, { root: true });
         });
     },
-    getAllCustomersPlans({ commit }, id) {
+    getAllCustomersPlans({ commit }, { id, unitPlanDetail = false }) {
       axios
-        .get(`/api/customers/${id}/plans`)
+        .get(`/api/customers/${id}/plans?unitPlanDetail=${unitPlanDetail}`)
         .then((result) => {
           commit("SET_CUSTOMER_PLANS", result.data.customerPlans);
         })

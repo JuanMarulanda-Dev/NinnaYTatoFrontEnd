@@ -190,7 +190,7 @@ export default {
 
     getAllDefaultPlans({ commit }) {
       axios
-        .get(`/api/default-plan-details`)
+        .get(`/api/default-plan-details?unitPlanDetail=true`)
         .then((result) => {
           commit("SET_DEFAULT_PLANS_DETAILS", result.data.defaultPlans);
         })

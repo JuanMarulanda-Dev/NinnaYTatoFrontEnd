@@ -180,6 +180,29 @@
                   </template>
                   <span>Imprimir Comprobante</span>
                 </v-tooltip>
+                <!-- Note -->
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn
+                      fab
+                      x-small
+                      dark
+                      color="secondary"
+                      v-bind="attrs"
+                      v-on="on"
+                      @click="
+                        showNoteFormDialog(
+                          item.id,
+                          item.number_payment_proof,
+                          item.note
+                        )
+                      "
+                    >
+                      <v-icon>mdi-note-text</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Nota</span>
+                </v-tooltip>
               </template>
             </v-data-table>
           </v-container>
@@ -190,6 +213,13 @@
     <sale-payments :payment_proof="payment_proof"></sale-payments>
     <!-- Show dialog details -->
     <sale-details :payment_proof="payment_proof"></sale-details>
+    <!-- Show dialog note -->
+    <note-form-dialog
+      v-model="dialogNoteForm"
+      :id="id_sale"
+      :note="note"
+      :payment_proof="payment_proof"
+    ></note-form-dialog>
   </div>
 </template>
 
@@ -198,13 +228,17 @@ import { moneyFormatMixin } from "@/mixins/moneyFormatMixin.js";
 import { mapState, mapMutations, mapActions } from "vuex";
 import SalePayments from "@/components/sales/SalePayments.vue";
 import SaleDetails from "@/components/sales/SaleDetails.vue";
+import NoteFormDialog from "@/components/NoteFormDialog.vue";
 
 export default {
   name: "sales-data-table",
   data: () => ({
     time: "",
     dialogDate: false,
+    dialogNoteForm: false,
     payment_proof: 0,
+    id_sale: 0,
+    note: "",
     headers: [
       { text: "N°", value: "number_payment_proof", align: "center" },
       { text: "Cliente", value: "customer_name", align: "center" },
@@ -215,6 +249,7 @@ export default {
       { text: "Estado", value: "state" },
       { text: "Fecha", value: "created_at" },
       { text: "Eliminado", value: "deleted_at" },
+      { text: "Nota", value: "user_name" },
       { text: "Acciones", value: "actions", sortable: false },
     ],
   }),
@@ -266,6 +301,13 @@ export default {
       this.getSaleDetails(saleId);
     },
 
+    showNoteFormDialog(id, payment_proof, note) {
+      this.id_sale = id;
+      this.payment_proof = payment_proof;
+      this.note = note;
+      this.dialogNoteForm = true;
+    },
+
     changeStateSale(item) {
       // Confirmation to change de status
       this.$confirm("¿Quieres cambiar el estado de esta venta?", {
@@ -294,6 +336,7 @@ export default {
   components: {
     SalePayments,
     SaleDetails,
+    NoteFormDialog,
   },
 };
 </script>

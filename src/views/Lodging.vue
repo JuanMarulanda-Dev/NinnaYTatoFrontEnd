@@ -481,7 +481,7 @@ export default {
       output_data = {},
       is_close = false
     ) {
-      this.getAllCustomersPlans(customer_id);
+      this.getAllCustomersPlans({ id: customer_id, unitPlanDetail: true });
       this.getAllSaleDetailsByLodging(lodging_id);
       if (!this.isObjEmpty(output_data)) {
         this.SET_OUTPUT_DATA(output_data);
