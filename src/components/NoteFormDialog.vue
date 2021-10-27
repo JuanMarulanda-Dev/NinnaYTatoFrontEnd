@@ -1,20 +1,5 @@
 <template>
   <v-dialog v-model="dialogNote" persistent max-width="500px">
-    <!-- Button active modal -->
-    <template v-slot:activator="{ on, attrs }">
-      <v-btn
-        fab
-        small
-        color="secondary"
-        elevation="3"
-        dark
-        v-bind="attrs"
-        v-on="on"
-        v-show="permissions.create"
-      >
-        <v-icon>mdi-plus-thick</v-icon>
-      </v-btn>
-    </template>
     <!-- Modal Form -->
     <v-card>
       <v-card-title>

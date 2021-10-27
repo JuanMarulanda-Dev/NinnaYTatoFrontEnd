@@ -104,17 +104,21 @@
 
               <v-tab href="#liquidacion">
                 Liquidación
-                <v-icon>mdi-phone</v-icon>
+                <v-icon>mdi-calculator-variant</v-icon>
               </v-tab>
 
               <v-tab href="#accesorios">
                 Accesorios
-                <v-icon>mdi-basket</v-icon>
+                <v-badge offset-x="-1" overlap dot :color="colorAccessories">
+                  <v-icon>mdi-basket</v-icon>
+                </v-badge>
               </v-tab>
 
               <v-tab href="#costos-adicionales">
                 Costos Adicionales
-                <v-icon>mdi-cart</v-icon>
+                <v-badge offset-x="-1" overlap dot :color="colorSalesLodging">
+                  <v-icon>mdi-cart</v-icon>
+                </v-badge>
               </v-tab>
             </v-tabs>
 
@@ -374,6 +378,13 @@ export default {
       if (!this.$v.outputData.time.$dirty) return errors;
       !this.$v.outputData.time.required && errors.push("La hora es requerida");
       return errors;
+    },
+
+    colorAccessories() {
+      return this.accessories.length > 0 ? "error" : "";
+    },
+    colorSalesLodging() {
+      return this.sales_lodging.length > 0 ? "error" : "";
     },
   },
 
