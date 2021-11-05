@@ -4,7 +4,7 @@
     <v-card>
       <v-card-title>
         <span class="headline">
-          Nota - <small>Venta N°&nbsp;{{ payment_proof }}</small></span
+          Nota - <small>Venta N°&nbsp;{{ title }}</small></span
         >
       </v-card-title>
 
@@ -15,10 +15,10 @@
               <v-textarea
                 name="input-7-1"
                 label="Notas de la venta"
-                v-model="note"
-                :error-messages="noteErrors"
-                @input="$v.note.$touch()"
-                @blur="$v.note.$touch()"
+                v-model="description"
+                :error-messages="descriptionErrors"
+                @input="$v.description.$touch()"
+                @blur="$v.description.$touch()"
               ></v-textarea>
             </v-col>
           </v-row>
@@ -43,12 +43,12 @@ export default {
   data() {
     return {
       permissions: {},
-      note: "",
+      description: "",
     };
   },
   mixins: [validationMixin],
   validations: {
-    note: {
+    description: {
       required,
     },
   },
@@ -57,7 +57,19 @@ export default {
       type: Boolean,
       required: true,
     },
-    payment_proof: {
+    type: {
+      type: Number,
+      required: true,
+    },
+    id: {
+      type: String,
+      required: true,
+    },
+    note: {
+      type: String,
+      required: true,
+    },
+    title: {
       type: Number,
       required: true,
     },
@@ -75,15 +87,21 @@ export default {
         this.$emit("input", value);
       },
     },
-    noteErrors() {
+
+    descriptionErrors() {
       const errors = [];
-      if (!this.$v.note.$dirty) return errors;
-      !this.$v.note.required && errors.push("La nota es requerida");
+      if (!this.$v.description.$dirty) return errors;
+      !this.$v.description.required && errors.push("La nota es requerida");
       return errors;
     },
   },
+  watch: {
+    note(newValue) {
+      this.description = newValue;
+    },
+  },
   methods: {
-    ...mapActions("notes", ["updateNote"]),
+    ...mapActions("notes", ["storeNote"]),
     close() {
       this.dialogNote = false;
     },
@@ -91,9 +109,14 @@ export default {
       this.$v.$touch();
 
       if (!this.$v.$invalid) {
-        this.updateNote().then((result) => {
+        this.storeNote({
+          item_id: this.id,
+          item_type: this.type,
+          description: this.description,
+        }).then((result) => {
           if (result) {
-            console.log(1);
+            this.close();
+            this.$emit("saved", this.description);
           }
         });
       }

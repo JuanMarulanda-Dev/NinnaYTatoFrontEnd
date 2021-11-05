@@ -217,8 +217,10 @@
     <note-form-dialog
       v-model="dialogNoteForm"
       :id="id_sale"
+      :type="1"
       :note="note"
-      :payment_proof="payment_proof"
+      :title="payment_proof"
+      @saved="updateRowNote($event)"
     ></note-form-dialog>
   </div>
 </template>
@@ -237,7 +239,7 @@ export default {
     dialogDate: false,
     dialogNoteForm: false,
     payment_proof: 0,
-    id_sale: 0,
+    id_sale: "",
     note: "",
     headers: [
       { text: "N°", value: "number_payment_proof", align: "center" },
@@ -249,7 +251,7 @@ export default {
       { text: "Estado", value: "state" },
       { text: "Fecha", value: "created_at" },
       { text: "Eliminado", value: "deleted_at" },
-      { text: "Nota", value: "user_name" },
+      { text: "Nota", value: "note", width: "16%" },
       { text: "Acciones", value: "actions", sortable: false },
     ],
   }),
@@ -331,6 +333,12 @@ export default {
     rollbackStateSale(item) {
       let saleIndex = this.sales.indexOf(item);
       this.sales[saleIndex].state = !this.sales[saleIndex].state;
+    },
+
+    updateRowNote(note) {
+      console.log(note);
+      let row = this.sales.find((element) => element.id === this.id_sale);
+      row.note = note;
     },
   },
   components: {

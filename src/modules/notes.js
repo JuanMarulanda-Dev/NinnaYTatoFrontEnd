@@ -5,11 +5,11 @@ axios.defaults.baseURL = process.env.VUE_APP_API_URL;
 export default {
   namespaced: true,
   actions: {
-    updateNote({ commit }, { id, data }) {
+    storeNote({ commit }, { item_id = 0, item_type = 0, description = "" }) {
       commit("SET_OVERLAY_LOADING", true, { root: true });
 
       return axios
-        .put(`/api/notes/${id}`, data)
+        .post(`/api/notes`, { item_id, item_type, description })
         .then((result) => {
           if (result.status == 201) {
             // show message
