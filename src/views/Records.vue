@@ -5,6 +5,7 @@
     :items="records"
     sort-by="name"
     class="elevation-3"
+    :search="search"
     :loading="loading"
     :loading-text="loadingText"
   >
@@ -16,7 +17,6 @@
           <v-icon large>mdi-history</v-icon> Historial
         </v-toolbar-title>
         <v-divider class="mx-4" inset vertical></v-divider>
-        <v-spacer></v-spacer>
         <!-- Filter date -->
         <v-dialog
           ref="fecha"
@@ -28,7 +28,7 @@
         >
           <template v-slot:activator="{ on, attrs }">
             <v-text-field
-              class="mt-8 mr-3"
+              class="mt-8"
               v-model="date"
               label="Fecha"
               prepend-icon="mdi-calendar"
@@ -45,24 +45,15 @@
             </v-btn>
           </v-date-picker>
         </v-dialog>
-        <!-- Reload btn Icon -->
-        <v-tooltip bottom v-show="permissions.update">
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              fab
-              small
-              color="secondary"
-              elevation="3"
-              dark
-              v-bind="attrs"
-              v-on="on"
-              @click="initialize()"
-            >
-              <v-icon>mdi-reload</v-icon>
-            </v-btn>
-          </template>
-          <span>Recargar</span>
-        </v-tooltip>
+        <v-spacer></v-spacer>
+        <v-text-field
+          v-model="search"
+          class="mr-3"
+          append-icon="mdi-magnify"
+          label="Buscar"
+          single-line
+          hide-details
+        ></v-text-field>
       </v-toolbar>
     </template>
   </v-data-table>
@@ -75,8 +66,8 @@ export default {
   data: () => ({
     permissions: {},
     dialog: false,
-    maxDate: new Date().toISOString().substr(0, 10),
-    date: new Date().toISOString().substr(0, 10),
+    search: "",
+    date: "",
     headers: [
       {
         text: "Numero",
@@ -93,15 +84,23 @@ export default {
   computed: {
     ...mapState(["loadingText"]),
     ...mapState("records", ["records", "loading"]),
+    maxDate() {
+      return this.getNowDate();
+    },
   },
 
   created() {
     // Obtener los permisos
     this.permissions = this.$route.meta.permissions;
-    // Acciones que debe realizar el componente una vez creado
-    if (this.permissions.read) {
-      this.initialize();
-    }
+    this.date = this.getNowDate();
+  },
+
+  watch: {
+    date() {
+      if (this.permissions.read) {
+        this.initialize();
+      }
+    },
   },
 
   methods: {

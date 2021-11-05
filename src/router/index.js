@@ -169,6 +169,15 @@ const routes = [
       permissions: {},
     },
   },
+  {
+    path: "/alojamientos",
+    name: "alojamientos",
+    component: () =>
+      import(/* webpackChunkName: "Lodging" */ "@/views/Lodging.vue"),
+    meta: {
+      permissions: {},
+    },
+  },
 ];
 
 const router = new VueRouter({

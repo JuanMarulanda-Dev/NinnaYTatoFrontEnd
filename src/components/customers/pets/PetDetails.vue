@@ -33,6 +33,19 @@
                 >
                   Inactivo
                 </v-chip>
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on, attrs }">
+                    <small
+                      class="font-weight-light"
+                      v-bind="attrs"
+                      v-on="on"
+                      v-show="pet.pet_days_last_lodging > 0"
+                    >
+                      ({{ pet.pet_days_last_lodging }})
+                    </small>
+                  </template>
+                  <span>Días que a dejado de asistir</span>
+                </v-tooltip>
               </h3>
               <v-tooltip bottom v-show="permissions.update">
                 <template v-slot:activator="{ on, attrs }">
@@ -160,14 +173,14 @@
                     <small>Dueño </small><br />
                     <v-avatar color="grey lighten-1">
                       <img
-                        v-if="additional_information.customer_avatar"
-                        :src="additional_information.customer_avatar"
-                        :alt="personal_infomation.first_name"
+                        v-if="pet.customer_avatar"
+                        :src="pet.customer_avatar"
+                        :alt="pet.customer_name"
                       />
                       <v-icon v-else dark> mdi-account-circle </v-icon>
                     </v-avatar>
                     <br />
-                    <label> {{ personal_infomation.first_name }} </label>
+                    <label> {{ pet.customer_name }} </label>
                   </v-col>
                 </v-row>
                 <v-row>
@@ -364,11 +377,7 @@ export default {
   },
   computed: {
     ...mapState("pets", ["pet", "vet_information", "pet_behavior"]),
-    ...mapState("customers", [
-      "personal_infomation",
-      "additional_information",
-      "permissions",
-    ]),
+    ...mapState("customers", ["personal_infomation", "permissions"]),
   },
   methods: {
     goBack() {
@@ -378,6 +387,8 @@ export default {
     },
     ...mapActions("pets", ["getDetailsPet", "changeStatusPet"]),
     ...mapMutations("pets", ["SET_PET_DEFAULT"]),
+    ...mapMutations("customers", ["SET_PERMISSIONS"]),
+
     goToEditPetForm() {
       this.$router.push({
         path: `${this.petId}/editar`,
@@ -411,6 +422,10 @@ export default {
     },
   },
   created() {
+    if (Object.keys(this.permissions).length === 0) {
+      // Obtener los permisos
+      this.SET_PERMISSIONS(this.$route.meta.permissions);
+    }
     //take id customer details
     if (this.personal_infomation.id == 0) {
       this.$router.push({

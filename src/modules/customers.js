@@ -59,6 +59,8 @@ export default {
       social_network: "",
       how_contact_id: null,
     },
+
+    customer_plans: [],
   },
   mutations: {
     SET_PERMISSIONS(state, permissions) {
@@ -95,6 +97,12 @@ export default {
     SET_HOW_CONTACT(state, how_contact) {
       state.how_contact = how_contact;
     },
+    SET_CUSTOMER_PLANS(state, customer_plans) {
+      state.customer_plans = customer_plans.map((obj) => ({
+        ...obj,
+        type: 1, //PlanCustomer
+      }));
+    },
   },
   actions: {
     getAllCustomers({ commit, rootState }, status = 0) {
@@ -119,7 +127,7 @@ export default {
           commit("SET_LOADING_DATATABLE", false);
         });
     },
-    async getDetailsCustomer({ commit }, customerId) {
+    getDetailsCustomer({ commit }, customerId) {
       commit("SET_OVERLAY_LOADING", true, { root: true });
       axios
         .get(`/api/customers/${customerId}`)
@@ -127,6 +135,7 @@ export default {
           // save all
           commit("SET_CUSTOMER_DETAILS", result.data.customer);
           commit("SET_CUSTOMER_PETS", result.data.pets);
+          commit("SET_CUSTOMER_PLANS", result.data.customerPlans);
         })
         .catch((errors) => {
           // show error message
@@ -255,6 +264,49 @@ export default {
             return true;
           } else {
             return false;
+          }
+        })
+        .catch((errors) => {
+          // show error message
+          this._vm.showToastMessage(
+            errors.response.status,
+            this._vm.createMessageError(errors.response.data.errors)
+          );
+          return false;
+        })
+        .finally(() => {
+          commit("SET_OVERLAY_LOADING", false, { root: true });
+        });
+    },
+    getAllCustomersPlans({ commit }, { id, unitPlanDetail = false }) {
+      axios
+        .get(`/api/customers/${id}/plans?unitPlanDetail=${unitPlanDetail}`)
+        .then((result) => {
+          commit("SET_CUSTOMER_PLANS", result.data.customerPlans);
+        })
+        .catch(() => {});
+    },
+    updateCustomerPlans({ state, commit }, id) {
+      commit("SET_OVERLAY_LOADING", true, { root: true });
+
+      let plans = state.customer_plans.map((plan) => {
+        return {
+          id: plan.id,
+          tickets: plan.tickets,
+        };
+      });
+
+      return axios
+        .put(`/api/customers/${id}/plans`, { plans })
+        .then((result) => {
+          if (result.status == 201) {
+            // show message
+            this._vm.showToastMessage(
+              result.status,
+              "Planes actualizado exitosamente"
+            );
+            // Result
+            return true;
           }
         })
         .catch((errors) => {

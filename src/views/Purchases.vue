@@ -253,7 +253,6 @@ export default {
     dialog: false,
     modalDatePicker: false,
     modalTimePicker: false,
-    maxDate: new Date().toISOString().substr(0, 10),
     date: "",
     time: "",
     headers: [
@@ -294,6 +293,9 @@ export default {
     ...mapState("suppliers", ["suppliers"]),
     ...mapState("products", ["products"]),
     ...mapState("cash_registers", ["cash_registers"]),
+    maxDate() {
+      return this.getNowDate();
+    },
     quantityErrors() {
       const errors = [];
       if (!this.$v.editedItem.quantity.$dirty) return errors;
@@ -340,6 +342,10 @@ export default {
     dialog(val) {
       val || this.close();
       this.$v.$reset();
+      if (val) {
+        this.date = this.getNowDate();
+        this.time = this.getNowTime();
+      }
     },
     mainBranchOffice() {
       if (this.permissions.read) {
@@ -366,7 +372,7 @@ export default {
     ...mapActions("suppliers", ["getAllSuppliers"]),
     ...mapActions("products", ["getAllProducts"]),
     ...mapActions("cash_registers", ["getAllCashRegisters"]),
-    ...mapMutations("users", ["SET_EDIT_ITEM"]),
+    ...mapMutations("purchases", ["SET_EDIT_ITEM"]),
     initialize() {
       this.getAllCashRegisters(1);
       this.getAllProducts(1);
@@ -396,8 +402,8 @@ export default {
 
     rollbackStatePurchases(item) {
       let purchasesIndex = this.purchases.indexOf(item);
-      this.purchases[purchasesIndex].state = !this.purchases[purchasesIndex]
-        .state;
+      this.purchases[purchasesIndex].state =
+        !this.purchases[purchasesIndex].state;
     },
 
     close() {

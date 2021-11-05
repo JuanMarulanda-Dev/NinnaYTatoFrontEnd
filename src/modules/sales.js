@@ -16,7 +16,9 @@ export default {
     saleDetails: {},
     sales: [],
     sale: {
-      customer_id: "",
+      sale_id: "",
+      lodging_id: null,
+      customer_id: null,
       print: true,
       send: false,
       cash_register_id: "",
@@ -24,7 +26,9 @@ export default {
       cart: [],
     },
     saleDefault: {
-      customer_id: "",
+      sale_id: "",
+      lodging_id: null,
+      customer_id: null,
       print: true,
       send: false,
       cash_register_id: "",
@@ -38,6 +42,12 @@ export default {
     },
     SET_SALE_ID(state, saleId) {
       state.saleId = saleId;
+    },
+    SET_CUSTOMER_ID(state, customer_id) {
+      state.sale.customer_id = customer_id;
+    },
+    SET_LODGING_ID(state, lodging_id) {
+      state.sale.lodging_id = lodging_id;
     },
     SET_PAYMENTS(state, payments) {
       state.payments = payments;

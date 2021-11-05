@@ -74,6 +74,12 @@
                           * Si el tipo de plan seleccionado es un servicio la
                           equivalencia en horas no se tomara en cuenta como
                           horas si no como servicios.
+                          <br />
+                          *Si se selecciona el cambio de día, a la hora de
+                          debitar un plan por guarderia tendra en cuenta si el
+                          día a cambiado desde que ingreso la mascota y
+                          procedera a cobrarle un ticket completo sin importar
+                          que haya pasado menos de las horas del plan.
                         </span>
                       </v-tooltip>
                     </v-card-title>
@@ -125,6 +131,12 @@
                               @input="$v.editedItem.type_id.$touch()"
                               @blur="$v.editedItem.type_id.$touch()"
                             ></v-select>
+                          </v-col>
+                          <v-col cols="12" sm="6" md="6">
+                            <v-switch
+                              label="Cambio de día"
+                              v-model="editedItem.day_change"
+                            ></v-switch>
                           </v-col>
                         </v-row>
                       </v-container>
@@ -191,7 +203,12 @@
 <script>
 import { validationMixin } from "vuelidate";
 import { moneyFormatMixin } from "@/mixins/moneyFormatMixin.js";
-import { required, maxLength, numeric } from "vuelidate/lib/validators";
+import {
+  required,
+  maxLength,
+  numeric,
+  minValue,
+} from "vuelidate/lib/validators";
 import { mapState, mapMutations, mapActions } from "vuex";
 import VuetifyMoney from "@/components/vuetifyMoney.vue";
 
@@ -221,7 +238,12 @@ export default {
   validations: {
     editedItem: {
       name: { required, maxLength: maxLength(255) },
-      equivalence: { required, maxLength: maxLength(255), numeric },
+      equivalence: {
+        required,
+        maxLength: maxLength(255),
+        minValue: minValue(1),
+        numeric,
+      },
       type_id: { required },
     },
   },
@@ -264,6 +286,9 @@ export default {
         errors.push("La equivalencia debe ser un numero");
       !this.$v.editedItem.equivalence.maxLength &&
         errors.push("Longitud no permitida");
+      !this.$v.editedItem.equivalence.minValue &&
+        errors.push("Valor no permitido");
+
       return errors;
     },
   },

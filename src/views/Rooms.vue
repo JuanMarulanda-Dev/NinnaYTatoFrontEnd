@@ -205,7 +205,9 @@ export default {
     ]),
     ...mapMutations("rooms", ["SET_EDIT_ITEM"]),
     initialize() {
-      this.getAllRooms();
+      if (this.rooms.length === 0) {
+        this.getAllRooms();
+      }
     },
 
     changeStateRoom(item) {
