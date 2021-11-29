@@ -426,8 +426,8 @@ export default {
 
     rollbackStateUser(item) {
       let branchOfficeIndex = this.users.indexOf(item);
-      this.users[branchOfficeIndex].state = !this.users[branchOfficeIndex]
-        .state;
+      this.users[branchOfficeIndex].state =
+        !this.users[branchOfficeIndex].state;
     },
 
     editItem(item) {

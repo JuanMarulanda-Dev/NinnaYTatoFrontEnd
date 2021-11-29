@@ -178,6 +178,15 @@ const routes = [
       permissions: {},
     },
   },
+  {
+    path: "/recomendaciones",
+    name: "recomendaciones",
+    component: () =>
+      import(/* webpackChunkName: "Reservas" */ "@/views/Reservas.vue"),
+    meta: {
+      permissions: {},
+    },
+  },
 ];
 
 const router = new VueRouter({

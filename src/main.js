@@ -15,7 +15,6 @@ import showMessageMixin from "@/mixins/showMessageMixin.js"; // my own helper
 import dateMixin from "@/mixins/dateMixin.js"; // my own helper
 import moment from "moment";
 import VueMoment from "vue-moment";
-
 import Toast from "vue-toastification";
 // Import the CSS or use your own!
 import "vue-toastification/dist/index.css"; // https://maronato.github.io/vue-toastification/
