@@ -179,8 +179,8 @@ const routes = [
     },
   },
   {
-    path: "/recomendaciones",
-    name: "recomendaciones",
+    path: "/reservas",
+    name: "Reservas",
     component: () =>
       import(/* webpackChunkName: "Reservas" */ "@/views/Reservas.vue"),
     meta: {
