@@ -7,6 +7,7 @@
     class="elevation-3"
     :loading="loading"
     :loading-text="loadingText"
+    :search="search"
   >
     <!-- Header content datatable -->
     <template v-slot:top>
@@ -16,7 +17,75 @@
           <v-icon large>mdi-book</v-icon> Reservaciones
         </v-toolbar-title>
         <v-divider class="mx-4" inset vertical></v-divider>
+        <!-- Filter date start -->
+        <v-dialog
+          ref="fecha"
+          v-model="dialogStart"
+          :return-value.sync="start"
+          persistent
+          width="290px"
+          :retain-focus="false"
+        >
+          <template v-slot:activator="{ on, attrs }">
+            <v-text-field
+              class="mt-8"
+              v-model="start"
+              label="Fecha"
+              prepend-icon="mdi-calendar"
+              readonly
+              v-bind="attrs"
+              v-on="on"
+            ></v-text-field>
+          </template>
+          <v-date-picker v-model="start" scrollable>
+            <v-spacer></v-spacer>
+            <v-btn text color="primary" @click="dialogStart = false">
+              Cancel
+            </v-btn>
+            <v-btn text color="primary" @click="$refs.fecha.save(start)">
+              OK
+            </v-btn>
+          </v-date-picker>
+        </v-dialog>
+        <!-- Filter date end -->
+        <v-dialog
+          ref="fecha"
+          v-model="dialogEnd"
+          :return-value.sync="end"
+          persistent
+          width="290px"
+          :retain-focus="false"
+        >
+          <template v-slot:activator="{ on, attrs }">
+            <v-text-field
+              class="mt-8"
+              v-model="end"
+              label="Fecha"
+              prepend-icon="mdi-calendar"
+              readonly
+              v-bind="attrs"
+              v-on="on"
+            ></v-text-field>
+          </template>
+          <v-date-picker v-model="end" scrollable>
+            <v-spacer></v-spacer>
+            <v-btn text color="primary" @click="dialogEnd = false">
+              Cancel
+            </v-btn>
+            <v-btn text color="primary" @click="$refs.fecha.save(end)">
+              OK
+            </v-btn>
+          </v-date-picker>
+        </v-dialog>
         <v-spacer></v-spacer>
+        <v-text-field
+          v-model="search"
+          class="mr-3"
+          append-icon="mdi-magnify"
+          label="Buscar"
+          single-line
+          hide-details
+        ></v-text-field>
         <!-- Modal New/edit-->
         <v-dialog v-model="dialog" persistent max-width="500px">
           <!-- Modal Form -->
@@ -43,44 +112,7 @@
             </v-card-title>
 
             <v-card-text>
-              <v-container>
-                <v-row>
-                  <v-col cols="12">
-                    <v-text-field
-                      v-model="editedItem.name"
-                      label="Nombre*"
-                      required
-                      prepend-inner-icon="mdi-format-letter-matches"
-                      counter="255"
-                      :error-messages="nameErrors"
-                      @input="$v.editedItem.name.$touch()"
-                      @blur="$v.editedItem.name.$touch()"
-                    ></v-text-field>
-                  </v-col>
-                  <v-col cols="12" sm="6" md="6">
-                    <v-text-field
-                      v-model="editedItem.address"
-                      label="Dirrección*"
-                      prepend-inner-icon="mdi-map-marker"
-                      counter="255"
-                      :error-messages="addressErrors"
-                      @input="$v.editedItem.address.$touch()"
-                      @blur="$v.editedItem.address.$touch()"
-                    ></v-text-field>
-                  </v-col>
-                  <v-col cols="12" sm="6" md="6">
-                    <v-text-field
-                      v-model="editedItem.phone"
-                      label="Telefono*"
-                      prepend-inner-icon="mdi-phone"
-                      counter="255"
-                      :error-messages="phoneErrors"
-                      @input="$v.editedItem.phone.$touch()"
-                      @blur="$v.editedItem.phone.$touch()"
-                    ></v-text-field>
-                  </v-col>
-                </v-row>
-              </v-container>
+              <reservation-form :dialog="dialog"></reservation-form>
             </v-card-text>
 
             <v-card-actions>
@@ -90,6 +122,18 @@
             </v-card-actions>
           </v-card>
         </v-dialog>
+        <!-- Modal Schedule gantt -->
+        <v-btn
+          fab
+          small
+          class="ml-1"
+          color="info"
+          elevation="3"
+          dark
+          v-show="permissions.read"
+        >
+          <v-icon>mdi-calendar-text-outline</v-icon>
+        </v-btn>
       </v-toolbar>
     </template>
 
@@ -114,34 +158,41 @@
         <span>Editar</span>
       </v-tooltip>
 
-      <!-- Detalles sucursal -->
+      <!-- Delete-->
       <v-tooltip bottom>
         <template v-slot:activator="{ on, attrs }">
           <v-btn
             fab
             x-small
             dark
-            color="info"
+            color="error"
             v-bind="attrs"
             v-on="on"
-            @click="goToShowDetailSucursal(item)"
+            @click="destroyReservation(item.id)"
           >
-            <v-icon> {{ detailsIcon }} </v-icon>
+            <v-icon> {{ deleteIcon }} </v-icon>
           </v-btn>
         </template>
-        <span>Detalles</span>
+        <span>Eliminar</span>
       </v-tooltip>
     </template>
   </v-data-table>
 </template>
 
 <script>
+import moment from "moment";
+import ReservationForm from "@/components/reservations/ReservationForm.vue";
 import { mapState, mapActions, mapMutations } from "vuex";
 
 export default {
   data: () => ({
     permissions: {},
+    dialogStart: false,
+    dialogEnd: false,
     dialog: false,
+    search: "",
+    start: "",
+    end: "",
     headers: [
       {
         text: "Nombre",
@@ -151,20 +202,15 @@ export default {
       { text: "Habitacion", value: "room_name" },
       { text: "Fecha inicio", value: "start" },
       { text: "Fecha fin", value: "end" },
-      { text: "Creado", value: "created_at" },
+      { text: "Actualizado", value: "updated_at" },
       { text: "Acciones", value: "actions", sortable: false },
     ],
     editedIndex: -1,
   }),
 
   computed: {
-    ...mapState(["editIcon", "deleteIcon", "detailsIcon", "loadingText"]),
-    ...mapState("reservations", [
-      "reservations",
-      "loading",
-      "editedItem",
-      "defaultItem",
-    ]),
+    ...mapState(["editIcon", "deleteIcon", "loadingText"]),
+    ...mapState("reservations", ["reservations", "loading", "defaultItem"]),
     formTitle() {
       return this.editedIndex === -1 ? "Nueva Reserva" : "Editar Reserva";
     },
@@ -173,7 +219,6 @@ export default {
   watch: {
     dialog(val) {
       val || this.close();
-      this.$v.$reset();
     },
   },
 
@@ -184,6 +229,8 @@ export default {
     if (this.permissions.read) {
       this.initialize();
     }
+    this.start = moment(Date.now()).subtract(2, "months").format("YYYY-MM-DD");
+    this.end = moment(Date.now()).add(2, "months").format("YYYY-MM-DD");
   },
 
   methods: {
@@ -237,17 +284,20 @@ export default {
       }
     },
 
-    destroyReservation(item) {
+    destroyReservation(id) {
       // Confirmation to change de status
       this.$confirm("¿Quieres esta reservación?", {
         title: "Advertencia",
       }).then((res) => {
         if (res) {
           // Make to change status to backend
-          this.destroyReservation(item.id);
+          this.destroyReservation(id);
         }
       });
     },
+  },
+  components: {
+    ReservationForm,
   },
 };
 </script>

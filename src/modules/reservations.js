@@ -14,23 +14,24 @@ export default {
     rooms: [],
     pets: [],
     editedItem: {
-      id: 0,
-      name: "",
-      address: "",
-      phone: "",
-      state: false,
+      pet_id: "",
+      room_id: "",
+      start: "",
+      end: "",
     },
     defaultItem: {
-      id: 0,
-      name: "",
-      address: "",
-      phone: "",
-      state: true,
+      pet_id: "",
+      room_id: "",
+      start: "",
+      end: "",
     },
   },
   mutations: {
     SET_RESERVATIONS(state, reservations) {
       state.reservations = reservations;
+    },
+    SET_ROOMS(state, rooms) {
+      state.rooms = rooms;
     },
     SET_LOADING_DATATABLE(state, status) {
       state.loading = status;
@@ -49,6 +50,27 @@ export default {
         .then((result) => {
           // save all
           commit("SET_RESERVATIONS", result.data.reservations);
+        })
+        .catch((errors) => {
+          // show error message
+          this._vm.showToastMessage(
+            errors.response.status,
+            this._vm.createMessageError(errors.response.data.errors)
+          );
+          return false;
+        })
+        .finally(() => {
+          commit("SET_LOADING_DATATABLE", false);
+        });
+    },
+
+    getAllRoomsReservations({ commit }, { start, end }) {
+      commit("SET_LOADING_DATATABLE", true);
+      axios
+        .get(`/api/reservations/rooms?start=${start}&end=${end}`)
+        .then((result) => {
+          // save all
+          commit("SET_ROOMS", result.data.rooms);
         })
         .catch((errors) => {
           // show error message
@@ -93,10 +115,10 @@ export default {
         });
     },
 
-    updateReservations({ state, commit, dispatch }) {
+    updateReservations({ state, commit, dispatch }, id) {
       commit("SET_OVERLAY_LOADING", true, { root: true });
       return axios
-        .put(`/api/reservations/${state.editedItem.id}`, state.editedItem)
+        .put(`/api/reservations/${id}`, state.editedItem)
         .then((result) => {
           if (result.status == 201) {
             // show message

@@ -41,45 +41,59 @@
 
 <script>
 import { validationMixin } from "vuelidate";
-import { required, maxLength, numeric } from "vuelidate/lib/validators";
+import { required } from "vuelidate/lib/validators";
+import { mapState } from "vuex";
 export default {
+  props: {
+    dialog: {
+      type: Boolean,
+      required: true,
+    },
+  },
+  name: "reservation-form",
   mixins: [validationMixin],
   validations: {
     editedItem: {
-      name: { required, maxLength: maxLength(255) },
-      address: { required, maxLength: maxLength(255) },
-      phone: { required, numeric, maxLength: maxLength(255) },
+      pet_id: { required },
+      room_id: { required },
+      start: { required },
+      end: { required },
     },
   },
   computed: {
-    nameErrors() {
+    ...mapState("reservations", ["editedItem", "defaultItem"]),
+    petErrors() {
       const errors = [];
-      if (!this.$v.editedItem.name.$dirty) return errors;
-      !this.$v.editedItem.name.required &&
-        errors.push("El nombre es requerido");
-      !this.$v.editedItem.name.maxLength &&
-        errors.push("Longitud no permitida");
+      if (!this.$v.editedItem.pet_id.$dirty) return errors;
+      !this.$v.editedItem.pet_id.required &&
+        errors.push("La mascota es requerida");
       return errors;
     },
-    addressErrors() {
+    roomErrors() {
       const errors = [];
-      if (!this.$v.editedItem.address.$dirty) return errors;
-      !this.$v.editedItem.address.required &&
-        errors.push("La dirección es requerido");
-      !this.$v.editedItem.address.maxLength &&
-        errors.push("Longitud no permitida");
+      if (!this.$v.editedItem.room_id.$dirty) return errors;
+      !this.$v.editedItem.room_id.required &&
+        errors.push("La habitación es requerida");
       return errors;
     },
-    phoneErrors() {
+    startErrors() {
       const errors = [];
-      if (!this.$v.editedItem.phone.$dirty) return errors;
-      !this.$v.editedItem.phone.required &&
-        errors.push("El telefono es requerido");
-      !this.$v.editedItem.phone.maxLength &&
-        errors.push("Longitud no permitida");
-      !this.$v.editedItem.phone.numeric &&
-        errors.push("Solo se permiten numeros");
+      if (!this.$v.editedItem.start.$dirty) return errors;
+      !this.$v.editedItem.start.required &&
+        errors.push("La fecha de inicio es requerida");
       return errors;
+    },
+    endErrors() {
+      const errors = [];
+      if (!this.$v.editedItem.end.$dirty) return errors;
+      !this.$v.editedItem.end.required &&
+        errors.push("La fecha de fin es requerida");
+      return errors;
+    },
+  },
+  watch: {
+    dialog() {
+      this.$v.$reset();
     },
   },
 };
