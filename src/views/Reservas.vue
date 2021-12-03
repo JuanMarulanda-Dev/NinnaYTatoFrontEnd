@@ -19,7 +19,7 @@
         <v-divider class="mx-4" inset vertical></v-divider>
         <!-- Filter date start -->
         <v-dialog
-          ref="fecha"
+          ref="start"
           v-model="dialogStart"
           :return-value.sync="start"
           persistent
@@ -42,14 +42,14 @@
             <v-btn text color="primary" @click="dialogStart = false">
               Cancel
             </v-btn>
-            <v-btn text color="primary" @click="$refs.fecha.save(start)">
+            <v-btn text color="primary" @click="$refs.start.save(start)">
               OK
             </v-btn>
           </v-date-picker>
         </v-dialog>
         <!-- Filter date end -->
         <v-dialog
-          ref="fecha"
+          ref="end"
           v-model="dialogEnd"
           :return-value.sync="end"
           persistent
@@ -72,7 +72,7 @@
             <v-btn text color="primary" @click="dialogEnd = false">
               Cancel
             </v-btn>
-            <v-btn text color="primary" @click="$refs.fecha.save(end)">
+            <v-btn text color="primary" @click="$refs.end.save(end)">
               OK
             </v-btn>
           </v-date-picker>
@@ -106,13 +106,16 @@
           <v-card>
             <v-card-title>
               <span class="headline">
-                <v-icon large>mdi-home-group</v-icon>
+                <v-icon large>mdi-book</v-icon>
                 {{ formTitle }}
               </span>
             </v-card-title>
 
             <v-card-text>
-              <reservation-form :dialog="dialog"></reservation-form>
+              <reservation-form
+                v-model="status_form"
+                :dialog="dialog"
+              ></reservation-form>
             </v-card-text>
 
             <v-card-actions>
@@ -168,7 +171,7 @@
             color="error"
             v-bind="attrs"
             v-on="on"
-            @click="destroyReservation(item.id)"
+            @click="destroy(item.id)"
           >
             <v-icon> {{ deleteIcon }} </v-icon>
           </v-btn>
@@ -186,6 +189,7 @@ import { mapState, mapActions, mapMutations } from "vuex";
 
 export default {
   data: () => ({
+    status_form: false,
     permissions: {},
     dialogStart: false,
     dialogEnd: false,
@@ -209,8 +213,13 @@ export default {
   }),
 
   computed: {
-    ...mapState(["editIcon", "deleteIcon", "loadingText"]),
-    ...mapState("reservations", ["reservations", "loading", "defaultItem"]),
+    ...mapState(["editIcon", "deleteIcon", "loadingText", "mainBranchOffice"]),
+    ...mapState("reservations", [
+      "reservations",
+      "loading",
+      "defaultItem",
+      "editedItem",
+    ]),
     formTitle() {
       return this.editedIndex === -1 ? "Nueva Reserva" : "Editar Reserva";
     },
@@ -219,6 +228,11 @@ export default {
   watch: {
     dialog(val) {
       val || this.close();
+    },
+    mainBranchOffice() {
+      if (this.permissions.read) {
+        this.initialize();
+      }
     },
   },
 
@@ -236,20 +250,25 @@ export default {
   methods: {
     ...mapActions("reservations", [
       "getAllReservations",
+      "getAllRoomsReservationsBetweenDates",
+      "getAllCustomersPets",
       "storeReservation",
       "updateReservation",
       "destroyReservation",
     ]),
     ...mapMutations("reservations", ["SET_EDIT_ITEM"]),
     initialize() {
-      if (this.reservations.length == 0) {
-        this.getAllReservations();
-      }
+      this.getAllReservations();
+      this.getAllCustomersPets();
     },
 
     editItem(item) {
       this.editedIndex = this.reservations.indexOf(item);
       this.SET_EDIT_ITEM(Object.assign({}, item));
+      this.getAllRoomsReservationsBetweenDates({
+        start: this.editedItem.start,
+        end: this.editedItem.end,
+      });
       this.dialog = true;
     },
 
@@ -262,10 +281,8 @@ export default {
     },
 
     save() {
-      // activate validations form
-      this.$v.$touch();
       // Correct validations
-      if (!this.$v.$invalid) {
+      if (this.status_form) {
         if (this.editedIndex > -1) {
           // Do update
           this.updateReservation().then((result) => {
@@ -284,7 +301,7 @@ export default {
       }
     },
 
-    destroyReservation(id) {
+    destroy(id) {
       // Confirmation to change de status
       this.$confirm("¿Quieres esta reservación?", {
         title: "Advertencia",

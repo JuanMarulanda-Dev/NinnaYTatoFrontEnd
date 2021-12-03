@@ -7,6 +7,7 @@ export default {
   state: {
     // Generals loading datatables
     loading: false,
+    room_loading: false,
     all: false,
     start: "",
     end: "",
@@ -33,8 +34,14 @@ export default {
     SET_ROOMS(state, rooms) {
       state.rooms = rooms;
     },
+    SET_PETS(state, pets) {
+      state.pets = pets;
+    },
     SET_LOADING_DATATABLE(state, status) {
       state.loading = status;
+    },
+    SET_LOADING_ROOMS_AUTOCOMPLETE(state, status) {
+      state.room_loading = status;
     },
     SET_EDIT_ITEM(state, object) {
       state.editedItem = object;
@@ -64,10 +71,12 @@ export default {
         });
     },
 
-    getAllRoomsReservations({ commit }, { start, end }) {
-      commit("SET_LOADING_DATATABLE", true);
+    getAllRoomsReservationsBetweenDates({ commit, rootState }, { start, end }) {
+      commit("SET_LOADING_ROOMS_AUTOCOMPLETE", true);
       axios
-        .get(`/api/reservations/rooms?start=${start}&end=${end}`)
+        .get(
+          `/api/reservations/rooms?branch_office_id=${rootState.mainBranchOffice}&start=${start}&end=${end}`
+        )
         .then((result) => {
           // save all
           commit("SET_ROOMS", result.data.rooms);
@@ -81,11 +90,22 @@ export default {
           return false;
         })
         .finally(() => {
-          commit("SET_LOADING_DATATABLE", false);
+          commit("SET_LOADING_ROOMS_AUTOCOMPLETE", false);
         });
     },
 
-    storeReservations({ state, commit, dispatch }) {
+    getAllCustomersPets({ commit, rootState }) {
+      axios
+        .get(
+          `/api/lodgings/pets?branch_office_id=${rootState.mainBranchOffice}`
+        )
+        .then((result) => {
+          commit("SET_PETS", result.data.pets);
+        })
+        .catch(() => {});
+    },
+
+    storeReservation({ state, commit, dispatch }) {
       commit("SET_OVERLAY_LOADING", true, { root: true });
       return axios
         .post("/api/reservations", state.editedItem)
@@ -96,7 +116,7 @@ export default {
               result.status,
               "Reserva creada exitosamente"
             );
-            // Reload branch officess
+            // Reload reservations
             dispatch("getAllReservations");
             // Result
             return true;
@@ -115,7 +135,7 @@ export default {
         });
     },
 
-    updateReservations({ state, commit, dispatch }, id) {
+    updateReservation({ state, commit, dispatch }, id) {
       commit("SET_OVERLAY_LOADING", true, { root: true });
       return axios
         .put(`/api/reservations/${id}`, state.editedItem)
@@ -126,7 +146,7 @@ export default {
               result.status,
               "Reserva actualizada exitosamente"
             );
-            // Reload branch officess
+            // Reload reservations
             dispatch("getAllReservations");
             // Result
             return true;
@@ -154,7 +174,7 @@ export default {
             // show message
             this._vm.showToastMessage(result.status);
             // Reload cash registers
-            dispatch("getAllCashRegisters");
+            dispatch("getAllReservations");
             return true;
           } else {
             return false;
