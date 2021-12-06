@@ -8,6 +8,7 @@ export default {
     // Generals loading datatables
     loading: false,
     room_loading: false,
+    dialog_form: false,
     all: false,
     start: "",
     end: "",
@@ -37,6 +38,15 @@ export default {
     SET_PETS(state, pets) {
       state.pets = pets;
     },
+    SET_START_DATE(state, start) {
+      state.start = start;
+    },
+    SET_END_DATE(state, end) {
+      state.end = end;
+    },
+    SET_DIALOG_FORM(state, dialog_form) {
+      state.dialog_form = dialog_form;
+    },
     SET_LOADING_DATATABLE(state, status) {
       state.loading = status;
     },
@@ -48,11 +58,11 @@ export default {
     },
   },
   actions: {
-    getAllReservations({ state, commit }) {
+    getAllReservations({ state, commit, rootState }) {
       commit("SET_LOADING_DATATABLE", true);
       axios
         .get(
-          `/api/reservations?all=${state.all}&start=${state.start}&end=${state.end}`
+          `/api/reservations?branch_office_id=${rootState.mainBranchOffice}&start=${state.start}&end=${state.end}`
         )
         .then((result) => {
           // save all
