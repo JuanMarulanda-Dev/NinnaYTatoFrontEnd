@@ -163,7 +163,8 @@
       </template>
     </v-data-table>
 
-    <dialog-reservation-form v-model="editedIndex"> </dialog-reservation-form>
+    <dialog-reservation-form :refresh_datatable="1" v-model="editedIndex">
+    </dialog-reservation-form>
   </div>
 </template>
 
@@ -248,8 +249,6 @@ export default {
       "getAllReservations",
       "getAllRoomsReservationsBetweenDates",
       "getAllCustomersPets",
-      "storeReservation",
-      "updateReservation",
       "destroyReservation",
     ]),
     ...mapMutations("reservations", [

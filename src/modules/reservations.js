@@ -115,7 +115,7 @@ export default {
         .catch(() => {});
     },
 
-    storeReservation({ state, commit, dispatch }) {
+    storeReservation({ state, commit, dispatch }, refresh_datatable = 0) {
       commit("SET_OVERLAY_LOADING", true, { root: true });
       return axios
         .post("/api/reservations", state.editedItem)
@@ -126,8 +126,12 @@ export default {
               result.status,
               "Reserva creada exitosamente"
             );
-            // Reload reservations
-            dispatch("getAllReservations");
+
+            if (refresh_datatable) {
+              // Reload reservations
+              dispatch("getAllReservations");
+            }
+
             // Result
             return true;
           }

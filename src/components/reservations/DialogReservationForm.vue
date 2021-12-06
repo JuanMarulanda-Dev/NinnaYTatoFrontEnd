@@ -211,6 +211,10 @@ export default {
       type: Number,
       default: -1,
     },
+    refresh_datatable: {
+      type: Number,
+      default: 0,
+    },
   },
   name: "reservation-form",
   mixins: [validationMixin],
@@ -278,7 +282,11 @@ export default {
   },
   methods: {
     ...mapMutations("reservations", ["SET_DIALOG_FORM", "SET_EDIT_ITEM"]),
-    ...mapActions("reservations", ["getAllRoomsReservationsBetweenDates"]),
+    ...mapActions("reservations", [
+      "getAllRoomsReservationsBetweenDates",
+      "storeReservation",
+      "updateReservation",
+    ]),
     searchAvailityRoomsBetweenDates() {
       if (this.editedItem.start != "" && this.editedItem.end != "") {
         this.getAllRoomsReservationsBetweenDates({
@@ -296,8 +304,9 @@ export default {
     },
 
     save() {
+      this.$v.$touch();
       // Correct validations
-      if (this.status_form) {
+      if (!this.$v.$invalid) {
         if (this.editedIndex > -1) {
           // Do update
           this.updateReservation(this.reservations[this.editedIndex].id).then(
@@ -309,7 +318,7 @@ export default {
           );
         } else {
           // Do store
-          this.storeReservation().then((result) => {
+          this.storeReservation(this.refresh_datatable).then((result) => {
             if (result) {
               this.close();
             }

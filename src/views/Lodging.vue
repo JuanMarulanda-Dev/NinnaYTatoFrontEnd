@@ -322,6 +322,8 @@
     <additional-charge-form
       v-model="dialogAdditionalCharge"
     ></additional-charge-form>
+
+    <dialog-reservation-form> </dialog-reservation-form>
   </div>
 </template>
 
@@ -332,6 +334,7 @@ import OutputForm from "@/components/lodging/OutputForm.vue";
 import MonitoringForm from "@/components/lodging/MonitoringForm.vue";
 import HistoryLodgingTable from "@/components/lodging/HistoryLodgingTable.vue";
 import AdditionalChargeForm from "@/components/lodging/AdditionalChargeForm.vue";
+import DialogReservationForm from "@/components/reservations/DialogReservationForm.vue";
 
 export default {
   data: () => ({
@@ -541,6 +544,7 @@ export default {
     MonitoringForm,
     HistoryLodgingTable,
     AdditionalChargeForm,
+    DialogReservationForm,
   },
 };
 </script>

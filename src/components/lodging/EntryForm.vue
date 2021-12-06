@@ -281,8 +281,12 @@ export default {
       pet_id: { required, petAvaliable },
     },
   },
+  created() {
+    this.SET_PETS(this.pets);
+  },
   computed: {
     ...mapState(["user"]),
+    ...mapState("reservations", ["defaultItem"]),
     ...mapState("lodging", ["pets", "accessories", "entryData"]),
     formTittle() {
       return this.lodging_id !== "" ? "Editar" : "Registrar";
@@ -350,6 +354,13 @@ export default {
   methods: {
     ...mapActions("lodging", ["storeLodging", "updateLodging"]),
     ...mapMutations("lodging", ["SET_DEFAULT_DATA_ENTRY", "SET_ACCESORIES"]),
+    ...mapMutations("reservations", [
+      "SET_EDIT_ITEM",
+      "SET_DIALOG_FORM",
+      "SET_PETS",
+      "SET_START_DATE",
+      "SET_END_DATE",
+    ]),
     close() {
       this.SET_ACCESORIES();
       this.SET_DEFAULT_DATA_ENTRY();
@@ -377,6 +388,11 @@ export default {
           day_instructions: this.entryData.day_instructions,
         };
 
+        // Set pet to reservation
+        let newReservation = Object.assign({}, this.defaultItem);
+        newReservation.pet_id = this.entryData.pet_id;
+        newReservation.start = this.maxDate;
+
         if (this.lodging_id !== "") {
           // Update entry
           this.updateLodging({ data, id: this.lodging_id }).then((result) => {
@@ -389,6 +405,14 @@ export default {
           this.storeLodging(data).then((result) => {
             if (result) {
               this.close();
+              this.$confirm("¿Deseas ingresar a hotel a la mascota?", {
+                title: "Advertencia",
+              }).then((res) => {
+                if (res) {
+                  this.SET_EDIT_ITEM(Object.assign({}, newReservation));
+                  this.SET_DIALOG_FORM(true);
+                }
+              });
             }
           });
         }
