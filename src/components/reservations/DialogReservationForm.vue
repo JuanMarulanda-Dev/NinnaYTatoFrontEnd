@@ -228,6 +228,7 @@ export default {
   },
   computed: {
     ...mapState("reservations", [
+      "reservations",
       "dialog_form",
       "rooms",
       "pets",
@@ -309,6 +310,7 @@ export default {
       if (!this.$v.$invalid) {
         if (this.editedIndex > -1) {
           // Do update
+          console.log(this.reservations);
           this.updateReservation(this.reservations[this.editedIndex].id).then(
             (result) => {
               if (result) {

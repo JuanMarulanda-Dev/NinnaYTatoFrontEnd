@@ -115,6 +115,7 @@
             color="info"
             elevation="3"
             dark
+            @click="SET_DIALOG_SCHEDULE_GANTT(true)"
             v-show="permissions.read"
           >
             <v-icon>mdi-calendar-text-outline</v-icon>
@@ -165,12 +166,15 @@
 
     <dialog-reservation-form :refresh_datatable="1" v-model="editedIndex">
     </dialog-reservation-form>
+
+    <schedule-gantt></schedule-gantt>
   </div>
 </template>
 
 <script>
 import moment from "moment";
 import DialogReservationForm from "@/components/reservations/DialogReservationForm.vue";
+import ScheduleGantt from "@/components/reservations/ScheduleGantt.vue";
 import { mapState, mapActions, mapMutations } from "vuex";
 
 export default {
@@ -256,6 +260,7 @@ export default {
       "SET_START_DATE",
       "SET_END_DATE",
       "SET_DIALOG_FORM",
+      "SET_DIALOG_SCHEDULE_GANTT",
     ]),
     initialize() {
       this.getAllReservations();
@@ -287,6 +292,7 @@ export default {
   },
   components: {
     DialogReservationForm,
+    ScheduleGantt,
   },
 };
 </script>

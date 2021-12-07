@@ -9,6 +9,7 @@ export default {
     loading: false,
     room_loading: false,
     dialog_form: false,
+    dialog_schedule_gantt: false,
     all: false,
     start: "",
     end: "",
@@ -46,6 +47,9 @@ export default {
     },
     SET_DIALOG_FORM(state, dialog_form) {
       state.dialog_form = dialog_form;
+    },
+    SET_DIALOG_SCHEDULE_GANTT(state, dialog_schedule_gantt) {
+      state.dialog_schedule_gantt = dialog_schedule_gantt;
     },
     SET_LOADING_DATATABLE(state, status) {
       state.loading = status;
