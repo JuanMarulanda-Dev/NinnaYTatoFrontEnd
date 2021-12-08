@@ -46,7 +46,7 @@ export default {
   data() {
     return {
       options: {
-        maxRows: 100,
+        // maxRows: 100,
         maxHeight: 1000,
         title: {
           label: "Agenda",
@@ -69,7 +69,7 @@ export default {
           height: 24,
         },
         scope: {
-          after: 15,
+          after: 18,
         },
         calendar: {
           hour: {
@@ -92,7 +92,7 @@ export default {
             {
               id: 1,
               label: "ID",
-              value: "id",
+              value: "human_id",
               width: 40,
             },
             {
@@ -131,207 +131,35 @@ export default {
         }*/
       },
       dynamicStyle: {},
-      tasks: [
-        {
-          id: 1,
-          room_name: "Habitación 1",
-          label: "Ninna - Juan David",
-          start: this.toTimeStamp("2021-12-06"),
-          duration: this.toMilliseconds(
-            this.diffDays("2021-12-06", "2021-12-12")
-          ),
-          progress: 0,
-          type: "task",
-          //collapsed: true,
-          // style: {
-          //   base: {
-          //     fill: "#1EBC61",
-          //     stroke: "#0EAC51",
-          //   },
-          // },
-        },
-        {
-          id: 2,
-          label: "Tato - Juan David",
-
-          parentId: 1,
-          start: this.toTimeStamp("2021-12-07"),
-          duration: this.toMilliseconds(
-            this.diffDays("2021-12-07", "2021-12-10")
-          ),
-          progress: 0,
-          type: "task",
-          collapsed: true,
-        },
-        {
-          id: 3,
-          label: "Pacho - Juan David",
-
-          parentId: 1,
-          start: this.toTimeStamp("2021-12-07"),
-          duration: this.toMilliseconds(
-            this.diffDays("2021-12-07", "2021-12-15")
-          ),
-          progress: 0,
-          type: "task",
-        },
-        // Habitacion 2
-        {
-          id: 4,
-          room_name: "Habitación 2",
-          label: "Ninna - Juan David",
-
-          start: this.toTimeStamp("2021-12-06"),
-          duration: this.toMilliseconds(
-            this.diffDays("2021-12-06", "2021-12-12")
-          ),
-          progress: 0,
-          type: "task",
-          //collapsed: true,
-          style: {
-            base: {
-              fill: "#FF3399",
-              stroke: "#FF3399",
-            },
-          },
-        },
-        {
-          id: 5,
-          label: "Tato - Juan David",
-
-          parentId: 4,
-          start: this.toTimeStamp("2021-12-09"),
-          duration: this.toMilliseconds(
-            this.diffDays("2021-12-09", "2021-12-16")
-          ),
-          progress: 0,
-          type: "task",
-          style: {
-            base: {
-              fill: "#FF3399",
-              stroke: "#FF3399",
-            },
-          },
-        },
-        {
-          id: 6,
-          label: "Pacho - Juan David",
-
-          parentId: 4,
-          start: this.toTimeStamp("2021-12-07"),
-          duration: this.toMilliseconds(
-            this.diffDays("2021-12-07", "2021-12-15")
-          ),
-          progress: 0,
-          type: "task",
-          style: {
-            base: {
-              fill: "#FF3399",
-              stroke: "#FF3399",
-            },
-          },
-        },
-        // Habitacion 3
-        {
-          id: 7,
-          room_name: "Habitación 3",
-          label: "Ninna - Juan David",
-
-          start: this.toTimeStamp("2021-12-06"),
-          duration: this.toMilliseconds(
-            this.diffDays("2021-12-06", "2021-12-12")
-          ),
-          progress: 0,
-          type: "task",
-          //collapsed: true,
-          style: {
-            base: {
-              fill: "#99FFCC",
-              stroke: "#99FFCC",
-            },
-          },
-        },
-        {
-          id: 8,
-          label: "Tato - Juan David",
-
-          parentId: 7,
-          start: this.toTimeStamp("2021-12-09"),
-          duration: this.toMilliseconds(
-            this.diffDays("2021-12-09", "2021-12-16")
-          ),
-          progress: 0,
-          type: "task",
-          style: {
-            base: {
-              fill: "#99FFCC",
-              stroke: "#99FFCC",
-            },
-          },
-        },
-        {
-          id: 9,
-          label: "Pacho - Juan David",
-
-          parentId: 7,
-          start: this.toTimeStamp("2021-12-10"),
-          duration: this.toMilliseconds(
-            this.diffDays("2021-12-10", "2021-12-31")
-          ),
-          progress: 0,
-          type: "task",
-          style: {
-            base: {
-              fill: "#99FFCC",
-              stroke: "#99FFCC",
-            },
-          },
-        },
-        // Habitacion 3
-        {
-          id: 10,
-          room_name: "Habitación 4",
-          // label: "Ninna - Juan David",
-
-          // start: this.toTimeStamp("2021-12-06"),
-          // duration: this.toMilliseconds(this.diffDays("2021-12-06", "2021-12-12")),
-          progress: 0,
-          type: "task",
-          //collapsed: true,
-          style: {
-            base: {
-              fill: "#99FFCC",
-              stroke: "#99FFCC",
-            },
-          },
-        },
-      ],
     };
   },
   computed: {
     ...mapState("reservations", ["reservations", "dialog_schedule_gantt"]),
-    tasks1() {
-      console.log(this.sortReservations());
-      return {};
+    tasks() {
+      return this.buildDataTasks(this.sortReservations());
     },
   },
   created() {
     // Ordenar array por habitaciones
-    console.log(this.tasks1);
+    console.log(this.tasks);
   },
   methods: {
     ...mapMutations("reservations", ["SET_DIALOG_SCHEDULE_GANTT"]),
     toTimeStamp(date) {
       return moment(date).valueOf(); // timestamp
     },
+
     diffDays(start, end) {
       return moment(end).diff(start, "days") + 1;
     },
+
     toMilliseconds(days) {
       return days * 24 * 60 * 60 * 1000;
     },
+
     sortReservations() {
       return this.reservations.sort((a, b) => {
+        // Ordenar por fechas tambien (start), de menor a mayor
         if (a.room_name > b.room_name) {
           return 1;
         }
@@ -341,6 +169,46 @@ export default {
         // a must be equal to b
         return 0;
       });
+    },
+
+    buildDataTasks(task) {
+      let lastIDRoom = "";
+      let lastIDReservation = "";
+      let lastID = 1;
+      let databuilder = task.map((element) => {
+        let newTask = {
+          id: element.id,
+          human_id: lastID,
+          label: element.name,
+          start: this.toTimeStamp(element.start),
+          duration: this.toMilliseconds(
+            this.diffDays(element.start, element.end)
+          ),
+          type: "task",
+          progress: 0,
+          style: {
+            base: {
+              fill: `#${element.room_color}`,
+              stroke: `#${element.room_color}`,
+            },
+          },
+        };
+
+        lastID++;
+
+        newTask.room_name =
+          lastIDRoom != element.room_id ? element.room_name : "";
+
+        if (lastIDRoom != element.room_id) {
+          lastIDRoom = element.room_id;
+          lastIDReservation = element.id;
+        } else {
+          newTask.parentId = lastIDReservation;
+        }
+
+        return newTask;
+      });
+      return databuilder;
     },
   },
   components: {
