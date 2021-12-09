@@ -244,6 +244,13 @@ export default {
     if (this.user.is_admin) {
       this.getAllBranchOffices();
     }
+
+    this.registerServiceWorker();
+
+    this.askPermission();
+    // if (window.location.pathname != "/sucursales") {
+
+    // }
   },
   computed: {
     ...mapState(["user", "menu", "notifications", "loadingOverlay"]),
