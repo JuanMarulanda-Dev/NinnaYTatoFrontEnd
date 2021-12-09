@@ -13,7 +13,7 @@ import VueAxios from "vue-axios";
 import Vuelidate from "vuelidate";
 import showMessageMixin from "@/mixins/showMessageMixin.js"; // my own helper
 import dateMixin from "@/mixins/dateMixin.js"; // my own helper
-import workerFunctionsMixin from "@/mixins/js/worker-functions.js"; // my own helper
+import workerFunctions from "@/mixins/js/workerFunctions.js"; // my own helper
 import moment from "moment";
 import VueMoment from "vue-moment";
 
@@ -42,7 +42,7 @@ Vue.use(VueMoment, { moment });
 // My helpers
 Vue.use(showMessageMixin);
 Vue.use(dateMixin);
-Vue.use(workerFunctionsMixin);
+Vue.use(workerFunctions);
 
 new Vue({
   router,
