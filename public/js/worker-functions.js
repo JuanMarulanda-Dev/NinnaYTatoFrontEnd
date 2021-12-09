@@ -2,7 +2,7 @@ var _registration = null;
 
 function registerServiceWorker() {
   return navigator.serviceWorker
-    .register("<%= BASE_URL %>js/serviceworker.js")
+    .register("https://spa.ninnaytato.ga/js/serviceworker.js")
     .then(function (registration) {
       console.log("Service worker successfully registered.");
       _registration = registration;
@@ -78,7 +78,7 @@ function subscribeUserToPush() {
 }
 
 function sendSubscriptionToBackEnd(subscription) {
-  return fetch("/api/save-subscription/PE", {
+  return fetch("https://ninnaytato.ga/api/save-subscription/PE", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
