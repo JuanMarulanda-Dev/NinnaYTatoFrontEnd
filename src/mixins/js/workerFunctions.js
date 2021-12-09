@@ -27,7 +27,7 @@ exports.install = function (Vue) {
       if (permissionResult !== "granted") {
         throw new Error("We weren't granted permission.");
       } else {
-        subscribeUserToPush();
+        this.subscribeUserToPush();
       }
     });
   };
@@ -35,7 +35,7 @@ exports.install = function (Vue) {
   Vue.prototype.urlBase64ToUint8Array = (base64String) => {
     const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
     const base64 = (base64String + padding)
-      .replace(/\-/g, "+")
+      .replace(/-/g, "+")
       .replace(/_/g, "/");
     const rawData = window.atob(base64);
     const outputArray = new Uint8Array(rawData.length);
@@ -74,7 +74,7 @@ exports.install = function (Vue) {
           "Received PushSubscription: ",
           JSON.stringify(pushSubscription)
         );
-        sendSubscriptionToBackEnd(pushSubscription);
+        this.sendSubscriptionToBackEnd(pushSubscription);
         return pushSubscription;
       });
   };
