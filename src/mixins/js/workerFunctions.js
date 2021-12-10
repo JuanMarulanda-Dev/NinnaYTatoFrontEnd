@@ -1,11 +1,11 @@
-let _registration = null;
-exports.install = function (Vue) {
+exports.install = function (Vue, options) {
+  Vue._registration = null;
   Vue.prototype.registerServiceWorker = () => {
     return navigator.serviceWorker
-      .register("/mixins/js/serviceworker.js")
+      .register(options.serviceWorker)
       .then(function (registration) {
         console.log("Service worker successfully registered.");
-        _registration = registration;
+        this._registration = registration;
         return registration;
       })
       .catch(function (err) {
@@ -48,8 +48,8 @@ exports.install = function (Vue) {
   Vue.prototype.getSWRegistration = () => {
     var promise = new Promise(function (resolve, reject) {
       // do a thing, possibly async, then…
-      if (_registration != null) {
-        resolve(_registration);
+      if (this._registration != null) {
+        resolve(this._registration);
       } else {
         reject(Error("It broke"));
       }
