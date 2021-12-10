@@ -42,7 +42,7 @@ Vue.use(VueMoment, { moment });
 // My helpers
 Vue.use(showMessageMixin);
 Vue.use(dateMixin);
-Vue.use(workerFunctions, { serviceWorker: "@/assets/serviceworker.js" });
+Vue.use(workerFunctions);
 
 new Vue({
   router,

@@ -1,8 +1,8 @@
-exports.install = function (Vue, options) {
+exports.install = function (Vue) {
   Vue._registration = null;
   Vue.prototype.registerServiceWorker = () => {
     return navigator.serviceWorker
-      .register(options.serviceWorker)
+      .register("/public-assets/serviceworker.js")
       .then(function (registration) {
         console.log("Service worker successfully registered.");
         this._registration = registration;
