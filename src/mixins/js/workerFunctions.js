@@ -27,7 +27,7 @@ exports.install = function (Vue) {
       if (permissionResult !== "granted") {
         throw new Error("We weren't granted permission.");
       } else {
-        Vue.subscribeUserToPush();
+        Vue.prototype.subscribeUserToPush();
       }
     });
   };
@@ -58,12 +58,13 @@ exports.install = function (Vue) {
   };
 
   Vue.prototype.subscribeUserToPush = () => {
-    Vue.getSWRegistration()
+    Vue.prototype
+      .getSWRegistration()
       .then(function (registration) {
         console.log(registration);
         const subscribeOptions = {
           userVisibleOnly: true,
-          applicationServerKey: Vue.urlBase64ToUint8Array(
+          applicationServerKey: Vue.prototype.urlBase64ToUint8Array(
             "BK2930BjqfA1WqOKAj6e4hxxGc1qIqRUZPbqTaRgI29vf1oEgWvqzL1tHId8UfLB69PQqF8Lnt7MgzTSUAnKmMo"
           ),
         };
@@ -74,7 +75,7 @@ exports.install = function (Vue) {
           "Received PushSubscription: ",
           JSON.stringify(pushSubscription)
         );
-        Vue.sendSubscriptionToBackEnd(pushSubscription);
+        Vue.prototype.sendSubscriptionToBackEnd(pushSubscription);
         return pushSubscription;
       });
   };
