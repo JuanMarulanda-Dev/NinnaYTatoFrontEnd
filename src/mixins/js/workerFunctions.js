@@ -5,7 +5,7 @@ exports.install = function (Vue) {
       .register("serviceworker.js")
       .then(function (registration) {
         console.log("Service worker successfully registered.");
-        this._registration = registration;
+        Vue._registration = registration;
         return registration;
       })
       .catch(function (err) {
@@ -27,7 +27,7 @@ exports.install = function (Vue) {
       if (permissionResult !== "granted") {
         throw new Error("We weren't granted permission.");
       } else {
-        this.subscribeUserToPush();
+        Vue.subscribeUserToPush();
       }
     });
   };
@@ -48,8 +48,8 @@ exports.install = function (Vue) {
   Vue.prototype.getSWRegistration = () => {
     var promise = new Promise(function (resolve, reject) {
       // do a thing, possibly async, then…
-      if (this._registration != null) {
-        resolve(this._registration);
+      if (Vue._registration != null) {
+        resolve(Vue._registration);
       } else {
         reject(Error("It broke"));
       }
@@ -58,12 +58,12 @@ exports.install = function (Vue) {
   };
 
   Vue.prototype.subscribeUserToPush = () => {
-    this.getSWRegistration()
+    Vue.getSWRegistration()
       .then(function (registration) {
         console.log(registration);
         const subscribeOptions = {
           userVisibleOnly: true,
-          applicationServerKey: this.urlBase64ToUint8Array(
+          applicationServerKey: Vue.urlBase64ToUint8Array(
             "BK2930BjqfA1WqOKAj6e4hxxGc1qIqRUZPbqTaRgI29vf1oEgWvqzL1tHId8UfLB69PQqF8Lnt7MgzTSUAnKmMo"
           ),
         };
@@ -74,7 +74,7 @@ exports.install = function (Vue) {
           "Received PushSubscription: ",
           JSON.stringify(pushSubscription)
         );
-        this.sendSubscriptionToBackEnd(pushSubscription);
+        Vue.sendSubscriptionToBackEnd(pushSubscription);
         return pushSubscription;
       });
   };
