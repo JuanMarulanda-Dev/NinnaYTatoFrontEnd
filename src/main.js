@@ -8,7 +8,6 @@ import "roboto-fontface/css/roboto/roboto-fontface.css";
 import "@mdi/font/css/materialdesignicons.css";
 import "@/styles/main.css";
 import "@/styles/main.scss";
-import serviceworker from "@/assets/serviceworker.js";
 import axios from "axios";
 import VueAxios from "vue-axios";
 import Vuelidate from "vuelidate";
@@ -43,7 +42,7 @@ Vue.use(VueMoment, { moment });
 // My helpers
 Vue.use(showMessageMixin);
 Vue.use(dateMixin);
-Vue.use(workerFunctions, { serviceworker });
+Vue.use(workerFunctions);
 
 new Vue({
   router,
