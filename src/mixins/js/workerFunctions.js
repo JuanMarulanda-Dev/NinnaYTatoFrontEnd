@@ -2,7 +2,7 @@ exports.install = function (Vue) {
   Vue._registration = null;
   Vue.prototype.registerServiceWorker = () => {
     return navigator.serviceWorker
-      .register("./public/serviceworker.js")
+      .register("serviceworker.js")
       .then(function (registration) {
         console.log("Service worker successfully registered.");
         this._registration = registration;
