@@ -91,7 +91,7 @@ export default new Vuex.Store({
 
         // Consultar las sucursales para cambiar entre sucursales solo si es administrador
         if (this.user) {
-          this._vm.askPermission();
+          Vue.askPermission();
           if (this.user.is_admin) {
             dispatch("branch_offices/getAllBranchOffices");
           }
