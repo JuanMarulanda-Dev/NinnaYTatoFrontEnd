@@ -246,11 +246,6 @@ export default {
     }
 
     this.registerServiceWorker();
-
-    this.askPermission();
-    // if (window.location.pathname != "/sucursales") {
-
-    // }
   },
   computed: {
     ...mapState(["user", "menu", "notifications", "loadingOverlay"]),
