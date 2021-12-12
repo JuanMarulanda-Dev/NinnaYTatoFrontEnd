@@ -88,7 +88,7 @@ export default new Vuex.Store({
         }
         // Obtener el usuario
         await dispatch("getUser");
-        this.askPermission();
+        // this.askPermission();
 
         // Consultar las sucursales para cambiar entre sucursales solo si es administrador
         if (this.user) {
