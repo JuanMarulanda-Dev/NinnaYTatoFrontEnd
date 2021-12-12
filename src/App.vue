@@ -247,7 +247,7 @@ export default {
 
     this.registerServiceWorker();
 
-    this.askPermission();
+    // this.askPermission();
   },
   computed: {
     ...mapState(["user", "menu", "notifications", "loadingOverlay"]),
