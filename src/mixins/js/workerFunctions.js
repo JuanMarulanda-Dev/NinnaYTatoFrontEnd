@@ -92,7 +92,7 @@ exports.install = function (Vue, options) {
         if (response.status != 201) {
           throw new Error("Bad status code from server.");
         }
-        return response.json();
+        return response;
       })
       .then(function (responseData) {
         if (!(responseData.data && responseData.data.success)) {
