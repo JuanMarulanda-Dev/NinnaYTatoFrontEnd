@@ -1,8 +1,6 @@
-import axios from "axios";
-axios.defaults.withCredentials = true;
-axios.defaults.baseURL = process.env.VUE_APP_API_URL;
-
 exports.install = function (Vue) {
+  Vue.axios.defaults.withCredentials = true;
+  Vue.axios.defaults.baseURL = process.env.VUE_APP_API_URL;
   Vue._registration = null;
   Vue.prototype.registerServiceWorker = () => {
     return navigator.serviceWorker
@@ -85,7 +83,7 @@ exports.install = function (Vue) {
   };
 
   Vue.prototype.sendSubscriptionToBackEnd = (subscription) => {
-    return axios
+    return Vue.axios
       .post(
         "https://ninnaytato.ga/api/save-subscription/PE",
         JSON.stringify(subscription)
