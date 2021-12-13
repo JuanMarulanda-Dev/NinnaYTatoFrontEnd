@@ -67,7 +67,7 @@ exports.install = function (Vue) {
         const subscribeOptions = {
           userVisibleOnly: true,
           applicationServerKey: Vue.prototype.urlBase64ToUint8Array(
-            "BK2930BjqfA1WqOKAj6e4hxxGc1qIqRUZPbqTaRgI29vf1oEgWvqzL1tHId8UfLB69PQqF8Lnt7MgzTSUAnKmMo"
+            process.env.VAPID_PUBLIC_KEY
           ),
         };
         return registration.pushManager.subscribe(subscribeOptions);
@@ -84,7 +84,10 @@ exports.install = function (Vue) {
 
   Vue.prototype.sendSubscriptionToBackEnd = (subscription) => {
     return Vue.axios
-      .post("https://ninnaytato.ga/api/save-subscription/PE", subscription)
+      .post(
+        `https://ninnaytato.ga/api/save-subscription/${Vue.$store.state.user.id}`,
+        subscription
+      )
       .then(function (response) {
         if (!response.ok) {
           throw new Error("Bad status code from server.");
