@@ -42,7 +42,7 @@ Vue.use(VueMoment, { moment });
 // My helpers
 Vue.use(showMessageMixin);
 Vue.use(dateMixin);
-Vue.use(workerFunctions);
+Vue.use(workerFunctions, { vapip: process.env.VAPID_PUBLIC_KEY });
 
 new Vue({
   router,

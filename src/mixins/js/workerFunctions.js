@@ -1,4 +1,4 @@
-exports.install = function (Vue) {
+exports.install = function (Vue, options) {
   Vue.axios.defaults.withCredentials = true;
 
   Vue._registration = null;
@@ -67,7 +67,7 @@ exports.install = function (Vue) {
         const subscribeOptions = {
           userVisibleOnly: true,
           applicationServerKey: Vue.prototype.urlBase64ToUint8Array(
-            Vue.process.env.VAPID_PUBLIC_KEY
+            options.vapip
           ),
         };
         return registration.pushManager.subscribe(subscribeOptions);
