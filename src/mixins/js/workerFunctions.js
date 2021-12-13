@@ -84,10 +84,7 @@ exports.install = function (Vue) {
 
   Vue.prototype.sendSubscriptionToBackEnd = (subscription) => {
     return Vue.axios
-      .post(
-        "https://ninnaytato.ga/api/save-subscription/PE",
-        JSON.stringify(subscription)
-      )
+      .post("https://ninnaytato.ga/api/save-subscription/PE", subscription)
       .then(function (response) {
         if (!response.ok) {
           throw new Error("Bad status code from server.");
