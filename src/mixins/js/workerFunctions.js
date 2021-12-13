@@ -1,6 +1,6 @@
 exports.install = function (Vue) {
   Vue.axios.defaults.withCredentials = true;
-  Vue.axios.defaults.baseURL = process.env.VUE_APP_API_URL;
+
   Vue._registration = null;
   Vue.prototype.registerServiceWorker = () => {
     return navigator.serviceWorker
@@ -67,7 +67,7 @@ exports.install = function (Vue) {
         const subscribeOptions = {
           userVisibleOnly: true,
           applicationServerKey: Vue.prototype.urlBase64ToUint8Array(
-            process.env.VAPID_PUBLIC_KEY
+            Vue.process.env.VAPID_PUBLIC_KEY
           ),
         };
         return registration.pushManager.subscribe(subscribeOptions);
