@@ -1,3 +1,7 @@
+import axios from "axios";
+axios.defaults.withCredentials = true;
+axios.defaults.baseURL = process.env.VUE_APP_API_URL;
+
 exports.install = function (Vue) {
   Vue._registration = null;
   Vue.prototype.registerServiceWorker = () => {
@@ -81,13 +85,11 @@ exports.install = function (Vue) {
   };
 
   Vue.prototype.sendSubscriptionToBackEnd = (subscription) => {
-    return fetch("https://ninnaytato.ga/api/save-subscription/PE", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(subscription),
-    })
+    return axios
+      .post(
+        "https://ninnaytato.ga/api/save-subscription/PE",
+        JSON.stringify(subscription)
+      )
       .then(function (response) {
         if (!response.ok) {
           throw new Error("Bad status code from server.");
