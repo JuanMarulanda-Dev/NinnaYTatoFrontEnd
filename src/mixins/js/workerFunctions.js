@@ -92,12 +92,12 @@ exports.install = function (Vue, options) {
         if (response.status != 201) {
           throw new Error("Bad status code from server.");
         }
-        return response;
-      })
-      .then(function (responseData) {
-        if (!(responseData.data && responseData.data.success)) {
-          throw new Error("Bad response from server.");
-        }
+        // return response;
       });
+    // .then(function (responseData) {
+    //   if (!(responseData.data && responseData.data.success)) {
+    //     throw new Error("Bad response from server.");
+    //   }
+    // });
   };
 };
