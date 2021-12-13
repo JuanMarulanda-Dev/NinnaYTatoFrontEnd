@@ -89,7 +89,7 @@ exports.install = function (Vue, options) {
         subscription
       )
       .then(function (response) {
-        if (!response.ok) {
+        if (response.status != 201) {
           throw new Error("Bad status code from server.");
         }
         return response.json();
