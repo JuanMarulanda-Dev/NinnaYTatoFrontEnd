@@ -15,7 +15,7 @@ exports.install = function (Vue, options) {
       });
   };
 
-  Vue.prototype.askPermission = () => {
+  Vue.prototype.askPermission = (user_id) => {
     return new Promise(function (resolve, reject) {
       const permissionResult = Notification.requestPermission(function (
         result
@@ -29,7 +29,7 @@ exports.install = function (Vue, options) {
       if (permissionResult !== "granted") {
         throw new Error("We weren't granted permission.");
       } else {
-        Vue.prototype.subscribeUserToPush();
+        Vue.prototype.subscribeUserToPush(user_id);
       }
     });
   };
@@ -59,7 +59,7 @@ exports.install = function (Vue, options) {
     return promise;
   };
 
-  Vue.prototype.subscribeUserToPush = () => {
+  Vue.prototype.subscribeUserToPush = (user_id) => {
     Vue.prototype
       .getSWRegistration()
       .then(function (registration) {
@@ -77,15 +77,15 @@ exports.install = function (Vue, options) {
           "Received PushSubscription: ",
           JSON.stringify(pushSubscription)
         );
-        Vue.prototype.sendSubscriptionToBackEnd(pushSubscription);
+        Vue.prototype.sendSubscriptionToBackEnd(pushSubscription, user_id);
         return pushSubscription;
       });
   };
 
-  Vue.prototype.sendSubscriptionToBackEnd = (subscription) => {
+  Vue.prototype.sendSubscriptionToBackEnd = (subscription, user_id) => {
     return Vue.axios
       .post(
-        `https://ninnaytato.ga/api/save-subscription/${Vue.$store.state.user.id}`,
+        `https://ninnaytato.ga/api/save-subscription/${user_id}`,
         subscription
       )
       .then(function (response) {
