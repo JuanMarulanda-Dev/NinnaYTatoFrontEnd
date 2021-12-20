@@ -34,6 +34,12 @@ export default {
       cash_register_id: "",
       overtime_liquidity_option: false,
     },
+    alertsData: {
+      hora: "",
+      type: "",
+      description: "",
+      frecuency: [],
+    },
     outputDefaultData: {
       date: "",
       time: "",
