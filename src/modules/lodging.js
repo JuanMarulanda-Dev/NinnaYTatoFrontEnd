@@ -17,6 +17,7 @@ export default {
     entryData: {
       pet_id: "",
       accessories: [],
+      alerts: [],
       prize: false,
       walk: false,
       breakfast: false,
@@ -51,6 +52,7 @@ export default {
     entryDataDefault: {
       pet_id: "",
       accessories: [],
+      alerts: [],
       prize: false,
       walk: false,
       breakfast: false,
@@ -183,15 +185,17 @@ export default {
         .catch(() => {});
     },
 
-    getAllCustomersPets({ commit, rootState }) {
-      axios
-        .get(
-          `/api/lodgings/pets?branch_office_id=${rootState.mainBranchOffice}`
-        )
-        .then((result) => {
-          commit("SET_PETS", result.data.pets);
-        })
-        .catch(() => {});
+    getAllCustomersPets({ state, commit, rootState }) {
+      if (state.pets.length === 0) {
+        axios
+          .get(
+            `/api/lodgings/pets?branch_office_id=${rootState.mainBranchOffice}`
+          )
+          .then((result) => {
+            commit("SET_PETS", result.data.pets);
+          })
+          .catch(() => {});
+      }
     },
 
     getAllDefaultPlans({ commit }) {

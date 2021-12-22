@@ -5,13 +5,13 @@
         <v-select
           label="Hora"
           :items="times"
-          v-model="alertsData.time"
+          v-model="editedItem.time"
         ></v-select>
       </v-col>
       <v-col md="6">
         <v-select
           label="Tipo de alarma"
-          v-model="alertsData.type"
+          v-model="editedItem.alert_type_id"
           :items="alert_types"
         ></v-select>
       </v-col>
@@ -35,7 +35,7 @@
       </v-col>
       <v-col cols="12" class="pt-0">
         <v-textarea
-          v-model="alertsData.description"
+          v-model="editedItem.description"
           outlined
           height="100"
           label="Instrucciones de la alerta"
@@ -49,7 +49,7 @@
           <v-select
             label="Dias"
             :items="days"
-            v-model="alertsData.frecuency"
+            v-model="editedItem.frequency"
             multiple
             item-text="day"
             v-show="row === '3'"
@@ -83,7 +83,7 @@ import { required } from "vuelidate/lib/validators";
 function customAlert() {
   let result = true;
   if (this.row === "3") {
-    result = this.alertsData.frecuency.lenght > 0;
+    result = this.editedItem.frecuency.lenght > 0;
   }
   return result;
 }
@@ -106,45 +106,45 @@ export default {
           value: "frequency",
         },
         { text: "Hora", align: "center", value: "time" },
-        { text: "Estado", align: "center", value: "time" },
+        { text: "Tipo", align: "center", value: "type" },
       ],
-      days: [
-        { day: "Lunes", value: 1 },
-        { day: "Martes", value: 2 },
-        { day: "Miercoles", value: 3 },
-        { day: "Jueves", value: 4 },
-        { day: "Viernes", value: 5 },
-        { day: "Sabado", value: 6 },
-        { day: "Domingo", value: 7 },
-      ],
-      times: [],
     };
   },
-  // model: { prop: "value", event: "input" },
   mixins: [validationMixin],
   validations: {
-    alertsData: {
-      type: { required },
+    editedItem: {
+      alert_type_id: { required },
       time: { required },
       description: { required },
-      frecuency: { customAlert },
+      frequency: { customAlert },
     },
   },
   created() {
-    this.doTimes();
+    this.getAllTypes();
+
+    if (this.times.length == 0) {
+      this.DO_TIMES();
+    }
   },
   computed: {
-    ...mapState("alerts", ["alerts", "alertsData", "alert_types"]),
+    ...mapState("alerts", [
+      "alerts",
+      "editedItem",
+      "alert_types",
+      "times",
+      "days",
+    ]),
+    ...mapState("lodging", ["entryData"]),
   },
   watch: {
     row(newValue) {
       switch (newValue) {
         case "1": // daily
-          this.alertsData.frecuency = [1, 2, 3, 4, 5, 6, 7];
+          this.editedItem.frecuency = [1, 2, 3, 4, 5, 6, 7];
           break;
         case "2": // once
         case "3": // Custom
-          this.alertsData.frecuency = [];
+          this.editedItem.frecuency = [];
           break;
       }
     },
@@ -154,23 +154,27 @@ export default {
       "ADD_NEW_ALERT",
       "SET_DEFAULT_ALERT_DATA",
       "DELETE_ALERT",
+      "DO_TIMES",
     ]),
-    doTimes() {
-      let halfHours = ["00", "30"];
-      for (let index = 0; index < 24; index++) {
-        halfHours.forEach((time) => {
-          this.times.push(`${index <= 9 ? 0 : ""}${index}:${time}`);
-        });
-      }
-    },
-    save() {
+
+    addAlert(alert) {
       this.$v.touch();
       if (!this.$v.invalid) {
         console.log("hola");
+        console.log(alert);
       }
+      // this.entryData.alerts.push(alert);
+      // this.SET_DEFAULT_ALERT_DATA();
     },
-    delete() {},
-    edit() {},
+
+    removeAlert(alert) {
+      let index = this.entryData.alerts.indexOf(alert);
+      this.entryData.alerts.splice(index, 1);
+    },
+
+    editAlert(alert) {
+      console.log(alert);
+    },
   },
 };
 </script>

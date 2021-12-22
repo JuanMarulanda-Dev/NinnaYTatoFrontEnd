@@ -187,6 +187,15 @@ const routes = [
       permissions: {},
     },
   },
+  {
+    path: "/recomendaciones",
+    name: "Recomendaciones",
+    component: () =>
+      import(/* webpackChunkName: "Alerts" */ "@/views/Alerts.vue"),
+    meta: {
+      permissions: {},
+    },
+  },
 ];
 
 const router = new VueRouter({
