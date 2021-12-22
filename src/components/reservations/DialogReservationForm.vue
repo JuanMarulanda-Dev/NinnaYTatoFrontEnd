@@ -231,11 +231,11 @@ export default {
       "reservations",
       "dialog_form",
       "rooms",
-      "pets",
       "room_loading",
       "editedItem",
       "defaultItem",
     ]),
+    ...mapState("lodging", ["pets"]),
     editedIndex: {
       get: function () {
         return this.value;

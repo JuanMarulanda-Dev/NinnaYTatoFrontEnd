@@ -376,6 +376,7 @@ export default {
     ...mapState(["editIcon", "loadingText", "mainBranchOffice"]),
     ...mapState("lodging", ["lodgings", "loading"]),
     ...mapState("customers", ["personal_infomation"]),
+    ...mapState("alerts", ["times"]),
     quantityLodgings() {
       return this.lodgings.length;
     },
@@ -420,6 +421,12 @@ export default {
     this.getAllCashRegisters(1);
     this.getPlaDetailDefaultToLiquidationHoursExtra();
 
+    this.getAllTypes();
+
+    if (this.times.length == 0) {
+      this.DO_TIMES();
+    }
+
     // Acciones que debe realizar el componente una vez creado
     if (this.permissions.read) {
       this.initialize();
@@ -442,6 +449,7 @@ export default {
     ]),
     ...mapActions("customers", ["getAllCustomersPlans"]),
     ...mapActions("cash_registers", ["getAllCashRegisters"]),
+    ...mapActions("alerts", ["getAllTypes"]),
     ...mapMutations("lodging", [
       "SET_ENTRY_DATA",
       "SET_DEFAULT_DATA_OUTPUT",
@@ -452,6 +460,7 @@ export default {
       "SET_LODGING_ID",
       "SET_SALE_DEFAULT",
     ]),
+    ...mapMutations("alerts", ["DO_TIMES"]),
     initialize() {
       this.getAllLodging({ status: 1 });
       this.getAllAccessories();

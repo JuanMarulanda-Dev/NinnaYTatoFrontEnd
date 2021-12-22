@@ -88,6 +88,9 @@
                       label="Hora"
                       :items="times"
                       v-model="editedItem.time"
+                      :error-messages="timeErrors"
+                      @input="$v.editedItem.time.$touch()"
+                      @blur="$v.editedItem.time.$touch()"
                     ></v-select>
                   </v-col>
                   <v-col md="3">
@@ -97,6 +100,9 @@
                       :items="alert_types"
                       item-text="name"
                       item-value="id"
+                      :error-messages="alertTypeErrors"
+                      @input="$v.editedItem.alert_type_id.$touch()"
+                      @blur="$v.editedItem.alert_type_id.$touch()"
                     ></v-select>
                   </v-col>
                   <v-col cols="12" class="pt-0">
@@ -105,6 +111,10 @@
                       outlined
                       height="100"
                       label="Instrucciones de la alerta"
+                      counter="255"
+                      :error-messages="descriptionErrors"
+                      @input="$v.editedItem.description.$touch()"
+                      @blur="$v.editedItem.description.$touch()"
                     ></v-textarea>
                     <v-radio-group class="my-0" v-model="row" row>
                       <v-radio label="Diario" value="1"></v-radio>
@@ -119,6 +129,9 @@
                         multiple
                         item-text="day"
                         v-show="row === '3'"
+                        :error-messages="frequencyErrors"
+                        @input="$v.editedItem.frequency.$touch()"
+                        @blur="$v.editedItem.frequency.$touch()"
                       ></v-select>
                     </transition>
                   </v-col>
@@ -197,13 +210,13 @@
 
 <script>
 import { validationMixin } from "vuelidate";
-import { required } from "vuelidate/lib/validators";
+import { required, maxLength } from "vuelidate/lib/validators";
 import { mapState, mapActions, mapMutations } from "vuex";
 
 function customAlert() {
   let result = true;
   if (this.row === "3") {
-    result = this.editedItem.frecuency.lenght > 0;
+    result = this.editedItem.frequency.length > 0;
   }
   return result;
 }
@@ -229,7 +242,7 @@ export default {
         align: "start",
         value: "days",
       },
-      { text: "Tipo", align: "center", value: "type" },
+      { text: "Tipo", align: "center", value: "alert_type" },
       { text: "Hora", align: "center", value: "time" },
       { text: "Estado", align: "center", value: "state" },
       { text: "Creado", value: "created_at" },
@@ -243,8 +256,8 @@ export default {
       pet_id: { required },
       alert_type_id: { required },
       time: { required },
-      description: { required },
-      frecuency: { customAlert },
+      description: { required, maxLength: maxLength(255) },
+      frequency: { customAlert },
     },
   },
   created() {
@@ -286,6 +299,35 @@ export default {
       //   errors.push("La mascota seleccionada no esta activa.");
       return errors;
     },
+    alertTypeErrors() {
+      const errors = [];
+      if (!this.$v.editedItem.alert_type_id.$dirty) return errors;
+      !this.$v.editedItem.alert_type_id.required &&
+        errors.push("El tipo es requerido");
+      return errors;
+    },
+    timeErrors() {
+      const errors = [];
+      if (!this.$v.editedItem.time.$dirty) return errors;
+      !this.$v.editedItem.time.required && errors.push("La hora es requerida");
+      return errors;
+    },
+    frequencyErrors() {
+      const errors = [];
+      if (!this.$v.editedItem.frequency.$dirty) return errors;
+      !this.$v.editedItem.frequency.customAlert &&
+        errors.push("Los días son requeridos");
+      return errors;
+    },
+    descriptionErrors() {
+      const errors = [];
+      if (!this.$v.editedItem.description.$dirty) return errors;
+      !this.$v.editedItem.description.required &&
+        errors.push("La hora es requerida");
+      !this.$v.editedItem.description.maxLength &&
+        errors.push("La descripcion es muy larga");
+      return errors;
+    },
   },
 
   watch: {
@@ -304,7 +346,6 @@ export default {
           this.editedItem.frequency = [1, 2, 3, 4, 5, 6, 7];
           break;
         case "2": // once
-        case "3": // Custom
           this.editedItem.frequency = [];
           break;
       }
@@ -358,7 +399,18 @@ export default {
     editItem(item) {
       this.editedIndex = this.alerts.indexOf(item);
       this.SET_EDIT_ITEM(Object.assign({}, item));
-      // this.editedItem = ;
+      switch (JSON.stringify(item.frequency)) {
+        case "[]": // Once
+          this.row = "2";
+          break;
+        case "[1,2,3,4,5,6,7]": // Daily
+          this.row = "1";
+          break;
+        default:
+          // Custom
+          this.row = "3";
+          break;
+      }
       this.dialog = true;
     },
 

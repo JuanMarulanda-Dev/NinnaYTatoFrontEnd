@@ -114,6 +114,12 @@ export default {
     SET_DEFAULT_PLAN_DETAIL_TO_LIQUIDATION(state, default_liquidation_plan) {
       state.default_liquidation_plan = default_liquidation_plan;
     },
+    PUSH_NEW_ALERT(state, alert) {
+      state.entryData.alerts.push(alert);
+    },
+    DELETE_ALERT(state, index) {
+      state.entryData.alerts.splice(index, 1);
+    },
   },
   actions: {
     getPlaDetailDefaultToLiquidationHoursExtra({ commit }) {

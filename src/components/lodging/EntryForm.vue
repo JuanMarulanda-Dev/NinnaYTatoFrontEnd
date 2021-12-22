@@ -40,7 +40,9 @@
 
                 <v-tab href="#alerts">
                   Alarmas
-                  <v-icon>mdi-clock</v-icon>
+                  <v-badge offset-x="-1" overlap dot :color="colorAlert">
+                    <v-icon>mdi-clock</v-icon>
+                  </v-badge>
                 </v-tab>
               </v-tabs>
             </v-col>
@@ -296,7 +298,7 @@ export default {
   name: "entry-form",
   data() {
     return {
-      tab: "alerts",
+      tab: "lodging",
       modalDatePicker: false,
       modalTimePicker: false,
       maxDate: this.getNowDate(),
@@ -378,6 +380,9 @@ export default {
       !this.$v.entryData.time.required && errors.push("La hora es requerida");
       return errors;
     },
+    colorAlert() {
+      return this.entryData.alerts.length > 0 ? "error" : "";
+    },
   },
 
   watch: {
@@ -419,6 +424,7 @@ export default {
         let data = {
           pet_id: this.entryData.pet_id,
           accessories: this.entryData.accessories,
+          alerts: this.entryData.alerts,
           prize: this.entryData.prize,
           walk: this.entryData.walk,
           breakfast: this.entryData.breakfast,
