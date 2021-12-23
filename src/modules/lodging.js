@@ -216,6 +216,10 @@ export default {
     storeLodging({ commit, dispatch, rootState }, data) {
       commit("SET_OVERLAY_LOADING", true, { root: true });
       data.branch_office_id = rootState.mainBranchOffice;
+      data.alerts = data.alerts.map((item) => {
+        item.frequency = JSON.stringify(item.frequency);
+        return item;
+      });
       return axios
         .post("/api/lodgings", data)
         .then((result) => {
@@ -244,8 +248,13 @@ export default {
         });
     },
 
-    updateLodging({ commit, dispatch }, { data, id }) {
+    updateLodging({ commit, dispatch, rootState }, { data, id }) {
       commit("SET_OVERLAY_LOADING", true, { root: true });
+      data.branch_office_id = rootState.mainBranchOffice;
+      data.alerts = data.alerts.map((item) => {
+        item.frequency = JSON.stringify(item.frequency);
+        return item;
+      });
       return axios
         .put(`/api/lodgings/${id}`, data)
         .then((result) => {
