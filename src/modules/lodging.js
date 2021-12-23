@@ -17,6 +17,7 @@ export default {
     entryData: {
       pet_id: "",
       accessories: [],
+      alerts: [],
       prize: false,
       walk: false,
       breakfast: false,
@@ -34,6 +35,12 @@ export default {
       cash_register_id: "",
       overtime_liquidity_option: false,
     },
+    alertsData: {
+      hora: "",
+      type: "",
+      description: "",
+      frecuency: [],
+    },
     outputDefaultData: {
       date: "",
       time: "",
@@ -45,6 +52,7 @@ export default {
     entryDataDefault: {
       pet_id: "",
       accessories: [],
+      alerts: [],
       prize: false,
       walk: false,
       breakfast: false,
@@ -105,6 +113,12 @@ export default {
     },
     SET_DEFAULT_PLAN_DETAIL_TO_LIQUIDATION(state, default_liquidation_plan) {
       state.default_liquidation_plan = default_liquidation_plan;
+    },
+    PUSH_NEW_ALERT(state, alert) {
+      state.entryData.alerts.push(alert);
+    },
+    DELETE_ALERT(state, index) {
+      state.entryData.alerts.splice(index, 1);
     },
   },
   actions: {
@@ -177,15 +191,17 @@ export default {
         .catch(() => {});
     },
 
-    getAllCustomersPets({ commit, rootState }) {
-      axios
-        .get(
-          `/api/lodgings/pets?branch_office_id=${rootState.mainBranchOffice}`
-        )
-        .then((result) => {
-          commit("SET_PETS", result.data.pets);
-        })
-        .catch(() => {});
+    getAllCustomersPets({ state, commit, rootState }) {
+      if (state.pets.length === 0) {
+        axios
+          .get(
+            `/api/lodgings/pets?branch_office_id=${rootState.mainBranchOffice}`
+          )
+          .then((result) => {
+            commit("SET_PETS", result.data.pets);
+          })
+          .catch(() => {});
+      }
     },
 
     getAllDefaultPlans({ commit }) {
@@ -200,6 +216,10 @@ export default {
     storeLodging({ commit, dispatch, rootState }, data) {
       commit("SET_OVERLAY_LOADING", true, { root: true });
       data.branch_office_id = rootState.mainBranchOffice;
+      data.alerts = data.alerts.map((item) => {
+        item.frequency = JSON.stringify(item.frequency);
+        return item;
+      });
       return axios
         .post("/api/lodgings", data)
         .then((result) => {
@@ -228,8 +248,13 @@ export default {
         });
     },
 
-    updateLodging({ commit, dispatch }, { data, id }) {
+    updateLodging({ commit, dispatch, rootState }, { data, id }) {
       commit("SET_OVERLAY_LOADING", true, { root: true });
+      data.branch_office_id = rootState.mainBranchOffice;
+      data.alerts = data.alerts.map((item) => {
+        item.frequency = JSON.stringify(item.frequency);
+        return item;
+      });
       return axios
         .put(`/api/lodgings/${id}`, data)
         .then((result) => {
