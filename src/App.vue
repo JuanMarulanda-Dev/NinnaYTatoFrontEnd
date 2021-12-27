@@ -250,7 +250,7 @@ export default {
     console.log("hola mundo");
 
     navigator.serviceWorker.addEventListener("message", (event) => {
-      console.log(event);
+      console.log(event.data);
     });
   },
   computed: {

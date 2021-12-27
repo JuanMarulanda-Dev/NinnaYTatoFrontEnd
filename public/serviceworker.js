@@ -8,7 +8,7 @@ self.addEventListener("push", function (event) {
     //
     self.clients.matchAll().then((all) =>
       all.forEach((client) => {
-        client.postMessage("Responding to " + event.data);
+        client.postMessage(data);
       })
     );
     // console.log("This push event has data: ", event.data.text());
