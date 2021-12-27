@@ -122,18 +122,23 @@
               offset-y
               left
               bottom
+              max-width="30rem"
               transition="scroll-y-transition"
-              max-width="17rem"
             >
               <template v-slot:activator="{ on, attrs }">
-                <v-btn icon v-bind="attrs" v-on="on">
+                <v-btn
+                  icon
+                  v-bind="attrs"
+                  v-on="on"
+                  @click="updateViewedNotifications(user.id)"
+                >
                   <v-badge color="green" overlap dot>
                     <v-icon>mdi-bell</v-icon>
                   </v-badge>
                 </v-btn>
               </template>
               <!-- Lista de notificaciones -->
-              <v-list max-height="250" width="17rem">
+              <v-list max-height="250">
                 <v-subheader>Notificaciones</v-subheader>
                 <v-list-item
                   v-for="(notification, i) in notifications"
@@ -144,14 +149,26 @@
                     }
                   "
                 >
+                  <v-list-item-avatar>
+                    <v-icon>{{ notification.icon }}</v-icon>
+                  </v-list-item-avatar>
+
                   <v-list-item-content>
-                    <v-list-item-title>{{
-                      notification.title
-                    }}</v-list-item-title>
-                    <v-list-item-subtitle>{{
-                      notification.message
-                    }}</v-list-item-subtitle>
+                    <v-list-item-title>
+                      {{ notification.title }}
+                    </v-list-item-title>
+
+                    <v-list-item-subtitle>
+                      {{ notification.description }}
+                    </v-list-item-subtitle>
                   </v-list-item-content>
+
+                  <v-list-item-action>
+                    <v-list-item-action-text>
+                      {{ "13 min" }}
+                    </v-list-item-action-text>
+                    <v-icon x-large> mdi-circle-small </v-icon>
+                  </v-list-item-action>
                 </v-list-item>
               </v-list>
             </v-menu>
@@ -229,12 +246,12 @@ export default {
   data: () => ({
     drawer: null,
     logoutModal: false,
-    countedSubOptions: 0,
   }),
   created() {
     // Validar si existe la info del usuario
     if (Object.keys(this.user).length === 0) {
       this.getUserLocalStorage();
+      this.getNotificationsByUser(this.user.id);
     }
     // Validar si existe la info del menu
     if (this.menu.length == 0) {
@@ -247,15 +264,15 @@ export default {
 
     this.registerServiceWorker();
 
-    console.log("hola mundo");
-
+    // Event to push notification
     navigator.serviceWorker.addEventListener("message", (event) => {
       console.log(event.data);
     });
   },
   computed: {
-    ...mapState(["user", "menu", "notifications", "loadingOverlay"]),
+    ...mapState(["user", "menu", "loadingOverlay"]),
     ...mapState("branch_offices", ["branch_offices"]),
+    ...mapState("notifications", ["notifications"]),
 
     mainBranchOffice: {
       get() {
@@ -275,6 +292,10 @@ export default {
       "logout",
     ]),
     ...mapActions("branch_offices", ["getAllBranchOffices"]),
+    ...mapActions("notifications", [
+      "getNotificationsByUser",
+      "updateViewedNotifications",
+    ]),
 
     async logoutAction() {
       // Ejecutar el cerrar session

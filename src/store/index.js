@@ -23,6 +23,7 @@ import monitorings from "@/modules/monitorings.js";
 import notes from "@/modules/notes.js";
 import reservations from "@/modules/reservations.js";
 import alerts from "@/modules/alerts.js";
+import notifications from "@/modules/notifications.js";
 
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL = process.env.VUE_APP_API_URL;
@@ -38,11 +39,6 @@ export default new Vuex.Store({
     user: {},
     isAuthenticated: false,
     menu: [],
-    notifications: [
-      { title: "Opcion 1", message: "esta es una notificación", redirect: "" },
-      { title: "Opcion 2", message: "esta es una notificación", redirect: "" },
-      { title: "Opcion 3", message: "esta es una notificación", redirect: "" },
-    ],
     loadingOverlay: false,
     loadingText: "Cargando datos...",
     deleteDialog: false,
@@ -100,6 +96,11 @@ export default new Vuex.Store({
         }
         // Obtener los permisos del usuario
         await dispatch("getMenu");
+
+        if (this.user) {
+          dispatch("notifications/getNotificationsByUser", this.user.id);
+        }
+
         // Obtener la ruta principal a donde se va a redireccionar al usuario
         // Redirrecionar a la ruta pertiente para el usuario
         router.push({ path: state.menu[0].to });
@@ -205,5 +206,6 @@ export default new Vuex.Store({
     notes,
     reservations,
     alerts,
+    notifications,
   },
 });
