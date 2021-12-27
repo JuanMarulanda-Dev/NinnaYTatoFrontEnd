@@ -249,7 +249,7 @@ export default {
 
     console.log("hola mundo");
 
-    navigator.serviceWorker.addEventListener("push", function (event) {
+    document.addEventListener("push-callback", function (event) {
       console.log(event);
       console.log("Hola mundo");
     });
