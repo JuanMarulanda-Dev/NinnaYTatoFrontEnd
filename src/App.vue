@@ -246,6 +246,11 @@ export default {
     }
 
     this.registerServiceWorker();
+
+    navigator.serviceWorker.addEventListener("push", function (event) {
+      console.log(event);
+      console.log("Hola mundo");
+    });
   },
   computed: {
     ...mapState(["user", "menu", "notifications", "loadingOverlay"]),
