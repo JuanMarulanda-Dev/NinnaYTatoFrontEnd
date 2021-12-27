@@ -249,9 +249,8 @@ export default {
 
     console.log("hola mundo");
 
-    document.addEventListener("push-callback", function (event) {
+    navigator.serviceWorker.addEventListener("message", (event) => {
       console.log(event);
-      console.log("Hola mundo");
     });
   },
   computed: {
