@@ -247,6 +247,8 @@ export default {
 
     this.registerServiceWorker();
 
+    console.log("hola mundo");
+
     navigator.serviceWorker.addEventListener("push", function (event) {
       console.log(event);
       console.log("Hola mundo");
