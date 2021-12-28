@@ -8,14 +8,14 @@ self.addEventListener("push", function (event) {
     });
     //
     // console.log(event.clientId);
-    console.log(self.get());
-    // .postMessage(data.body);
-    self.controller.postMessage(data.body);
-    // self.clients.matchAll().then((all) =>
-    //   all.forEach((client) => {
-
-    //   })
-    // );
+    // console.log(self.clients.get());
+    // // .postMessage(data.body);
+    // self.controller.postMessage(data.body);
+    self.clients.matchAll().then((all) =>
+      all.forEach((client) => {
+        client.postMessage(data);
+      })
+    );
     // console.log("This push event has data: ", event.data.text());
   } else {
     console.log("This push event has no data.");
