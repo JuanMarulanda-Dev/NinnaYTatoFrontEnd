@@ -7,7 +7,8 @@ self.addEventListener("push", function (event) {
       vibrate: [200, 100, 200],
     });
     //
-    navigator.serviceWorker.controller.postMessage(data);
+    // navigator.serviceWorker.controller.postMessage(data);
+    self.postMessage(data);
     // console.log(event.clientId);
     // console.log(self.clients.get());
     // // .postMessage(data.body);
