@@ -8,7 +8,7 @@ self.addEventListener("push", function (event) {
     });
     //
     // navigator.serviceWorker.controller.postMessage(data);
-    self.postMessage(data);
+    self.serviceWorker.postMessage(data);
     // console.log(event.clientId);
     // console.log(self.clients.get());
     // // .postMessage(data.body);
