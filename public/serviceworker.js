@@ -8,6 +8,8 @@ self.addEventListener("push", function (event) {
     });
     //
     // console.log(event.clientId);
+    console.log(self.get());
+    // .postMessage(data.body);
     self.controller.postMessage(data.body);
     // self.clients.matchAll().then((all) =>
     //   all.forEach((client) => {
