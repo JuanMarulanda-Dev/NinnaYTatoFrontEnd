@@ -7,8 +7,8 @@ self.addEventListener("push", function (event) {
       vibrate: [200, 100, 200],
     });
     //
-    console.log(event.clientId);
-    self.Client.postMessage(data.body);
+    // console.log(event.clientId);
+    self.controller.postMessage(data.body);
     // self.clients.matchAll().then((all) =>
     //   all.forEach((client) => {
 
