@@ -1,9 +1,10 @@
 self.addEventListener("push", function (event) {
   if (event.data) {
-    var data = event.data.json();
+    var data = event.data.body.json();
     self.registration.showNotification(data.title, {
-      body: data.body,
-      icon: "https://ninnaytato.s3.us-east-2.amazonaws.com/alerta.png",
+      body: data.description,
+      icon: "favicon.png",
+      vibrate: [200, 100, 200],
     });
     //
     self.clients.matchAll().then((all) =>

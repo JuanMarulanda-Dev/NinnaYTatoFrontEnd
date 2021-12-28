@@ -251,11 +251,14 @@ export default {
     // Validar si existe la info del usuario
     if (Object.keys(this.user).length === 0) {
       this.getUserLocalStorage();
-      this.getNotificationsByUser(this.user.id);
     }
     // Validar si existe la info del menu
     if (this.menu.length == 0) {
       this.getMenuLocalStorage();
+    }
+
+    if (this.user) {
+      this.getNotificationsByUser(this.user.id);
     }
 
     if (this.user.is_admin) {
@@ -267,6 +270,7 @@ export default {
     // Event to push notification
     navigator.serviceWorker.addEventListener("message", (event) => {
       console.log(event.data);
+      this.notifications.push(event.data);
     });
   },
   computed: {
