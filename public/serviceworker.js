@@ -7,11 +7,12 @@ self.addEventListener("push", function (event) {
       vibrate: [200, 100, 200],
     });
     //
-    self.clients.matchAll().then((all) =>
-      all.forEach((client) => {
-        client.postMessage(data.body);
-      })
-    );
+    self.Client.postMessage(data.body);
+    // self.clients.matchAll().then((all) =>
+    //   all.forEach((client) => {
+
+    //   })
+    // );
     // console.log("This push event has data: ", event.data.text());
   } else {
     console.log("This push event has no data.");
