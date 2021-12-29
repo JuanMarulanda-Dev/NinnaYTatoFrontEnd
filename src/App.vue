@@ -118,61 +118,7 @@
             <v-spacer></v-spacer>
 
             <!-- Notifications -->
-            <v-menu
-              offset-y
-              left
-              bottom
-              max-width="30rem"
-              transition="scroll-y-transition"
-            >
-              <template v-slot:activator="{ on, attrs }">
-                <v-btn
-                  icon
-                  v-bind="attrs"
-                  v-on="on"
-                  @click="updateViewedNotifications(user.id)"
-                >
-                  <v-badge color="green" overlap dot>
-                    <v-icon>mdi-bell</v-icon>
-                  </v-badge>
-                </v-btn>
-              </template>
-              <!-- Lista de notificaciones -->
-              <v-list max-height="250">
-                <v-subheader>Notificaciones</v-subheader>
-                <v-list-item
-                  v-for="(notification, i) in notifications"
-                  :key="i"
-                  @click="
-                    () => {
-                      // Make a redirect
-                    }
-                  "
-                >
-                  <v-list-item-avatar>
-                    <v-icon>{{ notification.icon }}</v-icon>
-                  </v-list-item-avatar>
-
-                  <v-list-item-content>
-                    <v-list-item-title>
-                      {{ notification.title }}
-                    </v-list-item-title>
-
-                    <v-list-item-subtitle>
-                      {{ notification.description }}
-                    </v-list-item-subtitle>
-                  </v-list-item-content>
-
-                  <v-list-item-action>
-                    <v-list-item-action-text>
-                      {{ "13 min" }}
-                    </v-list-item-action-text>
-                    <v-icon x-large> mdi-circle-small </v-icon>
-                  </v-list-item-action>
-                </v-list-item>
-              </v-list>
-            </v-menu>
-
+            <notifications :show="true" />
             <!-- Logout -->
             <v-dialog v-model="logoutModal" persistent max-width="300">
               <template v-slot:activator="{ on, attrs }">
@@ -240,6 +186,7 @@
 <script>
 import { mapState, mapActions } from "vuex";
 import pawLoading from "@/components/pawLoading.vue";
+import notifications from "@/components/notifications.vue";
 
 export default {
   name: "App",
@@ -271,12 +218,12 @@ export default {
     navigator.serviceWorker.addEventListener("message", (event) => {
       console.log(event.data);
       this.notifications.push(event.data);
+      // Pending
     });
   },
   computed: {
     ...mapState(["user", "menu", "loadingOverlay"]),
     ...mapState("branch_offices", ["branch_offices"]),
-    ...mapState("notifications", ["notifications"]),
 
     mainBranchOffice: {
       get() {
@@ -296,10 +243,7 @@ export default {
       "logout",
     ]),
     ...mapActions("branch_offices", ["getAllBranchOffices"]),
-    ...mapActions("notifications", [
-      "getNotificationsByUser",
-      "updateViewedNotifications",
-    ]),
+    ...mapActions("notifications", ["getNotificationsByUser"]),
 
     async logoutAction() {
       // Ejecutar el cerrar session
@@ -318,6 +262,7 @@ export default {
   },
   components: {
     pawLoading,
+    notifications,
   },
 };
 </script>

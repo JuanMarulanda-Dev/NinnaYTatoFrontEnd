@@ -12,6 +12,12 @@ export default {
     SET_NOTIFICATIONS(state, notifications) {
       state.notifications = notifications;
     },
+    CHANGE_STATUS_NOTIFICATIONS(state) {
+      state.notifications.map((item) => {
+        item.viewed = true;
+        return item;
+      });
+    },
   },
   actions: {
     getNotificationsByUser({ commit }, id) {
@@ -31,10 +37,10 @@ export default {
           );
         });
     },
-    updateViewedNotifications({ state }, id) {
+    updateViewedNotifications({ commit }, id) {
       return axios.put(`/api/notifications?user_id=${id}`).then((result) => {
         if (result.status == 201) {
-          console.log(state);
+          commit("CHANGE_STATUS_NOTIFICATIONS");
         }
       });
     },
