@@ -204,6 +204,7 @@ export default {
       this.getMenuLocalStorage();
     }
 
+    // Hacer estas consultas solo si exciste la cookie de autentificación
     if (this.user) {
       this.getNotificationsByUser(this.user.id);
     }
