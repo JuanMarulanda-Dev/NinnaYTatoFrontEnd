@@ -1,8 +1,8 @@
 self.addEventListener("push", function (event) {
   if (event.data) {
     var data = event.data.json();
-    self.registration.showNotification(data.title, {
-      body: data.description,
+    self.registration.showNotification(data.data.title, {
+      body: data.data.description,
       icon: "favicon.png",
       vibrate: [200, 100, 200],
     });
@@ -15,7 +15,7 @@ self.addEventListener("push", function (event) {
     // self.controller.postMessage(data.body);
     self.clients.matchAll().then((all) =>
       all.forEach((client) => {
-        client.postMessage(data);
+        client.postMessage(data.data);
       })
     );
     // console.log("This push event has data: ", event.data.text());
