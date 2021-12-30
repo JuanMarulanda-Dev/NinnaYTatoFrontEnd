@@ -1,8 +1,8 @@
 self.addEventListener("push", function (event) {
   if (event.data) {
     var data = event.data.json();
-    self.registration.showNotification(data.body.title, {
-      body: data.body.description,
+    self.registration.showNotification(data.title, {
+      body: data.description,
       icon: "favicon.png",
       vibrate: [200, 100, 200],
     });
