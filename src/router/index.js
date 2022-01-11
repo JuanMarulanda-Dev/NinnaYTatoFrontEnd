@@ -182,7 +182,7 @@ const routes = [
     path: "/reservas",
     name: "Reservas",
     component: () =>
-      import(/* webpackChunkName: "Reservas" */ "@/views/Reservas.vue"),
+      import(/* webpackChunkName: "Reservas" */ "@/views/Reservations.vue"),
     meta: {
       permissions: {},
     },

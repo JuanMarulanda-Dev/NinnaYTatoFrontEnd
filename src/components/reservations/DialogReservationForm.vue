@@ -235,7 +235,7 @@ export default {
       "editedItem",
       "defaultItem",
     ]),
-    ...mapState("lodging", ["pets"]),
+    ...mapState("reservations", ["pets"]),
     editedIndex: {
       get: function () {
         return this.value;
