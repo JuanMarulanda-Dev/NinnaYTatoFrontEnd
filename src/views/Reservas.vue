@@ -229,9 +229,9 @@ export default {
 
   created() {
     this.SET_START_DATE(
-      moment(Date.now()).subtract(2, "months").format("YYYY-MM-DD")
+      moment(Date.now()).format("YYYY-MM-DD")
     );
-    this.SET_END_DATE(moment(Date.now()).add(2, "months").format("YYYY-MM-DD"));
+    this.SET_END_DATE(moment(Date.now()).add(1, "months").format("YYYY-MM-DD"));
     // Obtener los permisos
     this.permissions = this.$route.meta.permissions;
     // Acciones que debe realizar el componente una vez creado
