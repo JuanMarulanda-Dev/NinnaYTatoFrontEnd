@@ -29,6 +29,29 @@
               </v-avatar>
             </v-col>
 
+            <v-col v-show="entryData.pet_id" cols="12" class="py-0">
+              <div class="d-flex justify-space-around">
+                <label>
+                  <v-icon :color="avaliablePentaVaccine ? 'success' : 'error'">
+                    mdi-circle-slice-8
+                  </v-icon>
+                  Penta
+                </label>
+                <label>
+                  <v-icon :color="avaliableRabiesVaccine ? 'success' : 'error'">
+                    mdi-circle-slice-8
+                  </v-icon>
+                  Rabia
+                </label>
+                <label>
+                  <v-icon :color="avaliableCoughVaccine ? 'success' : 'error'">
+                    mdi-circle-slice-8
+                  </v-icon>
+                  Tos
+                </label>
+              </div>
+            </v-col>
+
             <v-col cols="12">
               <v-tabs v-model="tab" color="primary" icons-and-text grow>
                 <v-tabs-slider></v-tabs-slider>
@@ -286,6 +309,8 @@ import { mapActions, mapState, mapMutations } from "vuex";
 import { validationMixin } from "vuelidate";
 import { required } from "vuelidate/lib/validators";
 import AlertsForm from "@/components/lodging/AlertsForm.vue";
+import moment from "moment";
+
 function petAvaliable() {
   let result = false;
   if (this.pets.find((pet) => pet.id === this.entryData.pet_id && pet.state)) {
@@ -330,10 +355,10 @@ export default {
     ...mapState(["user"]),
     ...mapState("reservations", ["defaultItem"]),
     ...mapState("lodging", ["pets", "accessories", "entryData"]),
+
     formTittle() {
       return this.lodging_id !== "" ? "Editar" : "Registrar";
     },
-
     findPetAvatar() {
       let index = this.pets.findIndex(
         (pet) => pet.id === this.entryData.pet_id
@@ -382,6 +407,37 @@ export default {
     },
     colorAlert() {
       return this.entryData.alerts.length > 0 ? "error" : "";
+    },
+
+    avaliablePentaVaccine() {
+      let index = this.pets.findIndex(
+        (pet) => pet.id === this.entryData.pet_id
+      );
+      let pet = index === -1 ? false : this.pets[index];
+      if (pet) {
+        return this.calculateAvailableVaccine(pet.pentavalent_vaccine);
+      }
+      return false;
+    },
+    avaliableCoughVaccine() {
+      let index = this.pets.findIndex(
+        (pet) => pet.id === this.entryData.pet_id
+      );
+      let pet = index === -1 ? false : this.pets[index];
+      if (pet) {
+        return this.calculateAvailableVaccine(pet.cough_vaccine);
+      }
+      return false;
+    },
+    avaliableRabiesVaccine() {
+      let index = this.pets.findIndex(
+        (pet) => pet.id === this.entryData.pet_id
+      );
+      let pet = index === -1 ? false : this.pets[index];
+      if (pet) {
+        return this.calculateAvailableVaccine(pet.rabies_vaccine);
+      }
+      return false;
     },
   },
 
@@ -463,6 +519,11 @@ export default {
           });
         }
       }
+    },
+
+    calculateAvailableVaccine(date) {
+      let result = !(moment().diff(moment(date), "year") > 0);
+      return result;
     },
   },
   components: {

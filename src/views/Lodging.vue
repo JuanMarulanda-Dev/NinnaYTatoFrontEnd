@@ -102,8 +102,8 @@
       <!-- prizes -->
       <template v-slot:[`item.arrival_data.prize`]="{ item }">
         <v-icon :color="item.arrival_data.prize ? 'success' : 'error'">
-          mdi-circle-slice-8</v-icon
-        >
+          mdi-circle-slice-8
+        </v-icon>
       </template>
 
       <!-- breakfast -->
