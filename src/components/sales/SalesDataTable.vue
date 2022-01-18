@@ -336,7 +336,6 @@ export default {
     },
 
     updateRowNote(note) {
-      console.log(note);
       let row = this.sales.find((element) => element.id === this.id_sale);
       row.note = note;
     },

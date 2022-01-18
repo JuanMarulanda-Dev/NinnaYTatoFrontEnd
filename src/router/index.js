@@ -196,6 +196,15 @@ const routes = [
       permissions: {},
     },
   },
+  {
+    path: "/movimientos",
+    name: "Recomendaciones",
+    component: () =>
+      import(/* webpackChunkName: "Movimientos" */ "@/views/Movements.vue"),
+    meta: {
+      permissions: {},
+    },
+  },
 ];
 
 const router = new VueRouter({

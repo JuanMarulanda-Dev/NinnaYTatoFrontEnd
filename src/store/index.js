@@ -24,9 +24,10 @@ import notes from "@/modules/notes.js";
 import reservations from "@/modules/reservations.js";
 import alerts from "@/modules/alerts.js";
 import notifications from "@/modules/notifications.js";
+import movements from "@/modules/movements.js";
 
 axios.defaults.withCredentials = true;
-axios.defaults.baseURL = process.env.VUE_APP_API_URL;
+axios.defaults.baseURL = process.env.VUE_APP_API_URL; // Esto se puede colocar desde el main de la aplicacion para solo declararlo una unica vez
 
 export default new Vuex.Store({
   state: {
@@ -68,7 +69,7 @@ export default new Vuex.Store({
     },
   },
   actions: {
-    // Todas estas acciones pertenecen a las funcionalidades del login (Modular)
+    // Todas estas acciones pertenecen a las funcionalidades del login (Pendiente Modular)
     async login({ state, dispatch, commit }, credentials) {
       try {
         commit("SET_OVERLAY_LOADING", true);
@@ -207,5 +208,6 @@ export default new Vuex.Store({
     reservations,
     alerts,
     notifications,
+    movements,
   },
 });
