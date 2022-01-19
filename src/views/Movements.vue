@@ -17,6 +17,74 @@
             <v-icon large>mdi-notebook-multiple</v-icon> Movimientos
           </v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
+          <!-- Filter date start -->
+          <v-dialog
+            ref="start"
+            v-model="dialogStart"
+            :return-value.sync="startDate"
+            persistent
+            width="290px"
+            :retain-focus="false"
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-text-field
+                class="mt-8"
+                v-model="startDate"
+                label="Fecha"
+                prepend-icon="mdi-calendar"
+                readonly
+                v-bind="attrs"
+                v-on="on"
+              ></v-text-field>
+            </template>
+            <v-date-picker
+              @change="getAllMovementsBewteenDates()"
+              v-model="startDate"
+              scrollable
+            >
+              <v-spacer></v-spacer>
+              <v-btn text color="primary" @click="dialogStart = false">
+                Cancel
+              </v-btn>
+              <v-btn text color="primary" @click="$refs.start.save(startDate)">
+                OK
+              </v-btn>
+            </v-date-picker>
+          </v-dialog>
+          <!-- Filter date end -->
+          <v-dialog
+            ref="end"
+            v-model="dialogEnd"
+            :return-value.sync="endDate"
+            persistent
+            width="290px"
+            :retain-focus="false"
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-text-field
+                class="mt-8"
+                v-model="endDate"
+                label="Fecha"
+                prepend-icon="mdi-calendar"
+                readonly
+                v-bind="attrs"
+                v-on="on"
+              ></v-text-field>
+            </template>
+            <v-date-picker
+              @change="getAllMovementsBewteenDates()"
+              v-model="endDate"
+              scrollable
+            >
+              <v-spacer></v-spacer>
+              <v-btn text color="primary" @click="dialogEnd = false">
+                Cancel
+              </v-btn>
+              <v-btn text color="primary" @click="$refs.end.save(endDate)">
+                OK
+              </v-btn>
+            </v-date-picker>
+          </v-dialog>
           <v-spacer></v-spacer>
           <!-- Modal New/edit-->
           <v-dialog v-model="dialog" persistent max-width="600px">
@@ -117,27 +185,6 @@
               </v-card-actions>
             </v-card>
           </v-dialog>
-
-          <!-- Modal New/edit Plans details-->
-          <v-tooltip bottom>
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn
-                fab
-                small
-                color="secondary"
-                elevation="3"
-                dark
-                v-bind="attrs"
-                v-on="on"
-                @click="SET_DIALOG_TURN(true)"
-                class="mr-1 ml-3"
-                v-show="permissions.create"
-              >
-                <v-icon>mdi-alpha-p-circle-outline</v-icon>
-              </v-btn>
-            </template>
-            <span>Turnos</span>
-          </v-tooltip>
         </v-toolbar>
       </template>
 
@@ -179,6 +226,7 @@ import { moneyFormatMixin } from "@/mixins/moneyFormatMixin.js";
 import { required, maxLength, minValue } from "vuelidate/lib/validators";
 import { mapState, mapActions, mapMutations } from "vuex";
 import VuetifyMoney from "@/components/vuetifyMoney.vue";
+import moment from "moment";
 
 export default {
   data: () => ({
@@ -187,18 +235,24 @@ export default {
     id_movement: 0,
     payment_proof: 0,
     note: 0,
+
     dialogNoteForm: false,
+
+    dialogStart: false,
+    dialogEnd: false,
+
     headers: [
       {
         text: "Fecha",
         align: "start",
         value: "created_at",
       },
-      { text: "Mediador", value: "price" },
+      { text: "Mediador", value: "mediator" },
       { text: "Tipo", value: "type_movement" },
       { text: "Grupo", value: "group" },
       { text: "Origin / Destino", value: "cash_register" },
       { text: "Total", value: "total" },
+      { text: "Nota", value: "note" },
       { text: "Acciones", value: "actions", sortable: false },
     ],
     editedIndex: -1,
@@ -212,10 +266,23 @@ export default {
       total: { required, minValue: minValue(1) },
     },
   },
+  created() {
+    this.SET_START_DATE(moment().startOf("month").format("YYYY-MM-DD"));
+    this.SET_END_DATE(moment().endOf("month").format("YYYY-MM-DD"));
+    // Obtener los permisos
+    this.permissions = this.$route.meta.permissions;
+
+    // Acciones que debe realizar el componente una vez creado
+    if (this.permissions.read) {
+      this.initialize();
+    }
+  },
   computed: {
     ...mapState(["deleteIcon", "loadingText", "mainBranchOffice"]),
     ...mapState("movements", [
       "movements",
+      "start",
+      "end",
       "loading",
       "editedItem",
       "defaultItem",
@@ -243,6 +310,23 @@ export default {
         errors.push("El origen es requerido");
       return errors;
     },
+
+    startDate: {
+      get: function () {
+        return this.start;
+      },
+      set: function (newValue) {
+        this.SET_START_DATE(newValue);
+      },
+    },
+    endDate: {
+      get: function () {
+        return this.end;
+      },
+      set: function (newValue) {
+        this.SET_END_DATE(newValue);
+      },
+    },
   },
 
   watch: {
@@ -257,26 +341,15 @@ export default {
     },
   },
 
-  created() {
-    // Obtener los permisos
-    this.permissions = this.$route.meta.permissions;
-
-    // Acciones que debe realizar el componente una vez creado
-    if (this.permissions.read) {
-      this.initialize();
-    }
-  },
-
   methods: {
-    ...mapActions("products", [
-      "getAllProducts",
-      "storeProduct",
-      "updateProduct",
-      "changeStatusProduct",
+    ...mapActions("movements", ["getAllMovementsBewteenDates"]),
+    ...mapMutations("movements", [
+      "SET_EDIT_ITEM",
+      "SET_START_DATE",
+      "SET_END_DATE",
     ]),
-    ...mapMutations("movements", ["SET_EDIT_ITEM"]),
     initialize() {
-      this.getAllProducts();
+      this.getAllMovementsBewteenDates();
     },
 
     close() {
@@ -293,7 +366,7 @@ export default {
       // Correct validations
       if (!this.$v.$invalid) {
         // Do store
-        this.storeProduct().then((result) => {
+        this.storeEgress().then((result) => {
           if (result) {
             this.close();
           }

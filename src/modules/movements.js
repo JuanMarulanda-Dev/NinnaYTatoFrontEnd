@@ -8,8 +8,8 @@ export default {
     // Generals loading datatables
     loading: false,
     movements: [],
-    start_date: "",
-    end_date: "",
+    start: "",
+    end: "",
     editedItem: {
       id: 0,
       mediator: "",
@@ -28,8 +28,8 @@ export default {
     },
   },
   mutations: {
-    SET_MOVEMENTS(state, products) {
-      state.products = products;
+    SET_MOVEMENTS(state, movements) {
+      state.movements = movements;
     },
     SET_LOADING_DATATABLE(state, status) {
       state.loading = status;
@@ -37,13 +37,19 @@ export default {
     SET_EDIT_ITEM(state, object) {
       state.editedItem = object;
     },
+    SET_START_DATE(state, start) {
+      state.start = start;
+    },
+    SET_END_DATE(state, end) {
+      state.end = end;
+    },
   },
   actions: {
     getAllMovementsBewteenDates({ state, commit, rootState }) {
       commit("SET_LOADING_DATATABLE", true);
       axios
         .get(
-          `/api/movements?branch_office_id=${rootState.mainBranchOffice}&start=${state.start_date}&end=${state.end_date}`
+          `/api/movements?branch_office_id=${rootState.mainBranchOffice}&start=${state.start}&end=${state.end}`
         )
         .then((result) => {
           // save all
