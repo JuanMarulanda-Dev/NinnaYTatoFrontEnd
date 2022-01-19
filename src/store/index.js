@@ -25,6 +25,7 @@ import reservations from "@/modules/reservations.js";
 import alerts from "@/modules/alerts.js";
 import notifications from "@/modules/notifications.js";
 import movements from "@/modules/movements.js";
+import turns from "@/modules/turns.js";
 
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL = process.env.VUE_APP_API_URL; // Esto se puede colocar desde el main de la aplicacion para solo declararlo una unica vez
@@ -209,5 +210,6 @@ export default new Vuex.Store({
     alerts,
     notifications,
     movements,
+    turns,
   },
 });

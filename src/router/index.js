@@ -198,9 +198,18 @@ const routes = [
   },
   {
     path: "/movimientos",
-    name: "Recomendaciones",
+    name: "Movimientos",
     component: () =>
-      import(/* webpackChunkName: "Movimientos" */ "@/views/Movements.vue"),
+      import(/* webpackChunkName: "Movements" */ "@/views/Movements.vue"),
+    meta: {
+      permissions: {},
+    },
+  },
+  {
+    path: "/turnos",
+    name: "Turnos",
+    component: () =>
+      import(/* webpackChunkName: "Turns" */ "@/views/Turns.vue"),
     meta: {
       permissions: {},
     },

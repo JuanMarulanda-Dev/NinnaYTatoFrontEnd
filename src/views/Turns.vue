@@ -3,7 +3,7 @@
     <v-data-table
       fixed-header
       :headers="headers"
-      :items="movements"
+      :items="turns"
       sort-by="name"
       class="elevation-3"
       :loading="loading"
@@ -14,7 +14,7 @@
         <v-toolbar flat color="white" class="rounded-xl">
           <!-- Title Module -->
           <v-toolbar-title>
-            <v-icon large>mdi-notebook-multiple</v-icon> Movimientos
+            <v-icon large>mdi-alpha-t-circle-outline</v-icon> Turnos
           </v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
           <v-spacer></v-spacer>
@@ -39,70 +39,62 @@
             <v-card>
               <v-card-title>
                 <span class="headline">
-                  <v-icon large>mdi-notebook-multiple</v-icon>
-                  Nuevo movimiento (Egreso)
+                  <v-icon large>mdi-alpha-t-circle-outline</v-icon>
+                  Nuevo turno
                 </span>
               </v-card-title>
 
               <v-card-text>
-                <!-- Form movements -->
+                <!-- Form turns -->
                 <v-container>
                   <v-row>
                     <v-col cols="6">
-                      <v-text-field
-                        v-model="editedItem.mediator"
-                        label="Mediador*"
-                        required
-                        counter="255"
-                        :error-messages="mediatorErrors"
-                        @input="$v.editedItem.mediator.$touch()"
-                        @blur="$v.editedItem.mediator.$touch()"
-                      ></v-text-field>
-                    </v-col>
-
-                    <v-col cols="6">
                       <v-select
-                        v-model="editedItem.group"
-                        :items="groups"
+                        v-model="editedItem.collaborator_id"
+                        :items="collaborators"
                         class="text-center"
                         item-text="name"
                         item-value="id"
-                        label="Grupo*"
-                        :error-messages="groupErrors"
-                        @input="$v.editedItem.group.$touch()"
-                        @blur="$v.editedItem.group.$touch()"
+                        label="Colaborador*"
+                        :error-messages="collaboratorErrors"
+                        @input="$v.editedItem.collaborator_id.$touch()"
+                        @blur="$v.editedItem.collaborator_id.$touch()"
                       ></v-select>
                     </v-col>
 
                     <v-col cols="6">
                       <v-select
-                        v-model="editedItem.cash_register_id"
-                        :items="cash_registers"
+                        v-model="editedItem.type_id"
+                        :items="types"
                         class="text-center"
                         item-text="name"
                         item-value="id"
-                        label="Origen*"
-                        :error-messages="cashRegisterErrors"
-                        @input="$v.editedItem.cash_register_id.$touch()"
-                        @blur="$v.editedItem.cash_register_id.$touch()"
+                        label="Tipo de*"
+                        :error-messages="typeErrors"
+                        @input="$v.editedItem.type_id.$touch()"
+                        @blur="$v.editedItem.type_id.$touch()"
                       ></v-select>
                     </v-col>
 
                     <v-col cols="6">
                       <vuetify-money
-                        v-model="editedItem.price"
-                        label="Valor*"
+                        v-model="editedItem.value"
+                        label="Valor turno*"
                       />
                     </v-col>
 
-                    <v-col cols="12">
-                      <v-textarea
-                        label="Nota"
-                        v-model="note"
-                        :error-messages="notaErrors"
-                        @input="$v.note.$touch()"
-                        @blur="$v.note.$touch()"
-                      ></v-textarea>
+                    <v-col cols="6">
+                      <vuetify-money
+                        v-model="editedItem.payment"
+                        label="Abono*"
+                      />
+                    </v-col>
+
+                    <v-col cols="6">
+                      <vuetify-money
+                        v-model="editedItem.total"
+                        label="Saldo*"
+                      />
                     </v-col>
                   </v-row>
                 </v-container>
@@ -117,27 +109,6 @@
               </v-card-actions>
             </v-card>
           </v-dialog>
-
-          <!-- Modal New/edit Plans details-->
-          <v-tooltip bottom>
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn
-                fab
-                small
-                color="secondary"
-                elevation="3"
-                dark
-                v-bind="attrs"
-                v-on="on"
-                @click="SET_DIALOG_TURN(true)"
-                class="mr-1 ml-3"
-                v-show="permissions.create"
-              >
-                <v-icon>mdi-alpha-p-circle-outline</v-icon>
-              </v-btn>
-            </template>
-            <span>Turnos</span>
-          </v-tooltip>
         </v-toolbar>
       </template>
 
@@ -170,6 +141,8 @@
         </v-tooltip>
       </template>
     </v-data-table>
+
+    <turn-form></turn-form>
   </div>
 </template>
 
@@ -194,11 +167,12 @@ export default {
         align: "start",
         value: "created_at",
       },
-      { text: "Mediador", value: "price" },
-      { text: "Tipo", value: "type_movement" },
-      { text: "Grupo", value: "group" },
-      { text: "Origin / Destino", value: "cash_register" },
-      { text: "Total", value: "total" },
+      { text: "Colaborador", value: "name" },
+      { text: "Turno", value: "turn_type" },
+      { text: "Valor", value: "total" },
+      { text: "Abono", value: "payment" },
+      { text: "Saldo", value: "total" },
+      { text: "Nota", value: "note" },
       { text: "Acciones", value: "actions", sortable: false },
     ],
     editedIndex: -1,
@@ -214,12 +188,7 @@ export default {
   },
   computed: {
     ...mapState(["deleteIcon", "loadingText", "mainBranchOffice"]),
-    ...mapState("movements", [
-      "movements",
-      "loading",
-      "editedItem",
-      "defaultItem",
-    ]),
+    ...mapState("turns", ["turns", "loading", "editedItem", "defaultItem"]),
     mediatorErrors() {
       const errors = [];
       if (!this.$v.editedItem.mediator.$dirty) return errors;
@@ -227,20 +196,6 @@ export default {
         errors.push("El mediador es requerido");
       !this.$v.editedItem.mediator.maxLength &&
         errors.push("Longitud no permitida");
-      return errors;
-    },
-    groupErrors() {
-      const errors = [];
-      if (!this.$v.editedItem.group.$dirty) return errors;
-      !this.$v.editedItem.group.required &&
-        errors.push("El grupo es requerido");
-      return errors;
-    },
-    cashRegisterErrors() {
-      const errors = [];
-      if (!this.$v.editedItem.cash_register_id.$dirty) return errors;
-      !this.$v.editedItem.cash_register_id.required &&
-        errors.push("El origen es requerido");
       return errors;
     },
   },
@@ -268,15 +223,15 @@ export default {
   },
 
   methods: {
-    ...mapActions("products", [
-      "getAllProducts",
-      "storeProduct",
-      "updateProduct",
-      "changeStatusProduct",
+    ...mapActions("turns", [
+      "getAllTurns",
+      "storeTurn",
+      "updateTurn",
+      "deleteTurn",
     ]),
-    ...mapMutations("movements", ["SET_EDIT_ITEM"]),
+    ...mapMutations("turns", ["SET_EDIT_ITEM"]),
     initialize() {
-      this.getAllProducts();
+      this.getAllTurns();
     },
 
     close() {
@@ -292,13 +247,29 @@ export default {
       this.$v.$touch();
       // Correct validations
       if (!this.$v.$invalid) {
-        // Do store
-        this.storeProduct().then((result) => {
-          if (result) {
-            this.close();
-          }
-        });
+        if (this.editedIndex > -1) {
+          // Do update
+          this.updateTurn().then((result) => {
+            if (result) {
+              this.close();
+            }
+          });
+        } else {
+          // Do store
+          this.storeTurn().then((result) => {
+            if (result) {
+              this.close();
+            }
+          });
+        }
       }
+    },
+
+    updateRowNote(note) {
+      let row = this.movements.find(
+        (element) => element.id === this.id_movement
+      );
+      row.note = note;
     },
   },
 
