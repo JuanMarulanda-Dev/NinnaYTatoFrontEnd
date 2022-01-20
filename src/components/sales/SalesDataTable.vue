@@ -91,10 +91,18 @@
               <template v-slot:[`item.payment`]="{ item }">
                 <v-icon
                   small
-                  :class="{ 'success--text': item.payment === item.total }"
+                  :class="{
+                    'success--text':
+                      item.payment === item.total && item.total > 0,
+                  }"
                   >{{ moneyIcon }}</v-icon
                 >
-                <span :class="{ 'success--text': item.payment === item.total }">
+                <span
+                  :class="{
+                    'success--text':
+                      item.payment === item.total && item.total > 0,
+                  }"
+                >
                   {{ currencyFormat(item.payment) }}
                 </span>
               </template>
@@ -217,9 +225,9 @@
     <note-form-dialog
       v-model="dialogNoteForm"
       :id="id_sale"
-      :type="1"
+      :type="note_type"
       :note="note"
-      :title="payment_proof"
+      :title="title"
       @saved="updateRowNote($event)"
     ></note-form-dialog>
   </div>
@@ -238,7 +246,8 @@ export default {
     time: "",
     dialogDate: false,
     dialogNoteForm: false,
-    payment_proof: 0,
+    title: 0,
+    note_type: 1,
     id_sale: "",
     note: "",
     headers: [
@@ -305,7 +314,7 @@ export default {
 
     showNoteFormDialog(id, payment_proof, note) {
       this.id_sale = id;
-      this.payment_proof = payment_proof;
+      this.title = "Venta N° " + payment_proof;
       this.note = note;
       this.dialogNoteForm = true;
     },

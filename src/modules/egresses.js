@@ -7,34 +7,59 @@ export default {
   state: {
     // Generals loading datatables
     loading: false,
-    movements: [],
-    start: "",
-    end: "",
+    egress_types: [],
+    editedItem: {
+      id: 0,
+      mediator: "",
+      egress_type_id: "",
+      cash_register_id: "",
+      total: "",
+    },
+    defaultItem: {
+      id: 0,
+      mediator: "",
+      egress_type_id: "",
+      cash_register_id: "",
+      total: "",
+    },
   },
   mutations: {
-    SET_MOVEMENTS(state, movements) {
-      state.movements = movements;
+    SET_EDIT_ITEM(state, object) {
+      state.editedItem = object;
     },
-    SET_LOADING_DATATABLE(state, status) {
-      state.loading = status;
-    },
-    SET_START_DATE(state, start) {
-      state.start = start;
-    },
-    SET_END_DATE(state, end) {
-      state.end = end;
+    SET_EGRESS_TYPES(state, egress_types) {
+      state.egress_types = egress_types;
     },
   },
   actions: {
-    getAllMovementsBewteenDates({ state, commit, rootState }) {
-      commit("SET_LOADING_DATATABLE", true);
+    getAllEgressTypes({ commit }) {
       axios
-        .get(
-          `/api/movements?branch_office_id=${rootState.mainBranchOffice}&start=${state.start}&end=${state.end}`
-        )
+        .get(`/api/egress-types`)
         .then((result) => {
           // save all
-          commit("SET_MOVEMENTS", result.data.movements);
+          commit("SET_EGRESS_TYPES", result.data.egressTypes);
+        })
+        .catch(() => {});
+    },
+
+    storeEgress({ state, commit, dispatch }) {
+      commit("SET_OVERLAY_LOADING", true, { root: true });
+      return axios
+        .post("/api/egresses", state.editedItem)
+        .then((result) => {
+          if (result.status == 201) {
+            // show message
+            this._vm.showToastMessage(
+              result.status,
+              "Egreso creado exitosamente"
+            );
+            //  Update movemnts
+            dispatch("movements/getAllMovementsBewteenDates", null, {
+              root: true,
+            });
+            // Result
+            return true;
+          }
         })
         .catch((errors) => {
           // show error message
@@ -45,23 +70,25 @@ export default {
           return false;
         })
         .finally(() => {
-          commit("SET_LOADING_DATATABLE", false);
+          commit("SET_OVERLAY_LOADING", false, { root: true });
         });
     },
 
-    storeEgress({ state, commit, dispatch }) {
+    updateEgress({ state, commit, dispatch }) {
       commit("SET_OVERLAY_LOADING", true, { root: true });
       return axios
-        .post("/api/egress", state.editedItem)
+        .put(`/api/egresses/${state.editedItem.id}`, state.editedItem)
         .then((result) => {
           if (result.status == 201) {
             // show message
             this._vm.showToastMessage(
               result.status,
-              "Producto creado exitosamente"
+              "Egreso actualizado exitosamente"
             );
-            // Reload cash registers
-            dispatch("getAllProducts");
+            //  Update movemnts
+            dispatch("movements/getAllMovementsBewteenDates", null, {
+              root: true,
+            });
             // Result
             return true;
           }
@@ -82,13 +109,15 @@ export default {
     deleteEgress({ commit, dispatch }, id) {
       commit("SET_OVERLAY_LOADING", true, { root: true });
       return axios
-        .delete(`/api/egress/${id}`)
+        .delete(`/api/egresses/${id}`)
         .then((result) => {
           if (result.status == 204) {
             // show message
             this._vm.showToastMessage(result.status);
-            // Reload cash registers
-            dispatch("getAllMovementsBewteenDates");
+            //  Update movemnts
+            dispatch("movements/getAllMovementsBewteenDates", null, {
+              root: true,
+            });
             return true;
           } else {
             return false;

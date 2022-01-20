@@ -130,15 +130,15 @@
 
                     <v-col cols="6">
                       <v-select
-                        v-model="editedItem.group"
-                        :items="groups"
+                        v-model="editedItem.egress_type_id"
+                        :items="egress_types"
                         class="text-center"
                         item-text="name"
                         item-value="id"
                         label="Grupo*"
-                        :error-messages="groupErrors"
-                        @input="$v.editedItem.group.$touch()"
-                        @blur="$v.editedItem.group.$touch()"
+                        :error-messages="egressTypeErrors"
+                        @input="$v.editedItem.egress_type_id.$touch()"
+                        @blur="$v.editedItem.egress_type_id.$touch()"
                       ></v-select>
                     </v-col>
 
@@ -158,19 +158,9 @@
 
                     <v-col cols="6">
                       <vuetify-money
-                        v-model="editedItem.price"
+                        v-model="editedItem.total"
                         label="Valor*"
                       />
-                    </v-col>
-
-                    <v-col cols="12">
-                      <v-textarea
-                        label="Nota"
-                        v-model="note"
-                        :error-messages="notaErrors"
-                        @input="$v.note.$touch()"
-                        @blur="$v.note.$touch()"
-                      ></v-textarea>
                     </v-col>
                   </v-row>
                 </v-container>
@@ -188,7 +178,7 @@
         </v-toolbar>
       </template>
 
-      <!-- price -->
+      <!-- total -->
       <template v-slot:[`item.total`]="{ item }">
         <!-- Definir colores rojo para egresos - verde para ingresos -->
         <v-icon small>{{ moneyIcon }}</v-icon>
@@ -204,19 +194,73 @@
               fab
               x-small
               dark
-              color="secondary mr-1"
+              color="error mr-1"
               v-bind="attrs"
               v-on="on"
-              @click="deleteItem(item)"
-              v-show="permissions.delete"
+              @click="deleteItem(item.id)"
+              v-show="permissions.delete && item.edit"
             >
               <v-icon> {{ deleteIcon }} </v-icon>
             </v-btn>
           </template>
           <span>Eliminar</span>
         </v-tooltip>
+
+        <!-- Edit -->
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              fab
+              x-small
+              dark
+              color="secondary mr-1"
+              v-bind="attrs"
+              v-on="on"
+              @click="editItem(item)"
+              v-show="item.edit"
+            >
+              <v-icon> {{ editIcon }} </v-icon>
+            </v-btn>
+          </template>
+          <span>Editar</span>
+        </v-tooltip>
+
+        <!-- Notes -->
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              fab
+              x-small
+              dark
+              color="info"
+              v-bind="attrs"
+              v-on="on"
+              @click="
+                showNoteFormDialog(
+                  item.id,
+                  item.created_at,
+                  item.note,
+                  item.note_type
+                )
+              "
+            >
+              <v-icon>mdi-note-text</v-icon>
+            </v-btn>
+          </template>
+          <span>Nota</span>
+        </v-tooltip>
       </template>
     </v-data-table>
+
+    <!-- Notes dialog -->
+    <note-form-dialog
+      v-model="dialogNoteForm"
+      :id="id_movement"
+      :type="note_type"
+      :note="note"
+      :title="title"
+      @saved="updateRowNote($event)"
+    ></note-form-dialog>
   </div>
 </template>
 
@@ -226,16 +270,18 @@ import { moneyFormatMixin } from "@/mixins/moneyFormatMixin.js";
 import { required, maxLength, minValue } from "vuelidate/lib/validators";
 import { mapState, mapActions, mapMutations } from "vuex";
 import VuetifyMoney from "@/components/vuetifyMoney.vue";
+import NoteFormDialog from "@/components/NoteFormDialog.vue";
 import moment from "moment";
 
 export default {
   data: () => ({
     permissions: {},
     dialog: false,
+    // Notes
     id_movement: 0,
-    payment_proof: 0,
-    note: 0,
-
+    title: "",
+    note_type: 0,
+    note: "",
     dialogNoteForm: false,
 
     dialogStart: false,
@@ -261,7 +307,7 @@ export default {
   validations: {
     editedItem: {
       mediator: { required, maxLength: maxLength(255) },
-      group: { required },
+      egress_type_id: { required },
       cash_register_id: { required },
       total: { required, minValue: minValue(1) },
     },
@@ -275,18 +321,15 @@ export default {
     // Acciones que debe realizar el componente una vez creado
     if (this.permissions.read) {
       this.initialize();
+      this.getAllEgressTypes();
+      this.getAllCashRegisters(1);
     }
   },
   computed: {
-    ...mapState(["deleteIcon", "loadingText", "mainBranchOffice"]),
-    ...mapState("movements", [
-      "movements",
-      "start",
-      "end",
-      "loading",
-      "editedItem",
-      "defaultItem",
-    ]),
+    ...mapState(["deleteIcon", "editIcon", "loadingText", "mainBranchOffice"]),
+    ...mapState("movements", ["movements", "start", "end", "loading"]),
+    ...mapState("cash_registers", ["cash_registers"]),
+    ...mapState("egresses", ["egress_types", "editedItem", "defaultItem"]),
     mediatorErrors() {
       const errors = [];
       if (!this.$v.editedItem.mediator.$dirty) return errors;
@@ -296,10 +339,10 @@ export default {
         errors.push("Longitud no permitida");
       return errors;
     },
-    groupErrors() {
+    egressTypeErrors() {
       const errors = [];
-      if (!this.$v.editedItem.group.$dirty) return errors;
-      !this.$v.editedItem.group.required &&
+      if (!this.$v.editedItem.egress_type_id.$dirty) return errors;
+      !this.$v.editedItem.egress_type_id.required &&
         errors.push("El grupo es requerido");
       return errors;
     },
@@ -337,17 +380,22 @@ export default {
     mainBranchOffice() {
       if (this.permissions.read) {
         this.initialize();
+        this.getAllCashRegisters(1);
       }
     },
   },
 
   methods: {
     ...mapActions("movements", ["getAllMovementsBewteenDates"]),
-    ...mapMutations("movements", [
-      "SET_EDIT_ITEM",
-      "SET_START_DATE",
-      "SET_END_DATE",
+    ...mapActions("cash_registers", ["getAllCashRegisters"]),
+    ...mapActions("egresses", [
+      "getAllEgressTypes",
+      "storeEgress",
+      "updateEgress",
+      "deleteEgress",
     ]),
+    ...mapMutations("egresses", ["SET_EDIT_ITEM"]),
+    ...mapMutations("movements", ["SET_START_DATE", "SET_END_DATE"]),
     initialize() {
       this.getAllMovementsBewteenDates();
     },
@@ -360,23 +408,70 @@ export default {
       });
     },
 
+    editItem(item) {
+      this.editedIndex = this.movements.indexOf(item);
+      this.SET_EDIT_ITEM(Object.assign({}, item));
+      this.dialog = true;
+    },
+
     save() {
       // activate validations form
       this.$v.$touch();
       // Correct validations
       if (!this.$v.$invalid) {
-        // Do store
-        this.storeEgress().then((result) => {
-          if (result) {
-            this.close();
-          }
-        });
+        if (this.editedIndex > -1) {
+          // Do update
+          this.updateEgress().then((result) => {
+            if (result) {
+              this.close();
+            }
+          });
+        } else {
+          // Do store
+          this.storeEgress().then((result) => {
+            if (result) {
+              this.close();
+            }
+          });
+        }
       }
+    },
+
+    deleteItem(id) {
+      this.$confirm(`¿Seguro quieres eliminar este egreso?`, {
+        title: "Advertencia",
+      }).then((res) => {
+        if (res) {
+          this.deleteEgress(id).then((result) => {
+            if (result) {
+              this.initialize();
+            }
+          });
+        }
+      });
+    },
+
+    showNoteFormDialog(id, title, note, note_type) {
+      this.id_movement = id;
+      this.title = "Fecha movimiento: " + title;
+      this.note = note;
+      this.note_type = note_type;
+      this.dialogNoteForm = true;
+    },
+
+    updateRowNote(note) {
+      let row = this.movements.find(
+        (element) =>
+          element.id === this.id_movement &&
+          element.note_type === this.note_type
+      );
+      row.note = note;
     },
   },
 
   components: {
     VuetifyMoney,
+    NoteFormDialog,
   },
 };
 </script>

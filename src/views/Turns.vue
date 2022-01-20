@@ -344,6 +344,7 @@ export default {
     // Acciones que debe realizar el componente una vez creado
     if (this.permissions.read) {
       this.initialize();
+      this.getAllCashRegisters(1);
     }
   },
 
@@ -460,6 +461,8 @@ export default {
     mainBranchOffice() {
       if (this.permissions.read) {
         this.initialize();
+        this.getAllCollaborators();
+        this.getAllCashRegisters(1);
       }
     },
   },
@@ -481,8 +484,6 @@ export default {
     ]),
     initialize() {
       this.getAllTurns();
-      this.getAllCollaborators();
-      this.getAllCashRegisters(1);
     },
 
     close() {

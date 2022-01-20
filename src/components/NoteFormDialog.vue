@@ -4,7 +4,7 @@
     <v-card>
       <v-card-title>
         <span class="headline">
-          Nota - <small>Venta N°&nbsp;{{ title }}</small></span
+          Nota - <small>{{ title }}</small></span
         >
       </v-card-title>
 
@@ -14,11 +14,12 @@
             <v-col cols="12">
               <v-textarea
                 name="input-7-1"
-                label="Notas de la venta"
+                label="Notas"
                 v-model="description"
                 :error-messages="descriptionErrors"
                 @input="$v.description.$touch()"
                 @blur="$v.description.$touch()"
+                counter="500"
               ></v-textarea>
             </v-col>
           </v-row>
@@ -37,7 +38,7 @@
 <script>
 import { mapActions } from "vuex";
 import { validationMixin } from "vuelidate";
-import { required } from "vuelidate/lib/validators";
+import { maxLength } from "vuelidate/lib/validators";
 export default {
   name: "note-form-dialog",
   data() {
@@ -49,7 +50,7 @@ export default {
   mixins: [validationMixin],
   validations: {
     description: {
-      required,
+      maxLength: maxLength(500),
     },
   },
   props: {
@@ -91,7 +92,8 @@ export default {
     descriptionErrors() {
       const errors = [];
       if (!this.$v.description.$dirty) return errors;
-      !this.$v.description.required && errors.push("La nota es requerida");
+      !this.$v.description.maxLength &&
+        errors.push("La longitud no es permitida");
       return errors;
     },
   },
