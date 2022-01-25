@@ -3,51 +3,49 @@
     <v-row>
       <!-- Cash registers -->
       <v-col md="6">
-        <v-simple-table fixed-header height="200px" class="elevation-2">
-          <template v-slot:default>
-            <thead>
-              <tr>
-                <th class="text-left">Caja</th>
-                <th class="text-left">Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(item, index) in cash_registers" :key="index">
-                <td>{{ item.name }}</td>
-                <td>
-                  <v-icon small>
-                    {{ moneyIcon }}
-                  </v-icon>
-                  {{ currencyFormat(item.amount) }}
-                </td>
-              </tr>
-            </tbody>
+        <v-data-table
+          fixed-header
+          sort-by="name"
+          class="elevation-3"
+          :headers="headersCashRegisters"
+          :items="cash_registers"
+          hide-actions
+          select-all
+          height="200px"
+          :hide-default-footer="true"
+          :disable-pagination="true"
+          item-key="id"
+        >
+          <template v-slot:[`item.amount`]="{ item }">
+            <v-icon small>{{ moneyIcon }}</v-icon>
+            <span>
+              {{ currencyFormat(item.amount) }}
+            </span>
           </template>
-        </v-simple-table>
+        </v-data-table>
       </v-col>
       <!-- Incomes Plans -->
       <v-col md="6">
-        <v-simple-table fixed-header height="200px" class="elevation-2">
-          <template v-slot:default>
-            <thead>
-              <tr>
-                <th class="text-left">Plan</th>
-                <th class="text-left">Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(item, index) in income_plans" :key="index">
-                <td>{{ item.name }}</td>
-                <td>
-                  <v-icon small>
-                    {{ moneyIcon }}
-                  </v-icon>
-                  {{ currencyFormat(item.total) }}
-                </td>
-              </tr>
-            </tbody>
+        <v-data-table
+          fixed-header
+          sort-by="name"
+          class="elevation-3"
+          :headers="headersPlans"
+          :items="income_plans"
+          hide-actions
+          select-all
+          height="200px"
+          :hide-default-footer="true"
+          :disable-pagination="true"
+          item-key="id"
+        >
+          <template v-slot:[`item.total`]="{ item }">
+            <v-icon small>{{ moneyIcon }}</v-icon>
+            <span>
+              {{ currencyFormat(item.total) }}
+            </span>
           </template>
-        </v-simple-table>
+        </v-data-table>
       </v-col>
     </v-row>
 
@@ -241,8 +239,15 @@
           <!-- total -->
           <template v-slot:[`item.total`]="{ item }">
             <!-- Definir colores rojo para egresos - verde para ingresos -->
-            <v-icon small>{{ moneyIcon }}</v-icon>
-            {{ currencyFormat(item.total) }}
+            <span :class="classObject(item.type_movement)">
+              {{ item.type_movement === "Egreso" ? "-" : "+" }}
+            </span>
+            <v-icon small :class="classObject(item.type_movement)">{{
+              moneyIcon
+            }}</v-icon>
+            <span :class="classObject(item.type_movement)">
+              {{ currencyFormat(item.total) }}
+            </span>
           </template>
 
           <!-- Actions -->
@@ -363,6 +368,15 @@ export default {
       { text: "Nota", value: "note" },
       { text: "Acciones", value: "actions", sortable: false },
     ],
+    headersCashRegisters: [
+      { text: "Caja", value: "name" },
+      { text: "Total", value: "amount" },
+    ],
+    headersPlans: [
+      { text: "Plan", value: "name" },
+      { text: "Total", value: "total" },
+    ],
+
     editedIndex: -1,
   }),
   mixins: [validationMixin, moneyFormatMixin],
@@ -520,6 +534,7 @@ export default {
           this.deleteEgress(id).then((result) => {
             if (result) {
               this.initialize();
+              this.getAllCashRegisters(1);
             }
           });
         }
@@ -545,6 +560,13 @@ export default {
 
     researchMovemets() {
       this.initialize();
+    },
+
+    classObject: function (type_movement) {
+      return {
+        "success--text": type_movement === "Ingreso",
+        "error--text": type_movement === "Egreso",
+      };
     },
   },
 

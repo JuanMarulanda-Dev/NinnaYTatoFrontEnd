@@ -212,6 +212,31 @@
                   <span>Nota</span>
                 </v-tooltip>
               </template>
+
+              <template v-slot:[`body.append`]>
+                <tr>
+                  <td class="font-weight-bold"></td>
+                  <td class="text-center font-weight-bold">Totals</td>
+                  <td class="text-left font-weight-bold">
+                    <v-icon small>
+                      {{ moneyIcon }}
+                    </v-icon>
+                    {{ currencyFormat(totals.total) }}
+                  </td>
+                  <td class="text-left font-weight-bold">
+                    <v-icon small>
+                      {{ moneyIcon }}
+                    </v-icon>
+                    {{ currencyFormat(totals.payment) }}
+                  </td>
+                  <td class="text-left font-weight-bold">
+                    <v-icon small>
+                      {{ moneyIcon }}
+                    </v-icon>
+                    {{ currencyFormat(totals.pending) }}
+                  </td>
+                </tr>
+              </template>
             </v-data-table>
           </v-container>
         </v-card-text>
@@ -279,6 +304,23 @@ export default {
     },
     maxDate() {
       return this.getNowDate();
+    },
+
+    totals() {
+      const totals = this.sales.reduce(
+        (acc, d) => {
+          acc.payment += parseFloat(d.payment);
+          acc.pending += parseFloat(d.pending);
+          acc.total += parseFloat(d.total);
+          return acc;
+        },
+        {
+          payment: 0,
+          pending: 0,
+          total: 0,
+        }
+      );
+      return totals;
     },
   },
 
