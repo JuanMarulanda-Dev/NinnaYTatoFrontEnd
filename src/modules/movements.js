@@ -8,12 +8,16 @@ export default {
     // Generals loading datatables
     loading: false,
     movements: [],
+    income_plans: [],
     start: "",
     end: "",
   },
   mutations: {
     SET_MOVEMENTS(state, movements) {
       state.movements = movements;
+    },
+    SET_INCOME_PLANS(state, income_plans) {
+      state.income_plans = income_plans;
     },
     SET_LOADING_DATATABLE(state, status) {
       state.loading = status;
@@ -46,6 +50,17 @@ export default {
         })
         .finally(() => {
           commit("SET_LOADING_DATATABLE", false);
+        });
+    },
+
+    getAllIncomePlans({ state, commit, rootState }) {
+      axios
+        .get(
+          `/api/movements/income-plans?branch_office_id=${rootState.mainBranchOffice}&start=${state.start}&end=${state.end}`
+        )
+        .then((result) => {
+          // save all
+          commit("SET_INCOME_PLANS", result.data.incomePlans);
         });
     },
 

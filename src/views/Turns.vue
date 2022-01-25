@@ -262,6 +262,7 @@
           <span>Eliminar</span>
         </v-tooltip>
 
+        <!-- Edit -->
         <v-tooltip bottom>
           <template v-slot:activator="{ on, attrs }">
             <v-btn
@@ -279,8 +280,43 @@
           </template>
           <span>Editar</span>
         </v-tooltip>
+
+        <!-- Notes -->
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              fab
+              x-small
+              dark
+              color="info"
+              v-bind="attrs"
+              v-on="on"
+              @click="
+                showNoteFormDialog(
+                  item.id,
+                  item.name,
+                  item.note,
+                  item.note_type
+                )
+              "
+            >
+              <v-icon>mdi-note-text</v-icon>
+            </v-btn>
+          </template>
+          <span>Nota</span>
+        </v-tooltip>
       </template>
     </v-data-table>
+
+    <!-- Notes dialog -->
+    <note-form-dialog
+      v-model="dialogNoteForm"
+      :id="id_turn"
+      :type="note_type"
+      :note="note"
+      :title="title"
+      @saved="updateRowNote($event)"
+    ></note-form-dialog>
   </div>
 </template>
 
@@ -290,15 +326,17 @@ import { moneyFormatMixin } from "@/mixins/moneyFormatMixin.js";
 import { required, minValue } from "vuelidate/lib/validators";
 import { mapState, mapActions, mapMutations } from "vuex";
 import VuetifyMoney from "@/components/vuetifyMoney.vue";
+import NoteFormDialog from "@/components/NoteFormDialog.vue";
 import moment from "moment";
 
 export default {
   data: () => ({
     permissions: {},
     dialog: false,
-    id_turn: 0,
-    payment_proof: 0, // esto no se va a utilizar más
-    note: 0,
+    id_turn: "",
+    title: "",
+    note: "",
+    note_type: 3,
     dialogNoteForm: false,
 
     dialogStart: false,
@@ -344,6 +382,7 @@ export default {
     // Acciones que debe realizar el componente una vez creado
     if (this.permissions.read) {
       this.initialize();
+      this.getAllCollaborators();
       this.getAllCashRegisters(1);
     }
   },
@@ -541,10 +580,18 @@ export default {
       let row = this.movements.find((element) => element.id === this.id_turn);
       row.note = note;
     },
+
+    showNoteFormDialog(id, title, note) {
+      this.id_turn = id;
+      this.title = "Turno: " + title;
+      this.note = note ?? "";
+      this.dialogNoteForm = true;
+    },
   },
 
   components: {
     VuetifyMoney,
+    NoteFormDialog,
   },
 };
 </script>

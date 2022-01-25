@@ -1,256 +1,318 @@
 <template>
   <div>
-    <v-data-table
-      fixed-header
-      :headers="headers"
-      :items="movements"
-      sort-by="name"
-      class="elevation-3"
-      :loading="loading"
-      :loading-text="loadingText"
-    >
-      <!-- Header content datatable -->
-      <template v-slot:top>
-        <v-toolbar flat color="white" class="rounded-xl">
-          <!-- Title Module -->
-          <v-toolbar-title>
-            <v-icon large>mdi-notebook-multiple</v-icon> Movimientos
-          </v-toolbar-title>
-          <v-divider class="mx-4" inset vertical></v-divider>
-          <!-- Filter date start -->
-          <v-dialog
-            ref="start"
-            v-model="dialogStart"
-            :return-value.sync="startDate"
-            persistent
-            width="290px"
-            :retain-focus="false"
-          >
-            <template v-slot:activator="{ on, attrs }">
-              <v-text-field
-                class="mt-8"
-                v-model="startDate"
-                label="Fecha"
-                prepend-icon="mdi-calendar"
-                readonly
-                v-bind="attrs"
-                v-on="on"
-              ></v-text-field>
-            </template>
-            <v-date-picker
-              @change="getAllMovementsBewteenDates()"
-              v-model="startDate"
-              scrollable
-            >
-              <v-spacer></v-spacer>
-              <v-btn text color="primary" @click="dialogStart = false">
-                Cancel
-              </v-btn>
-              <v-btn text color="primary" @click="$refs.start.save(startDate)">
-                OK
-              </v-btn>
-            </v-date-picker>
-          </v-dialog>
-          <!-- Filter date end -->
-          <v-dialog
-            ref="end"
-            v-model="dialogEnd"
-            :return-value.sync="endDate"
-            persistent
-            width="290px"
-            :retain-focus="false"
-          >
-            <template v-slot:activator="{ on, attrs }">
-              <v-text-field
-                class="mt-8"
-                v-model="endDate"
-                label="Fecha"
-                prepend-icon="mdi-calendar"
-                readonly
-                v-bind="attrs"
-                v-on="on"
-              ></v-text-field>
-            </template>
-            <v-date-picker
-              @change="getAllMovementsBewteenDates()"
-              v-model="endDate"
-              scrollable
-            >
-              <v-spacer></v-spacer>
-              <v-btn text color="primary" @click="dialogEnd = false">
-                Cancel
-              </v-btn>
-              <v-btn text color="primary" @click="$refs.end.save(endDate)">
-                OK
-              </v-btn>
-            </v-date-picker>
-          </v-dialog>
-          <v-spacer></v-spacer>
-          <!-- Modal New/edit-->
-          <v-dialog v-model="dialog" persistent max-width="600px">
-            <!-- Button active modal -->
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn
-                fab
-                small
-                color="secondary"
-                elevation="3"
-                dark
-                v-bind="attrs"
-                v-on="on"
-                v-show="permissions.create"
+    <v-row>
+      <!-- Cash registers -->
+      <v-col md="6">
+        <v-simple-table fixed-header height="200px" class="elevation-2">
+          <template v-slot:default>
+            <thead>
+              <tr>
+                <th class="text-left">Caja</th>
+                <th class="text-left">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(item, index) in cash_registers" :key="index">
+                <td>{{ item.name }}</td>
+                <td>
+                  <v-icon small>
+                    {{ moneyIcon }}
+                  </v-icon>
+                  {{ currencyFormat(item.amount) }}
+                </td>
+              </tr>
+            </tbody>
+          </template>
+        </v-simple-table>
+      </v-col>
+      <!-- Incomes Plans -->
+      <v-col md="6">
+        <v-simple-table fixed-header height="200px" class="elevation-2">
+          <template v-slot:default>
+            <thead>
+              <tr>
+                <th class="text-left">Plan</th>
+                <th class="text-left">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(item, index) in income_plans" :key="index">
+                <td>{{ item.name }}</td>
+                <td>
+                  <v-icon small>
+                    {{ moneyIcon }}
+                  </v-icon>
+                  {{ currencyFormat(item.total) }}
+                </td>
+              </tr>
+            </tbody>
+          </template>
+        </v-simple-table>
+      </v-col>
+    </v-row>
+
+    <v-row>
+      <v-col cols="12">
+        <v-data-table
+          fixed-header
+          :headers="headers"
+          :items="movements"
+          sort-by="name"
+          class="elevation-3"
+          :loading="loading"
+          :loading-text="loadingText"
+          item-key="created_at"
+        >
+          <!-- Header content datatable -->
+          <template v-slot:top>
+            <v-toolbar flat color="white" class="rounded-xl">
+              <!-- Title Module -->
+              <v-toolbar-title>
+                <v-icon large>mdi-notebook-multiple</v-icon> Movimientos
+              </v-toolbar-title>
+              <v-divider class="mx-4" inset vertical></v-divider>
+              <!-- Filter date start -->
+              <v-dialog
+                ref="start"
+                v-model="dialogStart"
+                :return-value.sync="startDate"
+                persistent
+                width="290px"
+                :retain-focus="false"
               >
-                <v-icon>mdi-plus-thick</v-icon>
-              </v-btn>
-            </template>
-            <!-- Modal Form -->
-            <v-card>
-              <v-card-title>
-                <span class="headline">
-                  <v-icon large>mdi-notebook-multiple</v-icon>
-                  Nuevo movimiento (Egreso)
-                </span>
-              </v-card-title>
-
-              <v-card-text>
-                <!-- Form movements -->
-                <v-container>
-                  <v-row>
-                    <v-col cols="6">
-                      <v-text-field
-                        v-model="editedItem.mediator"
-                        label="Mediador*"
-                        required
-                        counter="255"
-                        :error-messages="mediatorErrors"
-                        @input="$v.editedItem.mediator.$touch()"
-                        @blur="$v.editedItem.mediator.$touch()"
-                      ></v-text-field>
-                    </v-col>
-
-                    <v-col cols="6">
-                      <v-select
-                        v-model="editedItem.egress_type_id"
-                        :items="egress_types"
-                        class="text-center"
-                        item-text="name"
-                        item-value="id"
-                        label="Grupo*"
-                        :error-messages="egressTypeErrors"
-                        @input="$v.editedItem.egress_type_id.$touch()"
-                        @blur="$v.editedItem.egress_type_id.$touch()"
-                      ></v-select>
-                    </v-col>
-
-                    <v-col cols="6">
-                      <v-select
-                        v-model="editedItem.cash_register_id"
-                        :items="cash_registers"
-                        class="text-center"
-                        item-text="name"
-                        item-value="id"
-                        label="Origen*"
-                        :error-messages="cashRegisterErrors"
-                        @input="$v.editedItem.cash_register_id.$touch()"
-                        @blur="$v.editedItem.cash_register_id.$touch()"
-                      ></v-select>
-                    </v-col>
-
-                    <v-col cols="6">
-                      <vuetify-money
-                        v-model="editedItem.total"
-                        label="Valor*"
-                      />
-                    </v-col>
-                  </v-row>
-                </v-container>
-              </v-card-text>
-
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn color="error darken-1" text @click="close">Cancel</v-btn>
-                <v-btn color="blue darken-1" text @click="save()"
-                  >Guardar</v-btn
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field
+                    class="mt-8"
+                    v-model="startDate"
+                    label="Fecha"
+                    prepend-icon="mdi-calendar"
+                    readonly
+                    v-bind="attrs"
+                    v-on="on"
+                  ></v-text-field>
+                </template>
+                <v-date-picker
+                  @change="researchMovemets()"
+                  v-model="startDate"
+                  scrollable
                 >
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-        </v-toolbar>
-      </template>
+                  <v-spacer></v-spacer>
+                  <v-btn text color="primary" @click="dialogStart = false">
+                    Cancel
+                  </v-btn>
+                  <v-btn
+                    text
+                    color="primary"
+                    @click="$refs.start.save(startDate)"
+                  >
+                    OK
+                  </v-btn>
+                </v-date-picker>
+              </v-dialog>
+              <!-- Filter date end -->
+              <v-dialog
+                ref="end"
+                v-model="dialogEnd"
+                :return-value.sync="endDate"
+                persistent
+                width="290px"
+                :retain-focus="false"
+              >
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field
+                    class="mt-8"
+                    v-model="endDate"
+                    label="Fecha"
+                    prepend-icon="mdi-calendar"
+                    readonly
+                    v-bind="attrs"
+                    v-on="on"
+                  ></v-text-field>
+                </template>
+                <v-date-picker
+                  @change="researchMovemets()"
+                  v-model="endDate"
+                  scrollable
+                >
+                  <v-spacer></v-spacer>
+                  <v-btn text color="primary" @click="dialogEnd = false">
+                    Cancel
+                  </v-btn>
+                  <v-btn text color="primary" @click="$refs.end.save(endDate)">
+                    OK
+                  </v-btn>
+                </v-date-picker>
+              </v-dialog>
+              <v-spacer></v-spacer>
+              <!-- Modal New/edit-->
+              <v-dialog v-model="dialog" persistent max-width="600px">
+                <!-- Button active modal -->
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    fab
+                    small
+                    color="secondary"
+                    elevation="3"
+                    dark
+                    v-bind="attrs"
+                    v-on="on"
+                    v-show="permissions.create"
+                  >
+                    <v-icon>mdi-plus-thick</v-icon>
+                  </v-btn>
+                </template>
+                <!-- Modal Form -->
+                <v-card>
+                  <v-card-title>
+                    <span class="headline">
+                      <v-icon large>mdi-notebook-multiple</v-icon>
+                      Nuevo movimiento (Egreso)
+                    </span>
+                  </v-card-title>
 
-      <!-- total -->
-      <template v-slot:[`item.total`]="{ item }">
-        <!-- Definir colores rojo para egresos - verde para ingresos -->
-        <v-icon small>{{ moneyIcon }}</v-icon>
-        {{ currencyFormat(item.total) }}
-      </template>
+                  <v-card-text>
+                    <!-- Form movements -->
+                    <v-container>
+                      <v-row>
+                        <v-col cols="6">
+                          <v-text-field
+                            v-model="editedItem.mediator"
+                            label="Mediador*"
+                            required
+                            counter="255"
+                            :error-messages="mediatorErrors"
+                            @input="$v.editedItem.mediator.$touch()"
+                            @blur="$v.editedItem.mediator.$touch()"
+                          ></v-text-field>
+                        </v-col>
 
-      <!-- Actions -->
-      <template v-slot:[`item.actions`]="{ item }">
-        <!-- Eliminar (Only egresos) -->
-        <v-tooltip bottom>
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              fab
-              x-small
-              dark
-              color="error mr-1"
-              v-bind="attrs"
-              v-on="on"
-              @click="deleteItem(item.id)"
-              v-show="permissions.delete && item.edit"
-            >
-              <v-icon> {{ deleteIcon }} </v-icon>
-            </v-btn>
+                        <v-col cols="6">
+                          <v-select
+                            v-model="editedItem.egress_type_id"
+                            :items="egress_types"
+                            class="text-center"
+                            item-text="name"
+                            item-value="id"
+                            label="Grupo*"
+                            :error-messages="egressTypeErrors"
+                            @input="$v.editedItem.egress_type_id.$touch()"
+                            @blur="$v.editedItem.egress_type_id.$touch()"
+                          ></v-select>
+                        </v-col>
+
+                        <v-col cols="6">
+                          <v-select
+                            v-model="editedItem.cash_register_id"
+                            :items="cash_registers"
+                            class="text-center"
+                            item-text="name"
+                            item-value="id"
+                            label="Origen*"
+                            :error-messages="cashRegisterErrors"
+                            @input="$v.editedItem.cash_register_id.$touch()"
+                            @blur="$v.editedItem.cash_register_id.$touch()"
+                          ></v-select>
+                        </v-col>
+
+                        <v-col cols="6">
+                          <vuetify-money
+                            v-model="editedItem.total"
+                            label="Valor*"
+                          />
+                        </v-col>
+                      </v-row>
+                    </v-container>
+                  </v-card-text>
+
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="error darken-1" text @click="close"
+                      >Cancel</v-btn
+                    >
+                    <v-btn color="blue darken-1" text @click="save()"
+                      >Guardar</v-btn
+                    >
+                  </v-card-actions>
+                </v-card>
+              </v-dialog>
+            </v-toolbar>
           </template>
-          <span>Eliminar</span>
-        </v-tooltip>
 
-        <!-- Edit -->
-        <v-tooltip bottom>
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              fab
-              x-small
-              dark
-              color="secondary mr-1"
-              v-bind="attrs"
-              v-on="on"
-              @click="editItem(item)"
-              v-show="item.edit"
-            >
-              <v-icon> {{ editIcon }} </v-icon>
-            </v-btn>
+          <!-- total -->
+          <template v-slot:[`item.total`]="{ item }">
+            <!-- Definir colores rojo para egresos - verde para ingresos -->
+            <v-icon small>{{ moneyIcon }}</v-icon>
+            {{ currencyFormat(item.total) }}
           </template>
-          <span>Editar</span>
-        </v-tooltip>
 
-        <!-- Notes -->
-        <v-tooltip bottom>
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              fab
-              x-small
-              dark
-              color="info"
-              v-bind="attrs"
-              v-on="on"
-              @click="
-                showNoteFormDialog(
-                  item.id,
-                  item.created_at,
-                  item.note,
-                  item.note_type
-                )
-              "
-            >
-              <v-icon>mdi-note-text</v-icon>
-            </v-btn>
+          <!-- Actions -->
+          <template v-slot:[`item.actions`]="{ item }">
+            <!-- Eliminar (Only egresos) -->
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  fab
+                  x-small
+                  dark
+                  color="error mr-1"
+                  v-bind="attrs"
+                  v-on="on"
+                  @click="deleteItem(item.id)"
+                  v-show="permissions.delete && item.edit"
+                >
+                  <v-icon> {{ deleteIcon }} </v-icon>
+                </v-btn>
+              </template>
+              <span>Eliminar</span>
+            </v-tooltip>
+
+            <!-- Edit -->
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  fab
+                  x-small
+                  dark
+                  color="secondary mr-1"
+                  v-bind="attrs"
+                  v-on="on"
+                  @click="editItem(item)"
+                  v-show="item.edit"
+                >
+                  <v-icon> {{ editIcon }} </v-icon>
+                </v-btn>
+              </template>
+              <span>Editar</span>
+            </v-tooltip>
+
+            <!-- Notes -->
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  fab
+                  x-small
+                  dark
+                  color="info"
+                  v-bind="attrs"
+                  v-on="on"
+                  @click="
+                    showNoteFormDialog(
+                      item.id,
+                      item.created_at,
+                      item.note,
+                      item.note_type
+                    )
+                  "
+                >
+                  <v-icon>mdi-note-text</v-icon>
+                </v-btn>
+              </template>
+              <span>Nota</span>
+            </v-tooltip>
           </template>
-          <span>Nota</span>
-        </v-tooltip>
-      </template>
-    </v-data-table>
+        </v-data-table>
+      </v-col>
+    </v-row>
 
     <!-- Notes dialog -->
     <note-form-dialog
@@ -278,7 +340,7 @@ export default {
     permissions: {},
     dialog: false,
     // Notes
-    id_movement: 0,
+    id_movement: "",
     title: "",
     note_type: 0,
     note: "",
@@ -322,12 +384,19 @@ export default {
     if (this.permissions.read) {
       this.initialize();
       this.getAllEgressTypes();
+      this.getAllIncomePlans();
       this.getAllCashRegisters(1);
     }
   },
   computed: {
     ...mapState(["deleteIcon", "editIcon", "loadingText", "mainBranchOffice"]),
-    ...mapState("movements", ["movements", "start", "end", "loading"]),
+    ...mapState("movements", [
+      "movements",
+      "start",
+      "end",
+      "loading",
+      "income_plans",
+    ]),
     ...mapState("cash_registers", ["cash_registers"]),
     ...mapState("egresses", ["egress_types", "editedItem", "defaultItem"]),
     mediatorErrors() {
@@ -386,7 +455,10 @@ export default {
   },
 
   methods: {
-    ...mapActions("movements", ["getAllMovementsBewteenDates"]),
+    ...mapActions("movements", [
+      "getAllMovementsBewteenDates",
+      "getAllIncomePlans",
+    ]),
     ...mapActions("cash_registers", ["getAllCashRegisters"]),
     ...mapActions("egresses", [
       "getAllEgressTypes",
@@ -398,6 +470,7 @@ export default {
     ...mapMutations("movements", ["SET_START_DATE", "SET_END_DATE"]),
     initialize() {
       this.getAllMovementsBewteenDates();
+      this.getAllIncomePlans();
     },
 
     close() {
@@ -424,6 +497,7 @@ export default {
           this.updateEgress().then((result) => {
             if (result) {
               this.close();
+              this.getAllCashRegisters(1);
             }
           });
         } else {
@@ -431,6 +505,7 @@ export default {
           this.storeEgress().then((result) => {
             if (result) {
               this.close();
+              this.getAllCashRegisters(1);
             }
           });
         }
@@ -454,7 +529,7 @@ export default {
     showNoteFormDialog(id, title, note, note_type) {
       this.id_movement = id;
       this.title = "Fecha movimiento: " + title;
-      this.note = note;
+      this.note = note ?? "";
       this.note_type = note_type;
       this.dialogNoteForm = true;
     },
@@ -466,6 +541,10 @@ export default {
           element.note_type === this.note_type
       );
       row.note = note;
+    },
+
+    researchMovemets() {
+      this.initialize();
     },
   },
 

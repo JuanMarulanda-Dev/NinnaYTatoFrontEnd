@@ -246,7 +246,8 @@ export default {
     time: "",
     dialogDate: false,
     dialogNoteForm: false,
-    title: 0,
+    payment_proof: 0,
+    title: "",
     note_type: 1,
     id_sale: "",
     note: "",
@@ -315,7 +316,7 @@ export default {
     showNoteFormDialog(id, payment_proof, note) {
       this.id_sale = id;
       this.title = "Venta N° " + payment_proof;
-      this.note = note;
+      this.note = note ?? "";
       this.dialogNoteForm = true;
     },
 

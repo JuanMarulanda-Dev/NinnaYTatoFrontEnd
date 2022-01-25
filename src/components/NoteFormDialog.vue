@@ -71,7 +71,7 @@ export default {
       required: true,
     },
     title: {
-      type: Number,
+      type: String,
       required: true,
     },
   },
