@@ -167,10 +167,13 @@ export default {
         .finally(() => {});
     },
 
-    storeSale({ state, commit }) {
+    storeSale({ state, commit, rootState }) {
       commit("SET_OVERLAY_LOADING", true, { root: true });
       return axios
-        .post("/api/sales", state.sale)
+        .post("/api/sales", {
+          ...state.sale,
+          branch_office_id: rootState.mainBranchOffice,
+        })
         .then((result) => {
           if (result.status == 200) {
             // show message
@@ -200,6 +203,35 @@ export default {
         });
     },
 
+    changeStatusSale({ commit, dispatch }, id) {
+      commit("SET_OVERLAY_LOADING", true, { root: true });
+      return axios
+        .delete(`/api/sales/${id}`)
+        .then((result) => {
+          if (result.status == 204) {
+            // show message
+            this._vm.showToastMessage(result.status);
+            // Reload branch officess
+            dispatch("getAllSales");
+            return true;
+          } else {
+            return false;
+          }
+        })
+        .catch((errors) => {
+          // show error message
+          this._vm.showToastMessage(
+            errors.response.status,
+            this._vm.createMessageError(errors.response.data.errors)
+          );
+          return false;
+        })
+        .finally(() => {
+          commit("SET_OVERLAY_LOADING", false, { root: true });
+        });
+    },
+
+    // Esto se deberia encapsular en otro archivo
     getSalePayments({ commit }, saleId) {
       commit("SET_OVERLAY_LOADING", true, { root: true });
       // Process data before to send HTTP request
@@ -256,16 +288,46 @@ export default {
         });
     },
 
-    changeStatusSale({ commit, dispatch }, id) {
+    updatePayment({ state, commit, dispatch }) {
       commit("SET_OVERLAY_LOADING", true, { root: true });
       return axios
-        .delete(`/api/sales/${id}`)
+        .put(`/api/turns/${state.editedItem.id}`, state.editedItem)
+        .then((result) => {
+          if (result.status == 201) {
+            // show message
+            this._vm.showToastMessage(
+              result.status,
+              "Pago actualizado exitosamente"
+            );
+            // Reload cash registers
+            dispatch("getSalePayments");
+            // Result
+            return true;
+          }
+        })
+        .catch((errors) => {
+          // show error message
+          this._vm.showToastMessage(
+            errors.response.status,
+            this._vm.createMessageError(errors.response.data.errors)
+          );
+          return false;
+        })
+        .finally(() => {
+          commit("SET_OVERLAY_LOADING", false, { root: true });
+        });
+    },
+
+    deletePayment({ commit, dispatch }, id) {
+      commit("SET_OVERLAY_LOADING", true, { root: true });
+      return axios
+        .delete(`/api/payments/${id}`)
         .then((result) => {
           if (result.status == 204) {
             // show message
             this._vm.showToastMessage(result.status);
-            // Reload branch officess
-            dispatch("getAllSales");
+            // Reload cash registers
+            dispatch("getSalePayments");
             return true;
           } else {
             return false;
