@@ -27,7 +27,7 @@
             <v-col cols="12" md="6">
               <vuetify-money
                 label="Saldo a pagar"
-                v-model="editedItem.payment"
+                v-model="editedItem.total"
               ></vuetify-money>
             </v-col>
             <v-col cols="12" md="6">
@@ -80,24 +80,6 @@
                     </template>
                     <span>Eliminar</span>
                   </v-tooltip>
-
-                  <!-- Edit -->
-                  <v-tooltip bottom>
-                    <template v-slot:activator="{ on, attrs }">
-                      <v-btn
-                        fab
-                        x-small
-                        dark
-                        color="secondary mr-1"
-                        v-bind="attrs"
-                        v-on="on"
-                        @click="editItem(item)"
-                      >
-                        <v-icon> {{ editIcon }} </v-icon>
-                      </v-btn>
-                    </template>
-                    <span>Editar</span>
-                  </v-tooltip>
                 </template>
               </v-data-table>
             </v-col>
@@ -126,15 +108,16 @@ export default {
   data() {
     return {
       editedItem: {
-        payment: 0,
+        total: 0,
         cash_register_id: "",
       },
       defaultItem: {
-        payment: 0,
+        total: 0,
         cash_register_id: "",
       },
       headers: [
         { text: "Monto", value: "total", align: "center" },
+        { text: "Caja", value: "cash_register", align: "center" },
         { text: "Fecha", value: "created_at", align: "center" },
         { text: "Acciones", value: "actions", sortable: false },
       ],
@@ -167,7 +150,11 @@ export default {
   },
   methods: {
     ...mapMutations("sales", ["SET_DIALOG_SALE_PAYMENTS"]),
-    ...mapActions("sales", ["storeSalePayment", "getAllSales"]),
+    ...mapActions("sales", [
+      "storeSalePayment",
+      "getAllSales",
+      "deletePayment",
+    ]),
     ...mapActions("cash_registers", ["getAllCashRegisters"]),
     close() {
       this.SET_DIALOG_SALE_PAYMENTS(false);
@@ -179,11 +166,11 @@ export default {
       }).then((result) => {
         if (result) {
           // Store
-          if (this.editedItem.payment > 0) {
-            this.storeSalePayment(this.editedItem).then((result) => {
+          if (this.editedItem.total > 0) {
+            this.storeSalePayment({ ...this.editedItem }).then((result) => {
               if (result) {
                 this.getAllSales();
-                this.payment = 0;
+                this.total = 0;
                 this.close();
               }
             });
@@ -192,21 +179,12 @@ export default {
       });
     },
 
-    editItem(item) {
-      this.editedIndex = this.payments.indexOf(item);
-      this.editedItem = Object.assign({}, item);
-    },
-
     deleteItem(id) {
       this.$confirm(`¿Seguro quieres eliminar este turno?`, {
         title: "Advertencia",
       }).then((res) => {
         if (res) {
-          this.deletePayment(id).then((result) => {
-            if (result) {
-              this.getAllTurns();
-            }
-          });
+          this.deletePayment(id);
         }
       });
     },

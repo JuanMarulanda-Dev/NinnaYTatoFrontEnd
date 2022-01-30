@@ -11,6 +11,10 @@ export default {
     income_plans: [],
     start: "",
     end: "",
+    exchange: {
+      cash_register_id: "",
+      movement_type: "",
+    },
   },
   mutations: {
     SET_MOVEMENTS(state, movements) {
@@ -107,6 +111,34 @@ export default {
             return true;
           } else {
             return false;
+          }
+        })
+        .catch((errors) => {
+          // show error message
+          this._vm.showToastMessage(
+            errors.response.status,
+            this._vm.createMessageError(errors.response.data.errors)
+          );
+          return false;
+        })
+        .finally(() => {
+          commit("SET_OVERLAY_LOADING", false, { root: true });
+        });
+    },
+
+    saveExchangeCashRegister({ state, commit }, id) {
+      commit("SET_OVERLAY_LOADING", true, { root: true });
+      axios
+        .post(`/api/movments/${id}/exchange`, state.exchange)
+        .then((result) => {
+          if (result.status == 201) {
+            // show message
+            this._vm.showToastMessage(
+              result.status,
+              "Intercambio realizado exitosamente."
+            );
+            // Result
+            return true;
           }
         })
         .catch((errors) => {

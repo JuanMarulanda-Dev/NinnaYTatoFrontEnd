@@ -9,8 +9,6 @@
           class="elevation-3"
           :headers="headersCashRegisters"
           :items="cash_registers"
-          hide-actions
-          select-all
           height="200px"
           :hide-default-footer="true"
           :disable-pagination="true"
@@ -32,8 +30,6 @@
           class="elevation-3"
           :headers="headersPlans"
           :items="income_plans"
-          hide-actions
-          select-all
           height="200px"
           :hide-default-footer="true"
           :disable-pagination="true"
@@ -271,7 +267,7 @@
               <span>Eliminar</span>
             </v-tooltip>
 
-            <!-- Edit -->
+            <!-- Edit (Only egresos)-->
             <v-tooltip bottom>
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
@@ -297,7 +293,7 @@
                   fab
                   x-small
                   dark
-                  color="info"
+                  color="info mr-1"
                   v-bind="attrs"
                   v-on="on"
                   @click="
@@ -314,6 +310,24 @@
               </template>
               <span>Nota</span>
             </v-tooltip>
+
+            <!-- Change Cash register -->
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  fab
+                  x-small
+                  dark
+                  color="primary"
+                  v-bind="attrs"
+                  v-on="on"
+                  @click="showExchangeForm(item.id, item.note_type)"
+                >
+                  <v-icon>mdi-swap-horizontal-bold</v-icon>
+                </v-btn>
+              </template>
+              <span>Cambiar caja</span>
+            </v-tooltip>
           </template>
         </v-data-table>
       </v-col>
@@ -328,6 +342,12 @@
       :title="title"
       @saved="updateRowNote($event)"
     ></note-form-dialog>
+
+    <!-- Dialog exchange cash register -->
+    <movement-cash-register-change-form
+      v-model="dialogExchangeCashRegister"
+      :id="id_movement"
+    ></movement-cash-register-change-form>
   </div>
 </template>
 
@@ -338,6 +358,7 @@ import { required, maxLength, minValue } from "vuelidate/lib/validators";
 import { mapState, mapActions, mapMutations } from "vuex";
 import VuetifyMoney from "@/components/vuetifyMoney.vue";
 import NoteFormDialog from "@/components/NoteFormDialog.vue";
+import MovementCashRegisterChangeForm from "@/components/movements/MovementCashRegisterChangeForm.vue";
 import moment from "moment";
 
 export default {
@@ -353,6 +374,8 @@ export default {
 
     dialogStart: false,
     dialogEnd: false,
+
+    dialogExchangeCashRegister: false,
 
     headers: [
       {
@@ -410,6 +433,7 @@ export default {
       "end",
       "loading",
       "income_plans",
+      "exchange",
     ]),
     ...mapState("cash_registers", ["cash_registers"]),
     ...mapState("egresses", ["egress_types", "editedItem", "defaultItem"]),
@@ -472,6 +496,7 @@ export default {
     ...mapActions("movements", [
       "getAllMovementsBewteenDates",
       "getAllIncomePlans",
+      "saveExchangeCashRegister",
     ]),
     ...mapActions("cash_registers", ["getAllCashRegisters"]),
     ...mapActions("egresses", [
@@ -568,11 +593,18 @@ export default {
         "error--text": type_movement === "Egreso",
       };
     },
+
+    showExchangeForm(id, movement_type) {
+      this.id_movement = id;
+      this.exchange.movement_type = movement_type;
+      this.dialogExchangeCashRegister = true;
+    },
   },
 
   components: {
     VuetifyMoney,
     NoteFormDialog,
+    MovementCashRegisterChangeForm,
   },
 };
 </script>

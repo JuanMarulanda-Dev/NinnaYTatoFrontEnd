@@ -159,7 +159,7 @@
                       @click="
                         searchPayments(item.id, item.number_payment_proof)
                       "
-                      v-show="item.pending > 0"
+                      v-show="item.pending > 0 || user.is_admin"
                     >
                       <v-icon>mdi-cash-multiple</v-icon>
                     </v-btn>
@@ -292,7 +292,7 @@ export default {
   }),
   mixins: [moneyFormatMixin],
   computed: {
-    ...mapState(["loadingText", "mainBranchOffice", "detailsIcon"]),
+    ...mapState(["loadingText", "mainBranchOffice", "detailsIcon", "user"]),
     ...mapState("sales", ["sales", "loading", "dialog", "permissions"]),
     dateSales: {
       get() {

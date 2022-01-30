@@ -257,10 +257,10 @@ export default {
         });
     },
 
-    storeSalePayment({ state, commit }, payment) {
+    storeSalePayment({ state, commit }, data) {
       commit("SET_OVERLAY_LOADING", true, { root: true });
       return axios
-        .post(`/api/sales/${state.saleId}/payments`, { total: payment })
+        .post(`/api/sales/${state.saleId}/payments`, data)
         .then((result) => {
           if (result.status == 201) {
             // show message
@@ -318,7 +318,7 @@ export default {
         });
     },
 
-    deletePayment({ commit, dispatch }, id) {
+    deletePayment({ state, commit, dispatch }, id) {
       commit("SET_OVERLAY_LOADING", true, { root: true });
       return axios
         .delete(`/api/payments/${id}`)
@@ -327,7 +327,7 @@ export default {
             // show message
             this._vm.showToastMessage(result.status);
             // Reload cash registers
-            dispatch("getSalePayments");
+            dispatch("getSalePayments", state.saleId);
             return true;
           } else {
             return false;

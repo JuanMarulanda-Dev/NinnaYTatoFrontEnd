@@ -319,7 +319,7 @@ export default {
     },
   },
   computed: {
-    ...mapState(["user"]),
+    ...mapState(["user", "mainBranchOffice"]),
     ...mapState("lodging", [
       "default_plans_details",
       "outputData",
@@ -430,6 +430,7 @@ export default {
                 overtime_liquidity_option:
                   this.outputData.overtime_liquidity_option,
                 cash_register_id: this.outputData.cash_register_id,
+                branch_office_id: this.mainBranchOffice,
                 sales_payments: this.sales_lodging.map((obj) => ({
                   sale_id: obj.sale_id,
                   payment: obj.payment,
