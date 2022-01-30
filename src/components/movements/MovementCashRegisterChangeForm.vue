@@ -95,6 +95,7 @@ export default {
   },
   methods: {
     ...mapActions("movements", ["saveExchangeCashRegister"]),
+    ...mapActions("cash_registers", ["getAllCashRegisters"]),
 
     save() {
       // activate validations form
@@ -106,6 +107,8 @@ export default {
           if (result) {
             // Actualziar el nombre de la caja del movimiento y mandar a consultar nuevamente a las cajas
             this.close();
+            // ...
+            this.getAllCashRegisters(1);
           }
         });
       }

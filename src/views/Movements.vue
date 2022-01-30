@@ -311,7 +311,7 @@
               <span>Nota</span>
             </v-tooltip>
 
-            <!-- Change Cash register -->
+            <!-- Change Cash register (Not egresses)-->
             <v-tooltip bottom>
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
@@ -321,7 +321,14 @@
                   color="primary"
                   v-bind="attrs"
                   v-on="on"
-                  @click="showExchangeForm(item.id, item.note_type)"
+                  @click="
+                    showExchangeForm(
+                      item.id,
+                      item.exchange_type,
+                      item.payment_id
+                    )
+                  "
+                  v-show="!item.edit"
                 >
                   <v-icon>mdi-swap-horizontal-bold</v-icon>
                 </v-btn>
@@ -594,9 +601,10 @@ export default {
       };
     },
 
-    showExchangeForm(id, movement_type) {
+    showExchangeForm(id, movement_type, payment_id = 0) {
       this.id_movement = id;
       this.exchange.movement_type = movement_type;
+      this.exchange.payment_id = payment_id;
       this.dialogExchangeCashRegister = true;
     },
   },

@@ -14,6 +14,7 @@ export default {
     exchange: {
       cash_register_id: "",
       movement_type: "",
+      payment_id: "",
     },
   },
   mutations: {
@@ -128,8 +129,8 @@ export default {
 
     saveExchangeCashRegister({ state, commit }, id) {
       commit("SET_OVERLAY_LOADING", true, { root: true });
-      axios
-        .post(`/api/movments/${id}/exchange`, state.exchange)
+      return axios
+        .put(`/api/movements/${id}/exchange`, state.exchange)
         .then((result) => {
           if (result.status == 201) {
             // show message
