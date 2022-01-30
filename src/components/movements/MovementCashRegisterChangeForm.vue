@@ -69,7 +69,7 @@ export default {
     },
   },
   computed: {
-    ...mapState("movements", ["exchange", "cash_registers"]),
+    ...mapState("movements", ["exchange", "cash_registers", "movements"]),
     ...mapState("cash_registers", ["cash_registers"]),
     cashRegisterErrors() {
       const errors = [];
@@ -105,10 +105,20 @@ export default {
         // Do update
         this.saveExchangeCashRegister(this.id).then((result) => {
           if (result) {
-            // Actualziar el nombre de la caja del movimiento y mandar a consultar nuevamente a las cajas
-            this.close();
-            // ...
+            // Actualziar el nombre de la caja del movimiento
+            let row = this.movements.find(
+              (element) =>
+                element.id === this.id &&
+                element.exchange_type === this.exchange.movement_type
+            );
+            row.cash_register = this.cash_registers.find(
+              (item) => item.id === this.exchange.cash_register_id
+            ).name;
+
+            // Mandar a consultar nuevamente a las cajas
             this.getAllCashRegisters(1);
+
+            this.close();
           }
         });
       }

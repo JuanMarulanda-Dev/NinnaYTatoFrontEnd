@@ -213,7 +213,7 @@
                 </v-tooltip>
               </template>
 
-              <template v-slot:[`body.append`]>
+              <template v-slot:[`body.append`]="{ items }">
                 <tr>
                   <td class="font-weight-bold"></td>
                   <td class="text-center font-weight-bold">Totals</td>
@@ -221,19 +221,19 @@
                     <v-icon small>
                       {{ moneyIcon }}
                     </v-icon>
-                    {{ currencyFormat(totals.total) }}
+                    {{ currencyFormat(totals(items).total) }}
                   </td>
                   <td class="text-left font-weight-bold">
                     <v-icon small>
                       {{ moneyIcon }}
                     </v-icon>
-                    {{ currencyFormat(totals.payment) }}
+                    {{ currencyFormat(totals(items).payment) }}
                   </td>
                   <td class="text-left font-weight-bold">
                     <v-icon small>
                       {{ moneyIcon }}
                     </v-icon>
-                    {{ currencyFormat(totals.pending) }}
+                    {{ currencyFormat(totals(items).pending) }}
                   </td>
                 </tr>
               </template>
@@ -305,23 +305,6 @@ export default {
     maxDate() {
       return this.getNowDate();
     },
-
-    totals() {
-      const totals = this.sales.reduce(
-        (acc, d) => {
-          acc.payment += parseFloat(d.payment);
-          acc.pending += parseFloat(d.pending);
-          acc.total += parseFloat(d.total);
-          return acc;
-        },
-        {
-          payment: 0,
-          pending: 0,
-          total: 0,
-        }
-      );
-      return totals;
-    },
   },
 
   watch: {
@@ -390,6 +373,23 @@ export default {
     updateRowNote(note) {
       let row = this.sales.find((element) => element.id === this.id_sale);
       row.note = note;
+    },
+
+    totals(items) {
+      const totals = items.reduce(
+        (acc, d) => {
+          acc.payment += parseFloat(d.payment);
+          acc.pending += parseFloat(d.pending);
+          acc.total += parseFloat(d.total);
+          return acc;
+        },
+        {
+          payment: 0,
+          pending: 0,
+          total: 0,
+        }
+      );
+      return totals;
     },
   },
   components: {

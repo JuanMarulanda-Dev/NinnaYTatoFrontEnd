@@ -20,6 +20,18 @@
               {{ currencyFormat(item.amount) }}
             </span>
           </template>
+          <!-- footer -->
+          <template v-slot:[`body.append`]>
+            <tr>
+              <td class="text-center font-weight-bold">Total</td>
+              <td class="text-left font-weight-bold">
+                <v-icon small>
+                  {{ moneyIcon }}
+                </v-icon>
+                {{ currencyFormat(totalsCashRegisters.total) }}
+              </td>
+            </tr>
+          </template>
         </v-data-table>
       </v-col>
       <!-- Incomes Plans -->
@@ -41,6 +53,19 @@
               {{ currencyFormat(item.total) }}
             </span>
           </template>
+
+          <!-- footer -->
+          <template v-slot:[`body.append`]>
+            <tr>
+              <td class="text-center font-weight-bold">Total</td>
+              <td class="text-left font-weight-bold">
+                <v-icon small>
+                  {{ moneyIcon }}
+                </v-icon>
+                {{ currencyFormat(totalsIncomePlans.total) }}
+              </td>
+            </tr>
+          </template>
         </v-data-table>
       </v-col>
     </v-row>
@@ -53,6 +78,7 @@
           :items="movements"
           sort-by="name"
           class="elevation-3"
+          :search="search"
           :loading="loading"
           :loading-text="loadingText"
           item-key="created_at"
@@ -138,6 +164,15 @@
                 </v-date-picker>
               </v-dialog>
               <v-spacer></v-spacer>
+              <v-text-field
+                v-model="search"
+                append-icon="mdi-magnify"
+                class="mr-2"
+                label="Buscar"
+                single-line
+                hide-details
+              ></v-text-field>
+
               <!-- Modal New/edit-->
               <v-dialog v-model="dialog" persistent max-width="600px">
                 <!-- Button active modal -->
@@ -336,6 +371,23 @@
               <span>Cambiar caja</span>
             </v-tooltip>
           </template>
+
+          <!-- footer -->
+          <template v-slot:[`body.append`]="{ items }">
+            <tr>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td class="text-center font-weight-bold">Total</td>
+              <td class="text-center font-weight-bold">
+                <v-icon small>
+                  {{ moneyIcon }}
+                </v-icon>
+                {{ currencyFormat(totalsMovements(items)) }}
+              </td>
+            </tr>
+          </template>
         </v-data-table>
       </v-col>
     </v-row>
@@ -384,17 +436,19 @@ export default {
 
     dialogExchangeCashRegister: false,
 
+    search: "",
+
     headers: [
       {
         text: "Fecha",
         align: "start",
         value: "created_at",
       },
-      { text: "Mediador", value: "mediator" },
+      { text: "Mediador", value: "mediator", align: "left" },
       { text: "Tipo", value: "type_movement" },
-      { text: "Grupo", value: "group" },
-      { text: "Origin / Destino", value: "cash_register" },
-      { text: "Total", value: "total" },
+      { text: "Grupo", value: "group", align: "center" },
+      { text: "Origin / Destino", value: "cash_register", align: "center" },
+      { text: "Total", value: "total", align: "center" },
       { text: "Nota", value: "note" },
       { text: "Acciones", value: "actions", sortable: false },
     ],
@@ -483,6 +537,32 @@ export default {
       set: function (newValue) {
         this.SET_END_DATE(newValue);
       },
+    },
+
+    totalsCashRegisters() {
+      const totals = this.cash_registers.reduce(
+        (acc, d) => {
+          acc.total += parseFloat(d.amount);
+          return acc;
+        },
+        {
+          total: 0,
+        }
+      );
+      return totals;
+    },
+
+    totalsIncomePlans() {
+      const totals = this.income_plans.reduce(
+        (acc, d) => {
+          acc.total += parseFloat(d.total);
+          return acc;
+        },
+        {
+          total: 0,
+        }
+      );
+      return totals;
     },
   },
 
@@ -606,6 +686,23 @@ export default {
       this.exchange.movement_type = movement_type;
       this.exchange.payment_id = payment_id;
       this.dialogExchangeCashRegister = true;
+    },
+
+    totalsMovements(items) {
+      const totals = items.reduce(
+        (acc, d) => {
+          if (d.type_movement === "Ingreso") {
+            acc.total += parseFloat(d.total);
+          } else {
+            acc.total -= parseFloat(d.total);
+          }
+          return acc;
+        },
+        {
+          total: 0,
+        }
+      );
+      return totals.total;
     },
   },
 
