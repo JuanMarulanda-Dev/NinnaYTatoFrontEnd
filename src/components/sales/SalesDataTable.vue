@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-dialog
-      v-model="dialog"
+      v-model="dialogSaleDataTable"
       fullscreen
       hide-overlay
       transition="dialog-bottom-transition"
@@ -17,7 +17,7 @@
             </span></v-toolbar-title
           >
           <v-spacer></v-spacer>
-          <v-btn icon dark @click="SET_DIALOG_SALES_HITORY(false)">
+          <v-btn icon dark @click="dialogSaleDataTable = false">
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </v-toolbar>
@@ -302,6 +302,15 @@ export default {
         this.$store.commit("sales/SET_DATESALES", value);
       },
     },
+    dialogSaleDataTable: {
+      get() {
+        return this.dialog;
+      },
+      set(value) {
+        this.SET_DIALOG_SALES_HITORY(value);
+      },
+    },
+
     maxDate() {
       return this.getNowDate();
     },
@@ -378,9 +387,12 @@ export default {
     totals(items) {
       const totals = items.reduce(
         (acc, d) => {
-          acc.payment += parseFloat(d.payment);
-          acc.pending += parseFloat(d.pending);
-          acc.total += parseFloat(d.total);
+          if (d.state) {
+            acc.payment += parseFloat(d.payment);
+            acc.pending += parseFloat(d.pending);
+            acc.total += parseFloat(d.total);
+          }
+
           return acc;
         },
         {

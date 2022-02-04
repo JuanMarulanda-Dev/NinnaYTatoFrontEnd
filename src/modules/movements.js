@@ -9,6 +9,7 @@ export default {
     loading: false,
     movements: [],
     income_plans: [],
+    income_products: [],
     start: "",
     end: "",
     exchange: {
@@ -21,8 +22,9 @@ export default {
     SET_MOVEMENTS(state, movements) {
       state.movements = movements;
     },
-    SET_INCOME_PLANS(state, income_plans) {
-      state.income_plans = income_plans;
+    SET_INCOMES(state, incomes) {
+      state.income_plans = incomes.incomePlans;
+      state.income_products = incomes.incomeProducts;
     },
     SET_LOADING_DATATABLE(state, status) {
       state.loading = status;
@@ -58,14 +60,14 @@ export default {
         });
     },
 
-    getAllIncomePlans({ state, commit, rootState }) {
+    getAllIncomes({ state, commit, rootState }) {
       axios
         .get(
-          `/api/movements/income-plans?branch_office_id=${rootState.mainBranchOffice}&start=${state.start}&end=${state.end}`
+          `/api/movements/incomes?branch_office_id=${rootState.mainBranchOffice}&start=${state.start}&end=${state.end}`
         )
         .then((result) => {
           // save all
-          commit("SET_INCOME_PLANS", result.data.incomePlans);
+          commit("SET_INCOMES", result.data);
         });
     },
 

@@ -2,7 +2,7 @@
   <div>
     <v-row>
       <!-- Cash registers -->
-      <v-col md="6">
+      <v-col md="4">
         <v-data-table
           fixed-header
           sort-by="name"
@@ -35,7 +35,7 @@
         </v-data-table>
       </v-col>
       <!-- Incomes Plans -->
-      <v-col md="6">
+      <v-col md="4">
         <v-data-table
           fixed-header
           sort-by="name"
@@ -58,11 +58,51 @@
           <template v-slot:[`body.append`]>
             <tr>
               <td class="text-center font-weight-bold">Total</td>
+              <td class="text-center font-weight-bold">
+                {{ totalsIncomePlans.amount }}
+              </td>
               <td class="text-left font-weight-bold">
                 <v-icon small>
                   {{ moneyIcon }}
                 </v-icon>
                 {{ currencyFormat(totalsIncomePlans.total) }}
+              </td>
+            </tr>
+          </template>
+        </v-data-table>
+      </v-col>
+      <!-- Incomes Products -->
+      <v-col md="4">
+        <v-data-table
+          fixed-header
+          sort-by="name"
+          class="elevation-3"
+          :headers="headersProducts"
+          :items="income_products"
+          height="200px"
+          :hide-default-footer="true"
+          :disable-pagination="true"
+          item-key="id"
+        >
+          <template v-slot:[`item.total`]="{ item }">
+            <v-icon small>{{ moneyIcon }}</v-icon>
+            <span>
+              {{ currencyFormat(item.total) }}
+            </span>
+          </template>
+
+          <!-- footer -->
+          <template v-slot:[`body.append`]>
+            <tr>
+              <td class="text-center font-weight-bold">Total</td>
+              <td class="text-center font-weight-bold">
+                {{ totalsIncomeProducts.amount }}
+              </td>
+              <td class="text-left font-weight-bold">
+                <v-icon small>
+                  {{ moneyIcon }}
+                </v-icon>
+                {{ currencyFormat(totalsIncomeProducts.total) }}
               </td>
             </tr>
           </template>
@@ -458,6 +498,12 @@ export default {
     ],
     headersPlans: [
       { text: "Plan", value: "name" },
+      { text: "Cantidad", value: "num_plan", align: "center" },
+      { text: "Total", value: "total" },
+    ],
+    headersProducts: [
+      { text: "Producto", value: "name" },
+      { text: "Cantidad", value: "num_products", align: "center" },
       { text: "Total", value: "total" },
     ],
 
@@ -482,7 +528,6 @@ export default {
     if (this.permissions.read) {
       this.initialize();
       this.getAllEgressTypes();
-      this.getAllIncomePlans();
       this.getAllCashRegisters(1);
     }
   },
@@ -494,6 +539,7 @@ export default {
       "end",
       "loading",
       "income_plans",
+      "income_products",
       "exchange",
     ]),
     ...mapState("cash_registers", ["cash_registers"]),
@@ -556,10 +602,27 @@ export default {
       const totals = this.income_plans.reduce(
         (acc, d) => {
           acc.total += parseFloat(d.total);
+          acc.amount += parseInt(d.num_plan);
           return acc;
         },
         {
           total: 0,
+          amount: 0,
+        }
+      );
+      return totals;
+    },
+
+    totalsIncomeProducts() {
+      const totals = this.income_products.reduce(
+        (acc, d) => {
+          acc.total += parseFloat(d.total);
+          acc.amount += parseInt(d.num_products);
+          return acc;
+        },
+        {
+          total: 0,
+          amount: 0,
         }
       );
       return totals;
@@ -582,7 +645,7 @@ export default {
   methods: {
     ...mapActions("movements", [
       "getAllMovementsBewteenDates",
-      "getAllIncomePlans",
+      "getAllIncomes",
       "saveExchangeCashRegister",
     ]),
     ...mapActions("cash_registers", ["getAllCashRegisters"]),
@@ -596,7 +659,7 @@ export default {
     ...mapMutations("movements", ["SET_START_DATE", "SET_END_DATE"]),
     initialize() {
       this.getAllMovementsBewteenDates();
-      this.getAllIncomePlans();
+      this.getAllIncomes();
     },
 
     close() {
