@@ -20,6 +20,7 @@ export default {
       cash_register_id: "",
       total: "",
       payment: 0,
+      note: "",
     },
     defaultItem: {
       id: 0,
@@ -29,6 +30,7 @@ export default {
       cash_register_id: "",
       total: "",
       payment: 0,
+      note: "",
     },
   },
   mutations: {

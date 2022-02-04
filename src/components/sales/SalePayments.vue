@@ -45,6 +45,7 @@
               ></v-select>
             </v-col>
           </v-row>
+
           <v-row>
             <v-col cols="12">
               <v-data-table
@@ -84,6 +85,18 @@
               </v-data-table>
             </v-col>
           </v-row>
+
+          <v-col cols="12">
+            <v-textarea
+              name="input-7-1"
+              label="Notas"
+              v-model="editedItem.note"
+              :error-messages="noteErrors"
+              @input="$v.editedItem.note.$touch()"
+              @blur="$v.editedItem.note.$touch()"
+              counter="400"
+            ></v-textarea>
+          </v-col>
         </v-container>
       </v-card-text>
 
@@ -101,7 +114,7 @@ import { mapState, mapMutations, mapActions } from "vuex";
 import VuetifyMoney from "@/components/vuetifyMoney.vue";
 import { moneyFormatMixin } from "@/mixins/moneyFormatMixin.js";
 import { validationMixin } from "vuelidate";
-import { required } from "vuelidate/lib/validators";
+import { required, maxLength } from "vuelidate/lib/validators";
 
 export default {
   name: "sale-payments",
@@ -110,10 +123,12 @@ export default {
       editedItem: {
         total: 0,
         cash_register_id: "",
+        note: "",
       },
       defaultItem: {
         total: 0,
         cash_register_id: "",
+        note: "",
       },
       headers: [
         { text: "Monto", value: "total", align: "center" },
@@ -129,10 +144,17 @@ export default {
       type: Number,
       required: true,
     },
+    note: {
+      type: String,
+      default: "",
+    },
   },
   mixins: [moneyFormatMixin, validationMixin],
   validations: {
-    cash_register_id: { required },
+    editedItem: {
+      cash_register_id: { required },
+      note: { maxLength: maxLength(500) },
+    },
   },
   created() {
     this.getAllCashRegisters(1);
@@ -143,9 +165,22 @@ export default {
     ...mapState("cash_registers", ["cash_registers"]),
     cashRegisterErrors() {
       const errors = [];
-      if (!this.$v.cash_register_id.$dirty) return errors;
-      !this.$v.cash_register_id.required && errors.push("La caja es requerida");
+      if (!this.$v.editedItem.cash_register_id.$dirty) return errors;
+      !this.$v.editedItem.cash_register_id.required &&
+        errors.push("La caja es requerida");
       return errors;
+    },
+    noteErrors() {
+      const errors = [];
+      if (!this.$v.editedItem.note.$dirty) return errors;
+      !this.$v.editedItem.note.maxLength &&
+        errors.push("La longitud no es permitida");
+      return errors;
+    },
+  },
+  watch: {
+    note(value) {
+      this.editedItem.note = value;
     },
   },
   methods: {

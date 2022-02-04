@@ -14,6 +14,7 @@ export default {
       egress_type_id: "",
       cash_register_id: "",
       total: "",
+      note: "",
     },
     defaultItem: {
       id: 0,
@@ -21,6 +22,7 @@ export default {
       egress_type_id: "",
       cash_register_id: "",
       total: "",
+      note: "",
     },
   },
   mutations: {

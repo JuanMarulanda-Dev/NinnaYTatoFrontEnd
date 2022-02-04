@@ -157,7 +157,11 @@
                       v-bind="attrs"
                       v-on="on"
                       @click="
-                        searchPayments(item.id, item.number_payment_proof)
+                        searchPayments(
+                          item.id,
+                          item.number_payment_proof,
+                          item.note
+                        )
                       "
                       v-show="item.pending > 0 || user.is_admin"
                     >
@@ -243,7 +247,7 @@
       </v-card>
     </v-dialog>
     <!-- Show dialog payments -->
-    <sale-payments :payment_proof="payment_proof"></sale-payments>
+    <sale-payments :payment_proof="payment_proof" :note="note"></sale-payments>
     <!-- Show dialog details -->
     <sale-details :payment_proof="payment_proof"></sale-details>
     <!-- Show dialog note -->
@@ -337,8 +341,9 @@ export default {
       "getSaleDetails",
     ]),
 
-    searchPayments(saleId, payment_proof) {
+    searchPayments(saleId, payment_proof, note) {
       this.payment_proof = payment_proof;
+      this.note = note ?? "";
       this.getSalePayments(saleId);
     },
 

@@ -17,6 +17,7 @@ export default {
       cash_register_id: "",
       supplier_id: "",
       state: false,
+      note: "",
     },
     defaultItem: {
       id: 0,
@@ -27,6 +28,7 @@ export default {
       cash_register_id: "",
       supplier_id: "",
       state: false,
+      note: "",
     },
   },
   mutations: {

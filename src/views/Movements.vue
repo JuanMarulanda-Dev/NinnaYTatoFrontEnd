@@ -289,6 +289,18 @@
                             label="Valor*"
                           />
                         </v-col>
+
+                        <v-col cols="12">
+                          <v-textarea
+                            name="input-7-1"
+                            label="Notas"
+                            v-model="editedItem.note"
+                            :error-messages="noteErrors"
+                            @input="$v.editedItem.note.$touch()"
+                            @blur="$v.editedItem.note.$touch()"
+                            counter="500"
+                          ></v-textarea>
+                        </v-col>
                       </v-row>
                     </v-container>
                   </v-card-text>
@@ -516,6 +528,7 @@ export default {
       egress_type_id: { required },
       cash_register_id: { required },
       total: { required, minValue: minValue(1) },
+      note: { maxLength: maxLength(500) },
     },
   },
   created() {
@@ -565,6 +578,13 @@ export default {
       if (!this.$v.editedItem.cash_register_id.$dirty) return errors;
       !this.$v.editedItem.cash_register_id.required &&
         errors.push("El origen es requerido");
+      return errors;
+    },
+    noteErrors() {
+      const errors = [];
+      if (!this.$v.editedItem.note.$dirty) return errors;
+      !this.$v.editedItem.note.maxLength &&
+        errors.push("La longitud no es permitida");
       return errors;
     },
 

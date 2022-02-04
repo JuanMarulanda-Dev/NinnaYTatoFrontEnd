@@ -213,6 +213,18 @@
                         label="Saldo*"
                       />
                     </v-col>
+
+                    <v-col cols="12">
+                      <v-textarea
+                        name="input-7-1"
+                        label="Notas"
+                        v-model="editedItem.note"
+                        :error-messages="noteErrors"
+                        @input="$v.editedItem.note.$touch()"
+                        @blur="$v.editedItem.note.$touch()"
+                        counter="500"
+                      ></v-textarea>
+                    </v-col>
                   </v-row>
                 </v-container>
               </v-card-text>
@@ -323,7 +335,7 @@
 <script>
 import { validationMixin } from "vuelidate";
 import { moneyFormatMixin } from "@/mixins/moneyFormatMixin.js";
-import { required, minValue } from "vuelidate/lib/validators";
+import { required, minValue, maxLength } from "vuelidate/lib/validators";
 import { mapState, mapActions, mapMutations } from "vuex";
 import VuetifyMoney from "@/components/vuetifyMoney.vue";
 import NoteFormDialog from "@/components/NoteFormDialog.vue";
@@ -366,6 +378,7 @@ export default {
       turn_type_id: { required },
       cash_register_id: { required },
       payment: { required, minValue: minValue(0) },
+      note: { maxLength: maxLength(500) },
     },
   },
 
@@ -471,6 +484,14 @@ export default {
         errors.push("El abono es requerido");
       !this.$v.editedItem.payment.minValue &&
         errors.push("El abono no puede ser 0");
+      return errors;
+    },
+
+    noteErrors() {
+      const errors = [];
+      if (!this.$v.editedItem.note.$dirty) return errors;
+      !this.$v.editedItem.note.maxLength &&
+        errors.push("La longitud no es permitida");
       return errors;
     },
 
