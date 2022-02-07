@@ -11,7 +11,8 @@ export default {
     dialogPayments: false,
     dialogSaleDitails: false,
     saleId: null,
-    dateSales: new Date().toISOString().substr(0, 10),
+    start: "",
+    end: "",
     payments: [],
     saleDetails: {},
     sales: [],
@@ -52,8 +53,11 @@ export default {
     SET_PAYMENTS(state, payments) {
       state.payments = payments;
     },
-    SET_DATESALES(state, dateSales) {
-      state.dateSales = dateSales;
+    SET_START_DATE(state, start) {
+      state.start = start;
+    },
+    SET_END_DATE(state, end) {
+      state.end = end;
     },
     SET_SALE_DETAILS(state, details) {
       state.saleDetails = details;
@@ -95,7 +99,7 @@ export default {
       commit("SET_LOADING_DATATABLE", true);
       axios
         .get(
-          `/api/sales?branch_office_id=${rootState.mainBranchOffice}&date=${state.dateSales}`
+          `/api/sales?branch_office_id=${rootState.mainBranchOffice}&start=${state.start}&end=${state.end}`
         )
         .then((result) => {
           // save all
@@ -328,6 +332,7 @@ export default {
             this._vm.showToastMessage(result.status);
             // Reload cash registers
             dispatch("getSalePayments", state.saleId);
+            // Esto lo deberia hacer el front en vez de mandar a consultar todo de nuevo.
             return true;
           } else {
             return false;

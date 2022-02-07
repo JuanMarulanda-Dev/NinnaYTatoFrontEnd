@@ -475,7 +475,9 @@ export default {
       }
     },
     updateRowNote(note) {
-      let row = this.movements.find((element) => element.id === this.id_turn);
+      let row = this.purchases.find(
+        (element) => element.id === this.id_purchase
+      );
       row.note = note;
     },
 

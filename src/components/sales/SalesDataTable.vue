@@ -22,7 +22,7 @@
           </v-btn>
         </v-toolbar>
         <v-card-text>
-          <v-container>
+          <v-container fluid>
             <!-- Datatable planes-->
             <v-data-table
               fixed-header
@@ -39,12 +39,11 @@
                   <!-- Title Module -->
                   <v-toolbar-title> </v-toolbar-title>
                   <v-spacer></v-spacer>
-                  <!-- Modal New/edit-->
-                  <!-- Filter date -->
+                  <!-- Start date -->
                   <v-dialog
-                    ref="fecha"
+                    ref="start"
                     v-model="dialogDate"
-                    :return-value.sync="dateSales"
+                    :return-value.sync="startDate"
                     persistent
                     width="290px"
                     :retain-focus="false"
@@ -52,8 +51,8 @@
                     <template v-slot:activator="{ on, attrs }">
                       <v-text-field
                         class="mt-8 mr-3"
-                        v-model="dateSales"
-                        label="Fecha"
+                        v-model="startDate"
+                        label="Desde"
                         prepend-icon="mdi-calendar"
                         readonly
                         v-bind="attrs"
@@ -62,8 +61,9 @@
                     </template>
                     <v-date-picker
                       :max="maxDate"
-                      v-model="dateSales"
+                      v-model="startDate"
                       scrollable
+                      @change="getAllSales()"
                     >
                       <v-spacer></v-spacer>
                       <v-btn text color="primary" @click="dialogDate = false">
@@ -72,7 +72,46 @@
                       <v-btn
                         text
                         color="primary"
-                        @click="$refs.fecha.save(dateSales)"
+                        @click="$refs.start.save(startDate)"
+                      >
+                        OK
+                      </v-btn>
+                    </v-date-picker>
+                  </v-dialog>
+                  <!-- End date -->
+                  <v-dialog
+                    ref="end"
+                    v-model="dialogDate"
+                    :return-value.sync="endDate"
+                    persistent
+                    width="290px"
+                    :retain-focus="false"
+                  >
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-text-field
+                        class="mt-8 mr-3"
+                        v-model="endDate"
+                        label="Hasta"
+                        prepend-icon="mdi-calendar"
+                        readonly
+                        v-bind="attrs"
+                        v-on="on"
+                      ></v-text-field>
+                    </template>
+                    <v-date-picker
+                      :max="maxDate"
+                      v-model="endDate"
+                      scrollable
+                      @change="getAllSales()"
+                    >
+                      <v-spacer></v-spacer>
+                      <v-btn text color="primary" @click="dialogDate = false">
+                        Cancel
+                      </v-btn>
+                      <v-btn
+                        text
+                        color="primary"
+                        @click="$refs.end.save(endDate)"
                       >
                         OK
                       </v-btn>
@@ -246,6 +285,7 @@
         </v-card-text>
       </v-card>
     </v-dialog>
+
     <!-- Show dialog payments -->
     <sale-payments :payment_proof="payment_proof" :note="note"></sale-payments>
     <!-- Show dialog details -->
@@ -268,6 +308,7 @@ import { mapState, mapMutations, mapActions } from "vuex";
 import SalePayments from "@/components/sales/SalePayments.vue";
 import SaleDetails from "@/components/sales/SaleDetails.vue";
 import NoteFormDialog from "@/components/NoteFormDialog.vue";
+import moment from "moment";
 
 export default {
   name: "sales-data-table",
@@ -295,17 +336,20 @@ export default {
     ],
   }),
   mixins: [moneyFormatMixin],
+  created() {
+    this.SET_START_DATE(moment().startOf("month").format("YYYY-MM-DD"));
+    this.SET_END_DATE(moment().endOf("month").format("YYYY-MM-DD"));
+  },
   computed: {
     ...mapState(["loadingText", "mainBranchOffice", "detailsIcon", "user"]),
-    ...mapState("sales", ["sales", "loading", "dialog", "permissions"]),
-    dateSales: {
-      get() {
-        return this.$store.state.sales.dateSales;
-      },
-      set(value) {
-        this.$store.commit("sales/SET_DATESALES", value);
-      },
-    },
+    ...mapState("sales", [
+      "sales",
+      "loading",
+      "dialog",
+      "permissions",
+      "start",
+      "end",
+    ]),
     dialogSaleDataTable: {
       get() {
         return this.dialog;
@@ -318,6 +362,23 @@ export default {
     maxDate() {
       return this.getNowDate();
     },
+
+    startDate: {
+      get: function () {
+        return this.start;
+      },
+      set: function (newValue) {
+        this.SET_START_DATE(newValue);
+      },
+    },
+    endDate: {
+      get: function () {
+        return this.end;
+      },
+      set: function (newValue) {
+        this.SET_END_DATE(newValue);
+      },
+    },
   },
 
   watch: {
@@ -326,13 +387,14 @@ export default {
         this.getAllSales();
       }
     },
-    dateSales() {
-      this.getAllSales();
-    },
   },
 
   methods: {
-    ...mapMutations("sales", ["SET_DIALOG_SALES_HITORY"]),
+    ...mapMutations("sales", [
+      "SET_DIALOG_SALES_HITORY",
+      "SET_START_DATE",
+      "SET_END_DATE",
+    ]),
     ...mapActions("sales", [
       "getAllSales",
       "changeStatusSale",
