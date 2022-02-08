@@ -2,7 +2,7 @@
   <div>
     <v-data-table
       fixed-header
-      :headers="headers"
+      :headers="headersPurchases"
       :items="purchases"
       sort-by="name"
       class="elevation-3"
@@ -285,23 +285,6 @@ export default {
     modalTimePicker: false,
     date: "",
     time: "",
-    headers: [
-      {
-        text: "Producto",
-        align: "start",
-        value: "product_name",
-      },
-      { text: "Cantidad", value: "quantity", align: "center" },
-      { text: "Valor unidad", value: "price" },
-      { text: "Fecha", value: "datetime" },
-      { text: "Proveedor", value: "supplier_name" },
-      { text: "Caja", value: "cash_register_name" },
-      { text: "Estado", value: "state" },
-      { text: "Creado", value: "created_at" },
-      { text: "Eliminado", value: "deleted_at" },
-      { text: "Nota", value: "note" },
-      { text: "Acciones", value: "actions", sortable: false },
-    ],
 
     id_purchase: "",
     title: "",
@@ -328,6 +311,7 @@ export default {
       "loading",
       "editedItem",
       "defaultItem",
+      "headersPurchases",
     ]),
     ...mapState("suppliers", ["suppliers"]),
     ...mapState("products", ["products"]),

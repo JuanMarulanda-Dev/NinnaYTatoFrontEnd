@@ -36,6 +36,19 @@ export default {
       payment: 0,
       cart: [],
     },
+    headersSales: [
+      { text: "N°", value: "number_payment_proof", align: "center" },
+      { text: "Cliente", value: "customer_name", align: "center" },
+      { text: "Total", value: "total" },
+      { text: "Pagado", value: "payment" },
+      { text: "Saldo pendiente", value: "pending" },
+      { text: "Usuario", value: "user_name" },
+      { text: "Estado", value: "state" },
+      { text: "Fecha", value: "created_at" },
+      { text: "Eliminado", value: "deleted_at" },
+      { text: "Nota", value: "note", width: "16%" },
+      { text: "Acciones", value: "actions", sortable: false },
+    ],
   },
   mutations: {
     SET_SALES(state, sales) {

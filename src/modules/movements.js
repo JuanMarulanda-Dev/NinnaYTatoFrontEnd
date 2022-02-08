@@ -17,6 +17,9 @@ export default {
       movement_type: "",
       payment_id: "",
     },
+    dialogMovementDetail: false,
+    movement: {},
+    movement_type: 0,
   },
   mutations: {
     SET_MOVEMENTS(state, movements) {
@@ -34,6 +37,15 @@ export default {
     },
     SET_END_DATE(state, end) {
       state.end = end;
+    },
+    SET_DIALOG_MOVEMENT(state, dialogMovementDetail) {
+      state.dialogMovementDetail = dialogMovementDetail;
+    },
+    SET_DETAILS_MOVEMENT(state, movement) {
+      state.movement = movement;
+    },
+    SET_MOVEMENT_TYPE(state, movement_type) {
+      state.movement_type = movement_type;
     },
   },
   actions: {
@@ -57,6 +69,32 @@ export default {
         })
         .finally(() => {
           commit("SET_LOADING_DATATABLE", false);
+        });
+    },
+
+    getMovementDetails({ commit }, { id, type }) {
+      commit("SET_OVERLAY_LOADING", true, { root: true });
+      axios
+        .get(`/api/movements/${id}?movement_type=${type}`)
+        .then((result) => {
+          // Seleccionar los headers de la tabla de acuerdo el tipo
+
+          // Seleccionar las acciones correspondientes de acuerdo al tipo
+
+          // Guardar el movimiento
+          commit("SET_DETAILS_MOVEMENT", result.data.movement);
+          commit("SET_MOVEMENT_TYPE", type);
+          commit("SET_DIALOG_MOVEMENT", true);
+        })
+        .catch((errors) => {
+          // show error message
+          this._vm.showToastMessage(
+            errors.response.status,
+            this._vm.createMessageError(errors.response.data.errors)
+          );
+        })
+        .finally(() => {
+          commit("SET_OVERLAY_LOADING", false, { root: true });
         });
     },
 

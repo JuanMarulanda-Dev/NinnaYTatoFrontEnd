@@ -143,7 +143,7 @@
           </v-app-bar>
 
           <!-- Content -->
-          <v-container transition="slide-x-transition" class="pb-10 pa-5">
+          <v-container transition="slide-x-transition" fluid class="pb-10 pa-5">
             <transition mode="out-in" name="slide-fade">
               <router-view></router-view>
             </transition>

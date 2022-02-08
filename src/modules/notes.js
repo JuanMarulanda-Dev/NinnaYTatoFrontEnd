@@ -4,6 +4,29 @@ axios.defaults.withCredentials = true;
 axios.defaults.baseURL = process.env.VUE_APP_API_URL;
 export default {
   namespaced: true,
+  state: {
+    dialogNoteForm: false,
+    noteItem: {
+      type: "",
+      id: "",
+      note: "",
+      title: "",
+    },
+    defaultNoteItem: {
+      type: "",
+      id: "",
+      note: "",
+      title: "",
+    },
+  },
+  mutations: {
+    SET_EDIT_ITEM_NOTE(state, object) {
+      state.noteItem = object;
+    },
+    SET_DIALOG_NOTE_FORM(state, dialogNoteForm) {
+      state.dialogNoteForm = dialogNoteForm;
+    },
+  },
   actions: {
     storeNote({ commit }, { item_id = 0, item_type = 0, description = "" }) {
       commit("SET_OVERLAY_LOADING", true, { root: true });

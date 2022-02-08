@@ -26,7 +26,7 @@
             <!-- Datatable planes-->
             <v-data-table
               fixed-header
-              :headers="headers"
+              :headers="headersSales"
               :items="sales"
               sort-by="name"
               class="elevation-3"
@@ -321,19 +321,6 @@ export default {
     note_type: 1,
     id_sale: "",
     note: "",
-    headers: [
-      { text: "N°", value: "number_payment_proof", align: "center" },
-      { text: "Cliente", value: "customer_name", align: "center" },
-      { text: "Total", value: "total" },
-      { text: "Pagado", value: "payment" },
-      { text: "Saldo pendiente", value: "pending" },
-      { text: "Usuario", value: "user_name" },
-      { text: "Estado", value: "state" },
-      { text: "Fecha", value: "created_at" },
-      { text: "Eliminado", value: "deleted_at" },
-      { text: "Nota", value: "note", width: "16%" },
-      { text: "Acciones", value: "actions", sortable: false },
-    ],
   }),
   mixins: [moneyFormatMixin],
   created() {
@@ -349,6 +336,7 @@ export default {
       "permissions",
       "start",
       "end",
+      "headersSales",
     ]),
     dialogSaleDataTable: {
       get() {

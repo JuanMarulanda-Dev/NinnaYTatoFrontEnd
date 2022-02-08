@@ -2,7 +2,7 @@
   <div>
     <v-data-table
       fixed-header
-      :headers="headers"
+      :headers="headersTurns"
       :items="turns"
       sort-by="name"
       class="elevation-3"
@@ -83,22 +83,19 @@
           </v-dialog>
           <v-spacer></v-spacer>
           <!-- Modal New/edit-->
-          <v-dialog v-model="dialog" persistent max-width="600px">
-            <!-- Button active modal -->
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn
-                fab
-                small
-                color="secondary"
-                elevation="3"
-                dark
-                v-bind="attrs"
-                v-on="on"
-                v-show="permissions.create"
-              >
-                <v-icon>mdi-plus-thick</v-icon>
-              </v-btn>
-            </template>
+          <v-btn
+            fab
+            small
+            color="secondary"
+            elevation="3"
+            dark
+            v-show="permissions.create"
+            @click="SET_FORM_DIALOG(true)"
+          >
+            <v-icon>mdi-plus-thick</v-icon>
+          </v-btn>
+
+          <v-dialog v-model="formDialog" persistent max-width="600px">
             <!-- Modal Form -->
             <v-card>
               <v-card-title>
@@ -231,7 +228,9 @@
 
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="error darken-1" text @click="close">Cancel</v-btn>
+                <v-btn color="error darken-1" text @click="close()"
+                  >Cancel</v-btn
+                >
                 <v-btn color="blue darken-1" text @click="save()"
                   >Guardar</v-btn
                 >
@@ -255,80 +254,12 @@
 
       <!-- Actions -->
       <template v-slot:[`item.actions`]="{ item }">
-        <!-- Eliminar -->
-        <v-tooltip bottom>
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              fab
-              x-small
-              dark
-              color="error mr-1"
-              v-bind="attrs"
-              v-on="on"
-              @click="deleteItem(item.id)"
-              v-show="permissions.delete"
-            >
-              <v-icon> {{ deleteIcon }} </v-icon>
-            </v-btn>
-          </template>
-          <span>Eliminar</span>
-        </v-tooltip>
-
-        <!-- Edit -->
-        <v-tooltip bottom>
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              fab
-              x-small
-              dark
-              color="secondary mr-1"
-              v-bind="attrs"
-              v-on="on"
-              @click="editItem(item)"
-              v-show="permissions.update"
-            >
-              <v-icon> {{ editIcon }} </v-icon>
-            </v-btn>
-          </template>
-          <span>Editar</span>
-        </v-tooltip>
-
-        <!-- Notes -->
-        <v-tooltip bottom>
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              fab
-              x-small
-              dark
-              color="info"
-              v-bind="attrs"
-              v-on="on"
-              @click="
-                showNoteFormDialog(
-                  item.id,
-                  item.name,
-                  item.note,
-                  item.note_type
-                )
-              "
-            >
-              <v-icon>mdi-note-text</v-icon>
-            </v-btn>
-          </template>
-          <span>Nota</span>
-        </v-tooltip>
+        <turn-actions :item="item" :permissions="permissions"></turn-actions>
       </template>
     </v-data-table>
 
     <!-- Notes dialog -->
-    <note-form-dialog
-      v-model="dialogNoteForm"
-      :id="id_turn"
-      :type="note_type"
-      :note="note"
-      :title="title"
-      @saved="updateRowNote($event)"
-    ></note-form-dialog>
+    <note-form-dialog @saved="updateRowNote($event)"></note-form-dialog>
   </div>
 </template>
 
@@ -339,36 +270,15 @@ import { required, minValue, maxLength } from "vuelidate/lib/validators";
 import { mapState, mapActions, mapMutations } from "vuex";
 import VuetifyMoney from "@/components/vuetifyMoney.vue";
 import NoteFormDialog from "@/components/NoteFormDialog.vue";
+import TurnActions from "@/components/turns/TurnActions.vue";
 import moment from "moment";
 
 export default {
   data: () => ({
     permissions: {},
-    dialog: false,
-    id_turn: "",
-    title: "",
-    note: "",
-    note_type: 3,
-    dialogNoteForm: false,
-
     dialogStart: false,
     dialogEnd: false,
     dialogDate: false,
-
-    headers: [
-      {
-        text: "Fecha",
-        align: "start",
-        value: "date",
-      },
-      { text: "Colaborador", value: "name" },
-      { text: "Turno", value: "turn_type" },
-      { text: "Valor", value: "total" },
-      { text: "Abono", value: "payment" },
-      { text: "Nota", value: "note" },
-      { text: "Acciones", value: "actions", sortable: false },
-    ],
-    editedIndex: -1,
   }),
   mixins: [validationMixin, moneyFormatMixin],
   validations: {
@@ -401,7 +311,7 @@ export default {
   },
 
   computed: {
-    ...mapState(["deleteIcon", "editIcon", "loadingText", "mainBranchOffice"]),
+    ...mapState(["loadingText", "mainBranchOffice"]),
     ...mapState("turns", [
       "turns",
       "turn_types",
@@ -411,6 +321,10 @@ export default {
       "defaultItem",
       "start",
       "end",
+      "headersTurns",
+      "editedIndex",
+      "formDialog",
+      "dialogNoteForm",
     ]),
     ...mapState("cash_registers", ["cash_registers"]),
 
@@ -511,10 +425,19 @@ export default {
         this.SET_END_DATE(newValue);
       },
     },
+
+    dialogNote: {
+      get: function () {
+        return this.dialogNoteForm;
+      },
+      set: function (newValue) {
+        this.SET_DIALOG_NOTE_FORM(newValue);
+      },
+    },
   },
 
   watch: {
-    dialog(val) {
+    formDialog(val) {
       val || this.close();
       this.$v.$reset();
     },
@@ -526,12 +449,12 @@ export default {
       }
     },
   },
+
   methods: {
     ...mapActions("turns", [
       "getAllTurns",
       "storeTurn",
       "updateTurn",
-      "deleteTurn",
       "getAllTurnTypes",
       "getAllCollaborators",
     ]),
@@ -541,23 +464,19 @@ export default {
       "SET_EDIT_ITEM",
       "SET_START_DATE",
       "SET_END_DATE",
+      "SET_FORM_DIALOG",
+      "SET_EDITED_INDEX",
     ]),
     initialize() {
       this.getAllTurns();
     },
 
     close() {
-      this.dialog = false;
+      this.SET_FORM_DIALOG(false);
       this.$nextTick(() => {
         this.SET_EDIT_ITEM(Object.assign({}, this.defaultItem));
-        this.editedIndex = -1;
+        this.SET_EDITED_INDEX(-1);
       });
-    },
-
-    editItem(item) {
-      this.editedIndex = this.turns.indexOf(item);
-      this.SET_EDIT_ITEM(Object.assign({}, item));
-      this.dialog = true;
     },
 
     save() {
@@ -583,36 +502,16 @@ export default {
       }
     },
 
-    deleteItem(id) {
-      this.$confirm(`¿Seguro quieres eliminar este turno?`, {
-        title: "Advertencia",
-      }).then((res) => {
-        if (res) {
-          this.deleteTurn(id).then((result) => {
-            if (result) {
-              this.getAllTurns();
-            }
-          });
-        }
-      });
-    },
-
-    updateRowNote(note) {
-      let row = this.movements.find((element) => element.id === this.id_turn);
-      row.note = note;
-    },
-
-    showNoteFormDialog(id, title, note) {
-      this.id_turn = id;
-      this.title = "Turno: " + title;
-      this.note = note ?? "";
-      this.dialogNoteForm = true;
+    updateRowNote(data) {
+      let row = this.turns.find((element) => element.id === data.id);
+      row.note = data.note;
     },
   },
 
   components: {
     VuetifyMoney,
     NoteFormDialog,
+    TurnActions,
   },
 };
 </script>

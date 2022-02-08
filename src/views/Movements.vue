@@ -405,7 +405,7 @@
                   fab
                   x-small
                   dark
-                  color="primary"
+                  color="primary mr-1"
                   v-bind="attrs"
                   v-on="on"
                   @click="
@@ -421,6 +421,25 @@
                 </v-btn>
               </template>
               <span>Cambiar caja</span>
+            </v-tooltip>
+
+            <!-- Show movement details (Not egresses) -->
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  fab
+                  x-small
+                  dark
+                  color="secondary"
+                  v-bind="attrs"
+                  v-on="on"
+                  @click="searchMovementDetails(item.id, item.note_type)"
+                  v-show="!item.edit"
+                >
+                  <v-icon>mdi-link-variant</v-icon>
+                </v-btn>
+              </template>
+              <span>Link</span>
             </v-tooltip>
           </template>
 
@@ -458,7 +477,11 @@
     <movement-cash-register-change-form
       v-model="dialogExchangeCashRegister"
       :id="id_movement"
-    ></movement-cash-register-change-form>
+    >
+    </movement-cash-register-change-form>
+
+    <!-- Movement details -->
+    <movement-details-table></movement-details-table>
   </div>
 </template>
 
@@ -470,6 +493,7 @@ import { mapState, mapActions, mapMutations } from "vuex";
 import VuetifyMoney from "@/components/vuetifyMoney.vue";
 import NoteFormDialog from "@/components/NoteFormDialog.vue";
 import MovementCashRegisterChangeForm from "@/components/movements/MovementCashRegisterChangeForm.vue";
+import MovementDetailsTable from "@/components/movements/MovementDetailsTable.vue";
 import moment from "moment";
 
 export default {
@@ -667,6 +691,7 @@ export default {
       "getAllMovementsBewteenDates",
       "getAllIncomes",
       "saveExchangeCashRegister",
+      "getMovementDetails",
     ]),
     ...mapActions("cash_registers", ["getAllCashRegisters"]),
     ...mapActions("egresses", [
@@ -787,12 +812,17 @@ export default {
       );
       return totals.total;
     },
+
+    searchMovementDetails(id, type) {
+      this.getMovementDetails({ id, type });
+    },
   },
 
   components: {
     VuetifyMoney,
     NoteFormDialog,
     MovementCashRegisterChangeForm,
+    MovementDetailsTable,
   },
 };
 </script>

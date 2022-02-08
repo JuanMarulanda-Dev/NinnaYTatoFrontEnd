@@ -32,6 +32,22 @@ export default {
       payment: 0,
       note: "",
     },
+    headersTurns: [
+      {
+        text: "Fecha",
+        align: "start",
+        value: "date",
+      },
+      { text: "Colaborador", value: "name" },
+      { text: "Turno", value: "turn_type" },
+      { text: "Valor", value: "total" },
+      { text: "Abono", value: "payment" },
+      { text: "Nota", value: "note" },
+      { text: "Acciones", value: "actions", sortable: false },
+    ],
+    formDialog: false,
+    editedIndex: -1,
+    dialogNoteForm: false,
   },
   mutations: {
     SET_TURNS(state, turns) {
@@ -54,6 +70,12 @@ export default {
     },
     SET_END_DATE(state, end) {
       state.end = end;
+    },
+    SET_FORM_DIALOG(state, formDialog) {
+      state.formDialog = formDialog;
+    },
+    SET_EDITED_INDEX(state, editedIndex) {
+      state.editedIndex = editedIndex;
     },
   },
   actions: {

@@ -4,7 +4,7 @@
     <v-card>
       <v-card-title>
         <span class="headline">
-          Nota - <small>{{ title }}</small></span
+          Nota - <small>{{ noteItem.title }}</small></span
         >
       </v-card-title>
 
@@ -15,10 +15,10 @@
               <v-textarea
                 name="input-7-1"
                 label="Notas"
-                v-model="description"
-                :error-messages="descriptionErrors"
-                @input="$v.description.$touch()"
-                @blur="$v.description.$touch()"
+                v-model="noteItem.note"
+                :error-messages="noteErrors"
+                @input="$v.noteItem.note.$touch()"
+                @blur="$v.noteItem.note.$touch()"
                 counter="500"
               ></v-textarea>
             </v-col>
@@ -28,7 +28,7 @@
 
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="error darken-1" text @click="close">Cancel</v-btn>
+        <v-btn color="error darken-1" text @click="close()">Cancel</v-btn>
         <v-btn color="blue darken-1" text @click="save()">Guardar</v-btn>
       </v-card-actions>
     </v-card>
@@ -36,43 +36,22 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapState, mapActions, mapMutations } from "vuex";
 import { validationMixin } from "vuelidate";
-import { maxLength } from "vuelidate/lib/validators";
+import { maxLength, required } from "vuelidate/lib/validators";
 export default {
   name: "note-form-dialog",
   data() {
     return {
       permissions: {},
-      description: "",
     };
   },
   mixins: [validationMixin],
   validations: {
-    description: {
-      maxLength: maxLength(500),
-    },
-  },
-  props: {
-    value: {
-      type: Boolean,
-      required: true,
-    },
-    type: {
-      type: Number,
-      required: true,
-    },
-    id: {
-      type: String,
-      required: true,
-    },
-    note: {
-      type: String,
-      required: true,
-    },
-    title: {
-      type: String,
-      required: true,
+    noteItem: {
+      type: { required },
+      id: { required },
+      note: { maxLength: maxLength(500) },
     },
   },
   created() {
@@ -82,17 +61,19 @@ export default {
   computed: {
     dialogNote: {
       get: function () {
-        return this.value;
+        return this.dialogNoteForm;
       },
       set: function (value) {
-        this.$emit("input", value);
+        this.SET_DIALOG_NOTE_FORM(value);
       },
     },
 
-    descriptionErrors() {
+    ...mapState("notes", ["dialogNoteForm", "noteItem"]),
+
+    noteErrors() {
       const errors = [];
-      if (!this.$v.description.$dirty) return errors;
-      !this.$v.description.maxLength &&
+      if (!this.$v.noteItem.note.$dirty) return errors;
+      !this.$v.noteItem.note.maxLength &&
         errors.push("La longitud no es permitida");
       return errors;
     },
@@ -104,6 +85,7 @@ export default {
   },
   methods: {
     ...mapActions("notes", ["storeNote"]),
+    ...mapMutations("notes", ["SET_DIALOG_NOTE_FORM"]),
     close() {
       this.dialogNote = false;
     },
@@ -112,13 +94,16 @@ export default {
 
       if (!this.$v.$invalid) {
         this.storeNote({
-          item_id: this.id,
-          item_type: this.type,
-          description: this.description,
+          item_id: this.noteItem.id,
+          item_type: this.noteItem.type,
+          description: this.noteItem.note,
         }).then((result) => {
           if (result) {
+            this.$emit("saved", {
+              note: this.noteItem.note,
+              id: this.noteItem.id,
+            });
             this.close();
-            this.$emit("saved", this.description);
           }
         });
       }
