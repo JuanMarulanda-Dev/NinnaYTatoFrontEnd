@@ -324,7 +324,6 @@ export default {
       "headersTurns",
       "editedIndex",
       "formDialog",
-      "dialogNoteForm",
     ]),
     ...mapState("cash_registers", ["cash_registers"]),
 
@@ -417,21 +416,13 @@ export default {
         this.SET_START_DATE(newValue);
       },
     },
+
     endDate: {
       get: function () {
         return this.end;
       },
       set: function (newValue) {
         this.SET_END_DATE(newValue);
-      },
-    },
-
-    dialogNote: {
-      get: function () {
-        return this.dialogNoteForm;
-      },
-      set: function (newValue) {
-        this.SET_DIALOG_NOTE_FORM(newValue);
       },
     },
   },

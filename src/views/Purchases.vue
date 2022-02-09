@@ -230,42 +230,15 @@
 
       <!-- Actions -->
       <template v-slot:[`item.actions`]="{ item }">
-        <!-- Notes -->
-        <v-tooltip bottom>
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              fab
-              x-small
-              dark
-              color="info"
-              v-bind="attrs"
-              v-on="on"
-              @click="
-                showNoteFormDialog(
-                  item.id,
-                  `${item.product_name} - ${item.quantity} - ${item.created_at}`,
-                  item.note,
-                  item.note_type
-                )
-              "
-            >
-              <v-icon>mdi-note-text</v-icon>
-            </v-btn>
-          </template>
-          <span>Nota</span>
-        </v-tooltip>
+        <purchase-actions
+          :item="item"
+          :permissions="permissions"
+        ></purchase-actions>
       </template>
     </v-data-table>
 
     <!-- Notes dialog -->
-    <note-form-dialog
-      v-model="dialogNoteForm"
-      :id="id_purchase"
-      :type="note_type"
-      :note="note"
-      :title="title"
-      @saved="updateRowNote($event)"
-    ></note-form-dialog>
+    <note-form-dialog @saved="updateRowNote($event)"></note-form-dialog>
   </div>
 </template>
 
@@ -276,6 +249,7 @@ import { required, maxLength } from "vuelidate/lib/validators";
 import { mapState, mapActions, mapMutations } from "vuex";
 import VuetifyMoney from "@/components/vuetifyMoney.vue";
 import NoteFormDialog from "@/components/NoteFormDialog.vue";
+import PurchaseActions from "@/components/purchases/PurchaseActions.vue";
 
 export default {
   data: () => ({
@@ -285,12 +259,6 @@ export default {
     modalTimePicker: false,
     date: "",
     time: "",
-
-    id_purchase: "",
-    title: "",
-    note: "",
-    note_type: 5,
-    dialogNoteForm: false,
   }),
   mixins: [validationMixin, moneyFormatMixin],
   validations: {
@@ -458,23 +426,15 @@ export default {
         });
       }
     },
-    updateRowNote(note) {
-      let row = this.purchases.find(
-        (element) => element.id === this.id_purchase
-      );
-      row.note = note;
-    },
-
-    showNoteFormDialog(id, title, note) {
-      this.id_purchase = id;
-      this.title = "Compra: " + title;
-      this.note = note ?? "";
-      this.dialogNoteForm = true;
+    updateRowNote(data) {
+      let row = this.purchases.find((element) => element.id === data.id);
+      row.note = data.note;
     },
   },
   components: {
     VuetifyMoney,
     NoteFormDialog,
+    PurchaseActions,
   },
 };
 </script>
