@@ -139,16 +139,6 @@ export default {
       editedIndex: -1,
     };
   },
-  props: {
-    payment_proof: {
-      type: Number,
-      required: true,
-    },
-    note: {
-      type: String,
-      default: "",
-    },
-  },
   mixins: [moneyFormatMixin, validationMixin],
   validations: {
     editedItem: {
@@ -161,7 +151,12 @@ export default {
   },
   computed: {
     ...mapState(["editIcon", "deleteIcon"]),
-    ...mapState("sales", ["dialogPayments", "payments"]),
+    ...mapState("sales", [
+      "dialogPayments",
+      "payments",
+      "payment_proof",
+      "note",
+    ]),
     ...mapState("cash_registers", ["cash_registers"]),
     cashRegisterErrors() {
       const errors = [];
@@ -193,6 +188,7 @@ export default {
     ...mapActions("cash_registers", ["getAllCashRegisters"]),
     close() {
       this.SET_DIALOG_SALE_PAYMENTS(false);
+      this.editedItem = Object.assign({}, this.defaultItem);
     },
 
     save() {

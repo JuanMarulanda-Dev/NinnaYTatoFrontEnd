@@ -69,14 +69,8 @@ export default {
     };
   },
   mixins: [moneyFormatMixin],
-  props: {
-    payment_proof: {
-      type: Number,
-      required: true,
-    },
-  },
   computed: {
-    ...mapState("sales", ["dialogSaleDitails", "saleDetails"]),
+    ...mapState("sales", ["dialogSaleDitails", "saleDetails", "payment_proof"]),
   },
 
   methods: {

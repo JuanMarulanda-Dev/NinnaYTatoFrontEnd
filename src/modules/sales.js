@@ -49,6 +49,8 @@ export default {
       { text: "Nota", value: "note", width: "16%" },
       { text: "Acciones", value: "actions", sortable: false },
     ],
+    payment_proof: 0,
+    note: "",
   },
   mutations: {
     SET_SALES(state, sales) {
@@ -105,6 +107,12 @@ export default {
     },
     SET_PERMISSIONS(state, permissions) {
       state.permissions = permissions;
+    },
+    SET_PAYMENT_PROOF(state, payment_proof) {
+      state.payment_proof = payment_proof;
+    },
+    SET_NOTE(state, note) {
+      state.note = note;
     },
   },
   actions: {

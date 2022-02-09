@@ -168,92 +168,10 @@
 
               <!-- Actions -->
               <template v-slot:[`item.actions`]="{ item }">
-                <!-- Details -->
-                <v-tooltip bottom>
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-btn
-                      fab
-                      x-small
-                      dark
-                      color="info mr-1"
-                      v-bind="attrs"
-                      v-on="on"
-                      @click="searchDetails(item.id, item.number_payment_proof)"
-                    >
-                      <v-icon>{{ detailsIcon }}</v-icon>
-                    </v-btn>
-                  </template>
-                  <span>Detalle de venta</span>
-                </v-tooltip>
-                <!-- Payments -->
-                <v-tooltip bottom>
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-btn
-                      fab
-                      x-small
-                      dark
-                      color="success mr-1"
-                      v-bind="attrs"
-                      v-on="on"
-                      @click="
-                        searchPayments(
-                          item.id,
-                          item.number_payment_proof,
-                          item.note
-                        )
-                      "
-                      v-show="item.pending > 0 || user.is_admin"
-                    >
-                      <v-icon>mdi-cash-multiple</v-icon>
-                    </v-btn>
-                  </template>
-                  <span>Pagos</span>
-                </v-tooltip>
-                <!-- Print Paymentproof -->
-                <v-tooltip bottom>
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-btn
-                      fab
-                      x-small
-                      dark
-                      color="primary mr-1"
-                      v-bind="attrs"
-                      v-on="on"
-                      @click="
-                        downloadPaymentProof({
-                          saleId: item.id,
-                          name: item.number_payment_proof,
-                        })
-                      "
-                    >
-                      <v-icon>mdi-printer</v-icon>
-                    </v-btn>
-                  </template>
-                  <span>Imprimir Comprobante</span>
-                </v-tooltip>
-                <!-- Note -->
-                <v-tooltip bottom>
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-btn
-                      fab
-                      x-small
-                      dark
-                      color="secondary"
-                      v-bind="attrs"
-                      v-on="on"
-                      @click="
-                        showNoteFormDialog(
-                          item.id,
-                          item.number_payment_proof,
-                          item.note
-                        )
-                      "
-                    >
-                      <v-icon>mdi-note-text</v-icon>
-                    </v-btn>
-                  </template>
-                  <span>Nota</span>
-                </v-tooltip>
+                <sale-actions
+                  :item="item"
+                  :permissions="permissions"
+                ></sale-actions>
               </template>
 
               <template v-slot:[`body.append`]="{ items }">
@@ -287,18 +205,11 @@
     </v-dialog>
 
     <!-- Show dialog payments -->
-    <sale-payments :payment_proof="payment_proof" :note="note"></sale-payments>
+    <sale-payments></sale-payments>
     <!-- Show dialog details -->
-    <sale-details :payment_proof="payment_proof"></sale-details>
+    <sale-details></sale-details>
     <!-- Show dialog note -->
-    <note-form-dialog
-      v-model="dialogNoteForm"
-      :id="id_sale"
-      :type="note_type"
-      :note="note"
-      :title="title"
-      @saved="updateRowNote($event)"
-    ></note-form-dialog>
+    <note-form-dialog @saved="updateRowNote($event)"></note-form-dialog>
   </div>
 </template>
 
@@ -308,6 +219,7 @@ import { mapState, mapMutations, mapActions } from "vuex";
 import SalePayments from "@/components/sales/SalePayments.vue";
 import SaleDetails from "@/components/sales/SaleDetails.vue";
 import NoteFormDialog from "@/components/NoteFormDialog.vue";
+import SaleActions from "@/components/sales/SaleActions.vue";
 import moment from "moment";
 
 export default {
@@ -315,12 +227,7 @@ export default {
   data: () => ({
     time: "",
     dialogDate: false,
-    dialogNoteForm: false,
     payment_proof: 0,
-    title: "",
-    note_type: 1,
-    id_sale: "",
-    note: "",
   }),
   mixins: [moneyFormatMixin],
   created() {
@@ -359,6 +266,7 @@ export default {
         this.SET_START_DATE(newValue);
       },
     },
+
     endDate: {
       get: function () {
         return this.end;
@@ -383,31 +291,7 @@ export default {
       "SET_START_DATE",
       "SET_END_DATE",
     ]),
-    ...mapActions("sales", [
-      "getAllSales",
-      "changeStatusSale",
-      "getSalePayments",
-      "downloadPaymentProof",
-      "getSaleDetails",
-    ]),
-
-    searchPayments(saleId, payment_proof, note) {
-      this.payment_proof = payment_proof;
-      this.note = note ?? "";
-      this.getSalePayments(saleId);
-    },
-
-    searchDetails(saleId, payment_proof) {
-      this.payment_proof = payment_proof;
-      this.getSaleDetails(saleId);
-    },
-
-    showNoteFormDialog(id, payment_proof, note) {
-      this.id_sale = id;
-      this.title = "Venta N° " + payment_proof;
-      this.note = note ?? "";
-      this.dialogNoteForm = true;
-    },
+    ...mapActions("sales", ["getAllSales", "changeStatusSale"]),
 
     changeStateSale(item) {
       // Confirmation to change de status
@@ -434,9 +318,9 @@ export default {
       this.sales[saleIndex].state = !this.sales[saleIndex].state;
     },
 
-    updateRowNote(note) {
-      let row = this.sales.find((element) => element.id === this.id_sale);
-      row.note = note;
+    updateRowNote(data) {
+      let row = this.sales.find((element) => element.id === data.id);
+      row.note = data.note;
     },
 
     totals(items) {
@@ -463,6 +347,7 @@ export default {
     SalePayments,
     SaleDetails,
     NoteFormDialog,
+    SaleActions,
   },
 };
 </script>
