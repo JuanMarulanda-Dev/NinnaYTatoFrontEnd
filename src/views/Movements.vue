@@ -500,6 +500,7 @@ export default {
   data: () => ({
     permissions: {},
     dialog: false,
+
     // Notes
     id_movement: "",
     title: "",
@@ -581,6 +582,7 @@ export default {
     ]),
     ...mapState("cash_registers", ["cash_registers"]),
     ...mapState("egresses", ["egress_types", "editedItem", "defaultItem"]),
+
     mediatorErrors() {
       const errors = [];
       if (!this.$v.editedItem.mediator.$dirty) return errors;
@@ -590,6 +592,7 @@ export default {
         errors.push("Longitud no permitida");
       return errors;
     },
+
     egressTypeErrors() {
       const errors = [];
       if (!this.$v.editedItem.egress_type_id.$dirty) return errors;
@@ -597,6 +600,7 @@ export default {
         errors.push("El grupo es requerido");
       return errors;
     },
+
     cashRegisterErrors() {
       const errors = [];
       if (!this.$v.editedItem.cash_register_id.$dirty) return errors;
@@ -604,6 +608,7 @@ export default {
         errors.push("El origen es requerido");
       return errors;
     },
+
     noteErrors() {
       const errors = [];
       if (!this.$v.editedItem.note.$dirty) return errors;
@@ -702,11 +707,14 @@ export default {
     ]),
     ...mapMutations("egresses", ["SET_EDIT_ITEM"]),
     ...mapMutations("movements", ["SET_START_DATE", "SET_END_DATE"]),
+    ...mapMutations("notes", ["SET_EDIT_ITEM_NOTE", "SET_DIALOG_NOTE_FORM"]),
+
     initialize() {
       this.getAllMovementsBewteenDates();
       this.getAllIncomes();
     },
 
+    // Egrees
     close() {
       this.dialog = false;
       this.$nextTick(() => {
@@ -760,22 +768,23 @@ export default {
         }
       });
     },
+    // End Egrees
 
     showNoteFormDialog(id, title, note, note_type) {
-      this.id_movement = id;
-      this.title = "Fecha movimiento: " + title;
-      this.note = note ?? "";
-      this.note_type = note_type;
-      this.dialogNoteForm = true;
+      this.SET_EDIT_ITEM_NOTE({
+        id,
+        title: "Fecha movimiento: " + title,
+        note,
+        type: note_type,
+      });
+      this.SET_DIALOG_NOTE_FORM(true);
     },
 
-    updateRowNote(note) {
+    updateRowNote(data) {
       let row = this.movements.find(
-        (element) =>
-          element.id === this.id_movement &&
-          element.note_type === this.note_type
+        (element) => element.id === data.id && element.note_type === data.type
       );
-      row.note = note;
+      row.note = data.note;
     },
 
     researchMovemets() {

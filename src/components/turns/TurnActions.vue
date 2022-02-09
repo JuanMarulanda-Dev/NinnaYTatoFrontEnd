@@ -12,7 +12,7 @@
           v-bind="attrs"
           v-on="on"
           @click="deleteItem(item.id)"
-          v-show="permissions.delete"
+          v-show="permissions.delete || user.is_admin"
         >
           <v-icon> {{ deleteIcon }} </v-icon>
         </v-btn>
@@ -31,7 +31,7 @@
           v-bind="attrs"
           v-on="on"
           @click="editItem(item)"
-          v-show="permissions.update"
+          v-show="permissions.update || user.is_admin"
         >
           <v-icon> {{ editIcon }} </v-icon>
         </v-btn>
@@ -80,7 +80,7 @@ export default {
     },
   },
   computed: {
-    ...mapState(["deleteIcon", "editIcon"]),
+    ...mapState(["deleteIcon", "editIcon", "user"]),
     ...mapState("turns", ["editedIndex", "turns"]),
     ...mapState("notes", ["dialogNoteForm"]),
   },

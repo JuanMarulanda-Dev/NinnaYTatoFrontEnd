@@ -102,6 +102,7 @@ export default {
             this.$emit("saved", {
               note: this.noteItem.note,
               id: this.noteItem.id,
+              type: this.noteItem.type,
             });
             this.close();
           }

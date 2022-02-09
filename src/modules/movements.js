@@ -18,7 +18,7 @@ export default {
       payment_id: "",
     },
     dialogMovementDetail: false,
-    movement: {},
+    movement: [],
     movement_type: 0,
   },
   mutations: {
@@ -42,7 +42,7 @@ export default {
       state.dialogMovementDetail = dialogMovementDetail;
     },
     SET_DETAILS_MOVEMENT(state, movement) {
-      state.movement = movement;
+      state.movement[0] = movement;
     },
     SET_MOVEMENT_TYPE(state, movement_type) {
       state.movement_type = movement_type;
@@ -77,10 +77,6 @@ export default {
       axios
         .get(`/api/movements/${id}?movement_type=${type}`)
         .then((result) => {
-          // Seleccionar los headers de la tabla de acuerdo el tipo
-
-          // Seleccionar las acciones correspondientes de acuerdo al tipo
-
           // Guardar el movimiento
           commit("SET_DETAILS_MOVEMENT", result.data.movement);
           commit("SET_MOVEMENT_TYPE", type);
