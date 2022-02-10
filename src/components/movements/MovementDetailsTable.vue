@@ -63,7 +63,7 @@
                       :input-value="item.state"
                       v-model="item.state"
                       v-show="user.is_admin"
-                      @change="changeStateSale(item)"
+                      @change="changeState(item)"
                     ></v-switch>
                   </template>
 
@@ -175,9 +175,47 @@ export default {
   methods: {
     ...mapMutations("movements", ["SET_DIALOG_MOVEMENT"]),
     ...mapActions("movements", ["getAllMovementsBewteenDates"]),
+    ...mapActions("sales", ["changeStatusSale"]),
+    ...mapActions("purchases", ["changeStatusPurchases"]),
     close() {
       this.SET_DIALOG_MOVEMENT(false);
       this.getAllMovementsBewteenDates();
+    },
+
+    changeState(item) {
+      // Confirmation to change de status
+      this.$confirm("¿Quieres cambiar el estado?", {
+        title: "Advertencia",
+      }).then((res) => {
+        if (res) {
+          // Make to change status to backend
+
+          let func = null;
+          switch (this.movement_type) {
+            case 1: // Sale
+              func = this.changeStatusSale(item.id);
+              break;
+            case 5: // Purchases
+              func = this.changeStatusPurchases(item);
+              break;
+          }
+
+          func.then((result) => {
+            if (!result) {
+              // Rollback the state from branch office
+              this.rollbackState(item);
+            }
+          });
+        } else {
+          // Rollback the state from branch office
+          this.rollbackState(item);
+        }
+      });
+    },
+
+    rollbackState(item) {
+      let saleIndex = this.customeItem.indexOf(item);
+      this.customeItem[saleIndex].state = !this.customeItem[saleIndex].state;
     },
   },
   components: {

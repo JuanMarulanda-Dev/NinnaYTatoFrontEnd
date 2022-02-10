@@ -238,7 +238,7 @@
     </v-data-table>
 
     <!-- Notes dialog -->
-    <note-form-dialog @saved="updateRowNote($event)"></note-form-dialog>
+    <note-form-dialog></note-form-dialog>
   </div>
 </template>
 
@@ -425,10 +425,6 @@ export default {
           }
         });
       }
-    },
-    updateRowNote(data) {
-      let row = this.purchases.find((element) => element.id === data.id);
-      row.note = data.note;
     },
   },
   components: {

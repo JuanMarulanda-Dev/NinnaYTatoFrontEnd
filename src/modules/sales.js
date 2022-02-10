@@ -228,7 +228,7 @@ export default {
         });
     },
 
-    changeStatusSale({ commit, dispatch }, id) {
+    changeStatusSale({ commit }, id) {
       commit("SET_OVERLAY_LOADING", true, { root: true });
       return axios
         .delete(`/api/sales/${id}`)
@@ -236,8 +236,10 @@ export default {
           if (result.status == 204) {
             // show message
             this._vm.showToastMessage(result.status);
-            // Reload branch officess
-            dispatch("getAllSales");
+            // if (!rootState.movements.module_status) {
+            //   // Reload púrchases
+            //   dispatch("getAllSales");
+            // }
             return true;
           } else {
             return false;

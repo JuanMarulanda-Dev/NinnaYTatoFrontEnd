@@ -111,7 +111,7 @@ export default {
         });
     },
 
-    changeStatusPurchases({ commit, dispatch }, purchase) {
+    changeStatusPurchases({ commit }, purchase) {
       commit("SET_OVERLAY_LOADING", true, { root: true });
       return axios
         .delete(`/api/purchases/${purchase.id}`, {
@@ -124,8 +124,12 @@ export default {
           if (result.status == 204) {
             // show message
             this._vm.showToastMessage(result.status);
-            // Reload púrchases
-            dispatch("getAllPurchases");
+
+            // if (!rootState.movements.module_status) {
+            //   // Reload púrchases
+            //   dispatch("getAllPurchases");
+            // }
+
             return true;
           } else {
             return false;

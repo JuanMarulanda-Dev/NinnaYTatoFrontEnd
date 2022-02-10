@@ -209,7 +209,7 @@
     <!-- Show dialog details -->
     <sale-details></sale-details>
     <!-- Show dialog note -->
-    <note-form-dialog @saved="updateRowNote($event)"></note-form-dialog>
+    <note-form-dialog></note-form-dialog>
   </div>
 </template>
 
@@ -319,11 +319,6 @@ export default {
     rollbackStateSale(item) {
       let saleIndex = this.sales.indexOf(item);
       this.sales[saleIndex].state = !this.sales[saleIndex].state;
-    },
-
-    updateRowNote(data) {
-      let row = this.sales.find((element) => element.id === data.id);
-      row.note = data.note;
     },
 
     totals(items) {
