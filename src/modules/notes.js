@@ -56,5 +56,25 @@ export default {
           commit("SET_OVERLAY_LOADING", false, { root: true });
         });
     },
+
+    updateNoteFromData({ rootState }, data) {
+      let items = [];
+      switch (data.type) {
+        case 1: // Sale
+          items = rootState.sales.sales;
+          break;
+        case 3: // Turn
+          items = rootState.turns.turns;
+          break;
+        case 5: // Purchases
+          items = rootState.purchases.purchases;
+          break;
+      }
+
+      let row = items.find((element) => element.id === data.id);
+      if (row) {
+        row.note = data.note;
+      }
+    },
   },
 };

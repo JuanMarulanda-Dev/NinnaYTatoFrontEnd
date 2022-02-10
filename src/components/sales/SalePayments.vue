@@ -179,15 +179,12 @@ export default {
     },
   },
   methods: {
-    ...mapMutations("sales", ["SET_DIALOG_SALE_PAYMENTS"]),
-    ...mapActions("sales", [
-      "storeSalePayment",
-      "getAllSales",
-      "deletePayment",
-    ]),
+    ...mapMutations("sales", ["SET_DIALOG_SALE_PAYMENTS", "SET_NOTE"]),
+    ...mapActions("sales", ["storeSalePayment", "deletePayment"]),
     ...mapActions("cash_registers", ["getAllCashRegisters"]),
     close() {
       this.SET_DIALOG_SALE_PAYMENTS(false);
+      this.SET_NOTE("");
       this.editedItem = Object.assign({}, this.defaultItem);
     },
 
@@ -200,7 +197,6 @@ export default {
           if (this.editedItem.total > 0) {
             this.storeSalePayment({ ...this.editedItem }).then((result) => {
               if (result) {
-                this.getAllSales();
                 this.total = 0;
                 this.close();
               }

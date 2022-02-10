@@ -282,7 +282,7 @@ export default {
         });
     },
 
-    storeSalePayment({ state, commit }, data) {
+    storeSalePayment({ state, commit, dispatch, rootState }, data) {
       commit("SET_OVERLAY_LOADING", true, { root: true });
       return axios
         .post(`/api/sales/${state.saleId}/payments`, data)
@@ -293,6 +293,17 @@ export default {
               result.status,
               "Pago registrado exitosamente."
             );
+            // Unless from movements module
+            if (!rootState.movements.module_status) {
+              // Reload cash registers
+              dispatch("getAllSales");
+            } else {
+              dispatch(
+                "movements/getMovementDetails",
+                { id: state.saleId, type: 1 },
+                { root: true }
+              );
+            }
 
             commit("SET_SALE_ID", null);
 

@@ -84,7 +84,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions("notes", ["storeNote"]),
+    ...mapActions("notes", ["storeNote", "updateNoteFromData"]),
     ...mapMutations("notes", ["SET_DIALOG_NOTE_FORM"]),
     close() {
       this.dialogNote = false;
@@ -99,11 +99,14 @@ export default {
           description: this.noteItem.note,
         }).then((result) => {
           if (result) {
-            this.$emit("saved", {
+            let data = {
               note: this.noteItem.note,
               id: this.noteItem.id,
               type: this.noteItem.type,
-            });
+            };
+
+            this.updateNoteFromData(data);
+            this.$emit("saved", data);
             this.close();
           }
         });

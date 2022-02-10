@@ -233,6 +233,8 @@ export default {
   created() {
     this.SET_START_DATE(moment().startOf("month").format("YYYY-MM-DD"));
     this.SET_END_DATE(moment().endOf("month").format("YYYY-MM-DD"));
+    //Status movements module
+    this.SET_MODULE_STATUS(false);
   },
   computed: {
     ...mapState(["loadingText", "mainBranchOffice", "detailsIcon", "user"]),
@@ -292,6 +294,7 @@ export default {
       "SET_END_DATE",
     ]),
     ...mapActions("sales", ["getAllSales", "changeStatusSale"]),
+    ...mapMutations("movements", ["SET_MODULE_STATUS"]),
 
     changeStateSale(item) {
       // Confirmation to change de status

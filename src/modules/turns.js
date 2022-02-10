@@ -153,7 +153,7 @@ export default {
         });
     },
 
-    updateTurn({ state, commit, dispatch }) {
+    updateTurn({ state, commit, dispatch, rootState }) {
       commit("SET_OVERLAY_LOADING", true, { root: true });
       return axios
         .put(`/api/turns/${state.editedItem.id}`, state.editedItem)
@@ -164,9 +164,18 @@ export default {
               result.status,
               "Turno actualizado exitosamente"
             );
-            // Reload cash registers
-            dispatch("getAllTurns");
-            dispatch("getAllCollaborators");
+            // Unless from movements module
+            if (!rootState.movements.module_status) {
+              // Reload cash registers
+              dispatch("getAllTurns");
+              dispatch("getAllCollaborators");
+            } else {
+              dispatch(
+                "movements/getMovementDetails",
+                { id: state.editedItem.id, type: 3 },
+                { root: true }
+              );
+            }
             // Result
             return true;
           }
@@ -184,7 +193,7 @@ export default {
         });
     },
 
-    deleteTurn({ commit, dispatch }, id) {
+    deleteTurn({ commit, dispatch, rootState }, id) {
       commit("SET_OVERLAY_LOADING", true, { root: true });
       return axios
         .delete(`/api/turns/${id}`)
@@ -192,9 +201,15 @@ export default {
           if (result.status == 204) {
             // show message
             this._vm.showToastMessage(result.status);
-            // Reload cash registers
-            dispatch("getAllTurns");
-            dispatch("getAllCollaborators");
+
+            // Unless from movements module
+            if (!rootState.movements.module_status) {
+              // Reload cash registers
+              dispatch("getAllTurns");
+              dispatch("getAllCollaborators");
+            } else {
+              commit("SET_TURNS", []);
+            }
             return true;
           } else {
             return false;

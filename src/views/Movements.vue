@@ -464,14 +464,7 @@
     </v-row>
 
     <!-- Notes dialog -->
-    <note-form-dialog
-      v-model="dialogNoteForm"
-      :id="id_movement"
-      :type="note_type"
-      :note="note"
-      :title="title"
-      @saved="updateRowNote($event)"
-    ></note-form-dialog>
+    <note-form-dialog @saved="updateRowNote($event)"></note-form-dialog>
 
     <!-- Dialog exchange cash register -->
     <movement-cash-register-change-form
@@ -501,12 +494,7 @@ export default {
     permissions: {},
     dialog: false,
 
-    // Notes
     id_movement: "",
-    title: "",
-    note_type: 0,
-    note: "",
-    dialogNoteForm: false,
 
     dialogStart: false,
     dialogEnd: false,
@@ -568,6 +556,9 @@ export default {
       this.getAllEgressTypes();
       this.getAllCashRegisters(1);
     }
+
+    //Status movements module
+    this.SET_MODULE_STATUS(true);
   },
   computed: {
     ...mapState(["deleteIcon", "editIcon", "loadingText", "mainBranchOffice"]),
@@ -708,6 +699,7 @@ export default {
     ...mapMutations("egresses", ["SET_EDIT_ITEM"]),
     ...mapMutations("movements", ["SET_START_DATE", "SET_END_DATE"]),
     ...mapMutations("notes", ["SET_EDIT_ITEM_NOTE", "SET_DIALOG_NOTE_FORM"]),
+    ...mapMutations("movements", ["SET_MODULE_STATUS"]),
 
     initialize() {
       this.getAllMovementsBewteenDates();

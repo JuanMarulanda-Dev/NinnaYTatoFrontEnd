@@ -14,7 +14,7 @@
                 <v-data-table
                   fixed-header
                   :headers="customeHeaders"
-                  :items="movement"
+                  :items="customeItem"
                   sort-by="name"
                   class="elevation-3"
                   hide-default-footer
@@ -62,7 +62,7 @@
                     <v-switch
                       :input-value="item.state"
                       v-model="item.state"
-                      v-show="permissions.delete"
+                      v-show="user.is_admin"
                       @change="changeStateSale(item)"
                     ></v-switch>
                   </template>
@@ -117,7 +117,7 @@
 </template>
 
 <script>
-import { mapState, mapMutations } from "vuex";
+import { mapState, mapMutations, mapActions } from "vuex";
 import SaleActions from "@/components/sales/SaleActions.vue";
 import TurnActions from "@/components/turns/TurnActions.vue";
 import PurchaseActions from "@/components/purchases/PurchaseActions.vue";
@@ -128,26 +128,17 @@ import { moneyFormatMixin } from "@/mixins/moneyFormatMixin.js";
 
 export default {
   data() {
-    return {
-      permissions: {
-        read: 1,
-        create: 1,
-        delete: 1,
-        update: 1,
-      },
-    };
+    return {};
   },
   mixins: [moneyFormatMixin],
   computed: {
-    ...mapState("movements", [
-      "movement",
-      "dialogMovementDetail",
-      "movement_type",
-    ]),
+    ...mapState("movements", ["dialogMovementDetail", "movement_type"]),
 
-    ...mapState("sales", ["headersSales"]),
-    ...mapState("turns", ["headersTurns"]),
-    ...mapState("purchases", ["headersPurchases"]),
+    ...mapState(["user"]),
+
+    ...mapState("sales", ["headersSales", "sales"]),
+    ...mapState("turns", ["headersTurns", "turns"]),
+    ...mapState("purchases", ["headersPurchases", "purchases"]),
 
     customeHeaders() {
       let headers = {};
@@ -164,11 +155,29 @@ export default {
       }
       return headers;
     },
+
+    customeItem() {
+      let item = [];
+      switch (this.movement_type) {
+        case 1: // Sale
+          item = this.sales;
+          break;
+        case 3: // Turn
+          item = this.turns;
+          break;
+        case 5: // Purchases
+          item = this.purchases;
+          break;
+      }
+      return item;
+    },
   },
   methods: {
     ...mapMutations("movements", ["SET_DIALOG_MOVEMENT"]),
+    ...mapActions("movements", ["getAllMovementsBewteenDates"]),
     close() {
       this.SET_DIALOG_MOVEMENT(false);
+      this.getAllMovementsBewteenDates();
     },
   },
   components: {

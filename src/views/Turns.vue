@@ -116,7 +116,7 @@
     </v-data-table>
 
     <!-- Notes dialog -->
-    <note-form-dialog @saved="updateRowNote($event)"></note-form-dialog>
+    <note-form-dialog></note-form-dialog>
     <turn-form></turn-form>
   </div>
 </template>
@@ -153,6 +153,9 @@ export default {
       this.getAllCollaborators();
       this.getAllCashRegisters(1);
     }
+
+    //Status movements module
+    this.SET_MODULE_STATUS(false);
   },
 
   computed: {
@@ -207,6 +210,7 @@ export default {
     ]),
 
     ...mapActions("cash_registers", ["getAllCashRegisters"]),
+    ...mapMutations("movements", ["SET_MODULE_STATUS"]),
     ...mapMutations("turns", [
       "SET_START_DATE",
       "SET_END_DATE",
@@ -214,11 +218,6 @@ export default {
     ]),
     initialize() {
       this.getAllTurns();
-    },
-
-    updateRowNote(data) {
-      let row = this.turns.find((element) => element.id === data.id);
-      row.note = data.note;
     },
   },
 

@@ -18,8 +18,8 @@ export default {
       payment_id: "",
     },
     dialogMovementDetail: false,
-    movement: [],
     movement_type: 0,
+    module_status: true,
   },
   mutations: {
     SET_MOVEMENTS(state, movements) {
@@ -41,11 +41,11 @@ export default {
     SET_DIALOG_MOVEMENT(state, dialogMovementDetail) {
       state.dialogMovementDetail = dialogMovementDetail;
     },
-    SET_DETAILS_MOVEMENT(state, movement) {
-      state.movement[0] = movement;
-    },
     SET_MOVEMENT_TYPE(state, movement_type) {
       state.movement_type = movement_type;
+    },
+    SET_MODULE_STATUS(state, module_status) {
+      state.module_status = module_status;
     },
   },
   actions: {
@@ -77,8 +77,23 @@ export default {
       axios
         .get(`/api/movements/${id}?movement_type=${type}`)
         .then((result) => {
-          // Guardar el movimiento
-          commit("SET_DETAILS_MOVEMENT", result.data.movement);
+          // Guardar el movimiento de acuerto del tipo
+          switch (type) {
+            case 1: // sales
+              commit("sales/SET_SALES", [result.data.movement], { root: true });
+              break;
+
+            case 3: //Turns
+              commit("turns/SET_TURNS", [result.data.movement], { root: true });
+              break;
+
+            case 5: //Pruchases
+              commit("purchases/SET_PURCHASES", [result.data.movement], {
+                root: true,
+              });
+              break;
+          }
+
           commit("SET_MOVEMENT_TYPE", type);
           commit("SET_DIALOG_MOVEMENT", true);
         })
