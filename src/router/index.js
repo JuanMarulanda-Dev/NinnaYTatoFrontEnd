@@ -214,6 +214,15 @@ const routes = [
       permissions: {},
     },
   },
+  {
+    path: "/estadisticas",
+    name: "Estadisticas",
+    component: () =>
+      import(/* webpackChunkName: "Statistics" */ "@/views/Statistics.vue"),
+    meta: {
+      permissions: {},
+    },
+  },
 ];
 
 const router = new VueRouter({

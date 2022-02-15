@@ -27,6 +27,7 @@ import notifications from "@/modules/notifications.js";
 import movements from "@/modules/movements.js";
 import turns from "@/modules/turns.js";
 import egresses from "@/modules/egresses.js";
+import statistics from "@/modules/statistics.js";
 
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL = process.env.VUE_APP_API_URL; // Esto se puede colocar desde el main de la aplicacion para solo declararlo una unica vez
@@ -213,5 +214,6 @@ export default new Vuex.Store({
     movements,
     turns,
     egresses,
+    statistics,
   },
 });
