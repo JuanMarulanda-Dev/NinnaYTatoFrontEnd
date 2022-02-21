@@ -76,6 +76,9 @@
     </v-card>
     <v-container fluid>
       <v-row>
+        <v-col cols="12" class="px-0 pb-0">
+          <lodging-bar-report></lodging-bar-report>
+        </v-col>
         <v-col cols="12" class="px-0">
           <!-- Plans Customers Report -->
           <plans-customers-report></plans-customers-report>
@@ -89,6 +92,8 @@
 import moment from "moment";
 import { mapActions, mapMutations, mapState } from "vuex";
 import PlansCustomersReport from "@/components/statistics/PlansCustomersReport.vue";
+import LodgingBarReport from "@/components/statistics/LodgingBarReport.vue";
+
 export default {
   data: () => ({
     dialogStart: false,
@@ -127,13 +132,13 @@ export default {
     ...mapMutations("statistics", ["SET_START_DATE", "SET_END_DATE"]),
     ...mapActions("statistics", [
       "getPlanCustomerReportByDates",
-      "getLodgingCountReportByDates",
+      "getPercentageLodgingsByTime",
     ]),
     initialize() {
       try {
         this.SET_OVERLAY_LOADING(true);
         this.getPlanCustomerReportByDates();
-        this.getLodgingCountReportByDates();
+        this.getPercentageLodgingsByTime();
       } catch (errors) {
         this.showToastMessage(
           errors.response.status,
@@ -146,6 +151,7 @@ export default {
   },
   components: {
     PlansCustomersReport,
+    LodgingBarReport,
   },
 };
 </script>

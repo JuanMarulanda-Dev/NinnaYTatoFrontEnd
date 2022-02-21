@@ -19,6 +19,7 @@ import VueMoment from "vue-moment";
 import Toast from "vue-toastification";
 // Import the CSS or use your own!
 import "vue-toastification/dist/index.css"; // https://maronato.github.io/vue-toastification/
+import VueApexCharts from "vue-apexcharts";
 
 const options = {
   position: "top-right",
@@ -32,6 +33,9 @@ Vue.config.productionTip = false;
 Vue.use(VueAxios, axios);
 Vue.use(Vuelidate);
 Vue.use(VuetifyConfirm, { vuetify });
+Vue.use(VueApexCharts);
+
+Vue.component("apexchart", VueApexCharts);
 
 // moment configuration
 require("moment/locale/es");
