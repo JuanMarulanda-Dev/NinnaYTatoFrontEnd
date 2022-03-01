@@ -141,12 +141,14 @@ export default {
     ...mapActions("statistics", [
       "getPlanCustomerReportByDates",
       "getPercentageLodgingsByTime",
+      "getIncomesAndEgressByMonths",
     ]),
     initialize() {
       try {
         this.SET_OVERLAY_LOADING(true);
         this.getPlanCustomerReportByDates();
         this.getPercentageLodgingsByTime();
+        this.getIncomesAndEgressByMonths();
       } catch (errors) {
         this.showToastMessage(
           errors.response.status,

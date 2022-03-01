@@ -37,6 +37,7 @@
 
 <script>
 import { mapState } from "vuex";
+import { moneyFormatMixin } from "@/mixins/moneyFormatMixin.js";
 export default {
   data() {
     return {
@@ -57,6 +58,7 @@ export default {
       ],
     };
   },
+  mixins: [moneyFormatMixin],
   computed: {
     ...mapState("statistics", ["plans_customers_report"]),
   },

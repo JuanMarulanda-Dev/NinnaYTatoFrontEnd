@@ -39,6 +39,7 @@
     <v-card-text>
       <div id="chart">
         <apexchart
+          ref="incomesEgresses"
           type="line"
           height="350"
           :options="chartOptions"
@@ -166,17 +167,23 @@ export default {
     menu(val) {
       val && this.$nextTick(() => (this.activePicker = "YEAR"));
     },
+    series_incomes_egress: {
+      handler() {
+        this.$refs.incomesEgresses.updateSeries(this.series_incomes_egress);
+      },
+      deep: true,
+    },
   },
   methods: {
     ...mapMutations("statistics", ["SET_YEAR"]),
-    ...mapActions("statistics", ["getPercentageLodgingsByTime"]),
+    ...mapActions("statistics", ["getIncomesAndEgressByMonths"]),
     save(date) {
       this.$refs.menu.save(date);
       this.activePicker = "YEAR";
       // this.$refs.picker.activePicker = "YEAR";
       this.menu = false;
       this.SET_YEAR(this.year);
-      this.getPercentageLodgingsByTime();
+      this.getIncomesAndEgressByMonths();
     },
   },
 };

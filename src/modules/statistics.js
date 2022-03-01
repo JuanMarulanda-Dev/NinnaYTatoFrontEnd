@@ -48,11 +48,11 @@ export default {
     series_incomes_egress: [
       {
         name: "Ingresos",
-        data: [200000000, 15500000, 38, 24, 33, 26, 21, 20, 6, 8, 15, 10],
+        data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       },
       {
         name: "Egresos",
-        data: [35, 41, 62, 42, 13, 18, 29, 37, 36, 51, 32, 35],
+        data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       },
     ],
     categories_hours: [
@@ -133,6 +133,12 @@ export default {
         state.series[index].data = serie.data;
       });
     },
+
+    SET_INCOMES_EGRESS_REPORT(state, series) {
+      state.series_incomes_egress[0].data = series.incomes.data;
+      state.series_incomes_egress[1].data = series.egresses.data;
+    },
+
     SET_YEAR(state, year) {
       state.year = year;
     },
@@ -155,6 +161,16 @@ export default {
         )
         .then((result) => {
           commit("PERCENTAGE_LODGING_REPORT", result.data.series);
+        })
+        .catch(() => {});
+    },
+    getIncomesAndEgressByMonths({ commit, rootState, state }) {
+      axios
+        .get(
+          `/api/incomes-egresses-report?branch_office_id=${rootState.mainBranchOffice}&year=${state.year}`
+        )
+        .then((result) => {
+          commit("SET_INCOMES_EGRESS_REPORT", result.data);
         })
         .catch(() => {});
     },

@@ -37,13 +37,23 @@
       </div>
     </v-card-title>
     <v-card-text>
-      <div id="chart">
-        <apexchart
-          type="line"
-          height="350"
-          :options="chartOptions"
-          :series="series_hours"
-        ></apexchart>
+      <div id="wrapper">
+        <div id="chart-line2">
+          <apexchart
+            type="line"
+            height="230"
+            :options="chartOptions"
+            :series="series"
+          ></apexchart>
+        </div>
+        <div id="chart-line">
+          <apexchart
+            type="area"
+            height="130"
+            :options="chartOptionsLine"
+            :series="seriesLine"
+          ></apexchart>
+        </div>
       </div>
     </v-card-text>
   </v-card>
@@ -52,6 +62,27 @@
 <script>
 import moment from "moment";
 import { mapActions, mapMutations, mapState } from "vuex";
+
+var data = generateDayWiseTimeSeries(new Date("22 Apr 2017").getTime(), 115, {
+  min: 30,
+  max: 90,
+});
+function generateDayWiseTimeSeries(baseval, count, yrange) {
+  var i = 0;
+  var series = [];
+  while (i < count) {
+    var x = baseval;
+    var y =
+      Math.floor(Math.random() * (yrange.max - yrange.min + 1)) + yrange.min;
+
+    series.push([x, y]);
+    baseval += 86400000;
+    i++;
+  }
+  console.log(series);
+  return series;
+}
+
 export default {
   data() {
     return {
@@ -59,13 +90,90 @@ export default {
       date: moment().startOf("month").format("YYYY-MM-DD"),
       max: moment().startOf("month").format("YYYY-MM-DD"),
       activePicker: null,
+
+      series: [
+        {
+          data: data,
+        },
+      ],
+      chartOptions: {
+        chart: {
+          id: "chart2",
+          type: "area",
+          height: 230,
+          toolbar: {
+            autoSelected: "pan",
+            show: false,
+          },
+        },
+        colors: ["#546E7A"],
+        stroke: {
+          width: 3,
+        },
+        dataLabels: {
+          enabled: false,
+        },
+        fill: {
+          opacity: 1,
+        },
+        markers: {
+          size: 0,
+        },
+        xaxis: {
+          type: "datetime",
+        },
+        zoom: {
+          enabled: false,
+        },
+      },
+
+      seriesLine: [
+        {
+          data: data,
+        },
+      ],
+      chartOptionsLine: {
+        chart: {
+          id: "chart1",
+          height: 130,
+          type: "area",
+          brush: {
+            target: "chart2",
+            enabled: true,
+          },
+          selection: {
+            enabled: true,
+            xaxis: {
+              min: new Date("27 Jul 2017").getTime(),
+              max: new Date("14 Aug 2017").getTime(),
+            },
+          },
+        },
+        colors: ["#008FFB"],
+        fill: {
+          type: "gradient",
+          gradient: {
+            opacityFrom: 0.91,
+            opacityTo: 0.1,
+          },
+        },
+        xaxis: {
+          type: "datetime",
+          tooltip: {
+            enabled: false,
+          },
+        },
+        yaxis: {
+          tickAmount: 2,
+        },
+      },
     };
   },
 
   computed: {
     ...mapState("statistics", ["series_hours", "categories_hours"]),
 
-    chartOptions() {
+    chartOptions1() {
       return {
         chart: {
           height: 350,
