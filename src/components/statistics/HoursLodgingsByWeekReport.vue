@@ -2,7 +2,7 @@
   <v-card>
     <v-card-title primary-title>
       <div>
-        <h3 class="headline mb-0">Porcentaje de asistencias por mes - día</h3>
+        <h3 class="headline mb-0">Historial semanal de horas</h3>
       </div>
       <v-spacer></v-spacer>
       <div>
@@ -39,11 +39,10 @@
     <v-card-text>
       <div id="chart">
         <apexchart
-          ref="percentage"
-          type="bar"
+          type="line"
           height="350"
           :options="chartOptions"
-          :series="series"
+          :series="series_hours"
         ></apexchart>
       </div>
     </v-card-text>
@@ -64,38 +63,31 @@ export default {
   },
 
   computed: {
-    ...mapState("statistics", ["series", "months"]),
+    ...mapState("statistics", ["series_hours", "categories_hours"]),
 
     chartOptions() {
       return {
         chart: {
-          type: "bar",
           height: 350,
-          stacked: true,
-          stackType: "100%",
-        },
-        responsive: [
-          {
-            breakpoint: 480,
-            options: {
-              legend: {
-                position: "bottom",
-                offsetX: -10,
-                offsetY: 0,
-              },
-            },
+          type: "line",
+          zoom: {
+            enabled: false,
           },
-        ],
+        },
+        dataLabels: {
+          enabled: false,
+        },
+        stroke: {
+          curve: "straight",
+        },
+        grid: {
+          row: {
+            colors: ["#f3f3f3", "transparent"], // takes an array which will be repeated on columns
+            opacity: 0.5,
+          },
+        },
         xaxis: {
-          categories: this.months,
-        },
-        fill: {
-          opacity: 1,
-        },
-        legend: {
-          position: "right",
-          offsetX: 0,
-          offsetY: 50,
+          categories: this.categories_hours,
         },
       };
     },
@@ -112,12 +104,6 @@ export default {
   watch: {
     menu(val) {
       val && this.$nextTick(() => (this.activePicker = "YEAR"));
-    },
-    series: {
-      handler() {
-        this.$refs.percentage.updateSeries(this.series);
-      },
-      deep: true,
     },
   },
   methods: {

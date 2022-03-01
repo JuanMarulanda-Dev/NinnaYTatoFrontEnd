@@ -79,6 +79,12 @@
         <v-col cols="12" class="px-0 pb-0">
           <lodging-bar-report></lodging-bar-report>
         </v-col>
+        <v-col cols="12" class="px-0 pb-0">
+          <hours-lodgings-by-week-report></hours-lodgings-by-week-report>
+        </v-col>
+        <v-col cols="12" class="px-0 pb-0">
+          <income-vs-expenses-report></income-vs-expenses-report>
+        </v-col>
         <v-col cols="12" class="px-0">
           <!-- Plans Customers Report -->
           <plans-customers-report></plans-customers-report>
@@ -93,6 +99,8 @@ import moment from "moment";
 import { mapActions, mapMutations, mapState } from "vuex";
 import PlansCustomersReport from "@/components/statistics/PlansCustomersReport.vue";
 import LodgingBarReport from "@/components/statistics/LodgingBarReport.vue";
+import HoursLodgingsByWeekReport from "@/components/statistics/HoursLodgingsByWeekReport.vue";
+import IncomeVsExpensesReport from "@/components/statistics/IncomeVsExpensesReport.vue";
 
 export default {
   data: () => ({
@@ -152,6 +160,8 @@ export default {
   components: {
     PlansCustomersReport,
     LodgingBarReport,
+    HoursLodgingsByWeekReport,
+    IncomeVsExpensesReport,
   },
 };
 </script>

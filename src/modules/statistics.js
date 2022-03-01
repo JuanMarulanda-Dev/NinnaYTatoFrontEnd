@@ -35,6 +35,81 @@ export default {
       "Noviembre",
       "Diciembre",
     ],
+    series_hours: [
+      {
+        name: "Horas",
+        data: [
+          10, 41, 35, 51, 49, 62, 69, 91, 148, 200, 10, 41, 35, 51, 49, 62, 69,
+          91, 148, 200, 1000, 41, 35, 51, 49, 62, 69, 91, 148, 200, 10, 41, 35,
+          51, 49, 62, 69, 91, 148, 200, 10, 41, 35,
+        ],
+      },
+    ],
+    series_incomes_egress: [
+      {
+        name: "Ingresos",
+        data: [200000000, 15500000, 38, 24, 33, 26, 21, 20, 6, 8, 15, 10],
+      },
+      {
+        name: "Egresos",
+        data: [35, 41, 62, 42, 13, 18, 29, 37, 36, 51, 32, 35],
+      },
+    ],
+    categories_hours: [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8",
+      "9",
+      "10",
+      "11",
+      "12",
+      "13",
+      "14",
+      "15",
+      "16",
+      "17",
+      "18",
+      "19",
+      "20",
+      "21",
+      "22",
+      "23",
+      "24",
+      "25",
+      "26",
+      "27",
+      "28",
+      "29",
+      "30",
+      "31",
+      "32",
+      "33",
+      "34",
+      "35",
+      "36",
+      "37",
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45",
+      "46",
+      "47",
+      "48",
+      "49",
+      "50",
+      "51",
+      "52",
+      "53",
+    ],
   },
   mutations: {
     SET_START_DATE(state, start) {
@@ -47,6 +122,10 @@ export default {
       state.plans_customers_report = plans_customers_report;
     },
     PERCENTAGE_LODGING_REPORT(state, series) {
+      state.series.forEach((serie, index) => {
+        state.series[index].data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+      });
+
       series.forEach((serie) => {
         let index = state.series.findIndex(
           (element) => element.name === serie.name
