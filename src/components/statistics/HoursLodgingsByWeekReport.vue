@@ -40,14 +40,16 @@
       <div id="wrapper">
         <div id="chart-line2">
           <apexchart
+            ref="hours"
             type="line"
             height="230"
             :options="chartOptions"
-            :series="series"
+            :series="series_hours"
           ></apexchart>
         </div>
         <div id="chart-line">
           <apexchart
+            ref="hours"
             type="area"
             height="130"
             :options="chartOptionsLine"
@@ -63,26 +65,6 @@
 import moment from "moment";
 import { mapActions, mapMutations, mapState } from "vuex";
 
-var data = generateDayWiseTimeSeries(new Date("22 Apr 2017").getTime(), 115, {
-  min: 30,
-  max: 90,
-});
-function generateDayWiseTimeSeries(baseval, count, yrange) {
-  var i = 0;
-  var series = [];
-  while (i < count) {
-    var x = baseval;
-    var y =
-      Math.floor(Math.random() * (yrange.max - yrange.min + 1)) + yrange.min;
-
-    series.push([x, y]);
-    baseval += 86400000;
-    i++;
-  }
-  console.log(series);
-  return series;
-}
-
 export default {
   data() {
     return {
@@ -91,11 +73,11 @@ export default {
       max: moment().startOf("month").format("YYYY-MM-DD"),
       activePicker: null,
 
-      series: [
-        {
-          data: data,
-        },
-      ],
+      // series: [
+      //   {
+      //     data: this.series_hours,
+      //   },
+      // ],
       chartOptions: {
         chart: {
           id: "chart2",
@@ -108,7 +90,7 @@ export default {
         },
         colors: ["#546E7A"],
         stroke: {
-          width: 3,
+          width: 2,
         },
         dataLabels: {
           enabled: false,
@@ -126,13 +108,18 @@ export default {
           enabled: false,
         },
       },
+    };
+  },
 
-      seriesLine: [
-        {
-          data: data,
-        },
-      ],
-      chartOptionsLine: {
+  computed: {
+    ...mapState("statistics", ["series_hours"]),
+
+    seriesLine() {
+      return this.series_hours;
+    },
+
+    chartOptionsLine() {
+      return {
         chart: {
           id: "chart1",
           height: 130,
@@ -144,8 +131,8 @@ export default {
           selection: {
             enabled: true,
             xaxis: {
-              min: new Date("27 Jul 2017").getTime(),
-              max: new Date("14 Aug 2017").getTime(),
+              min: new Date(this.minDate).getTime(),
+              max: new Date(this.maxDate).getTime(),
             },
           },
         },
@@ -164,40 +151,19 @@ export default {
           },
         },
         yaxis: {
-          tickAmount: 2,
-        },
-      },
-    };
-  },
-
-  computed: {
-    ...mapState("statistics", ["series_hours", "categories_hours"]),
-
-    chartOptions1() {
-      return {
-        chart: {
-          height: 350,
-          type: "line",
-          zoom: {
-            enabled: false,
-          },
-        },
-        dataLabels: {
-          enabled: false,
-        },
-        stroke: {
-          curve: "straight",
-        },
-        grid: {
-          row: {
-            colors: ["#f3f3f3", "transparent"], // takes an array which will be repeated on columns
-            opacity: 0.5,
-          },
-        },
-        xaxis: {
-          categories: this.categories_hours,
+          tickAmount: 0,
         },
       };
+    },
+
+    minDate() {
+      return this.getDateOfWeekByYear(this.year, 1);
+    },
+    maxDate() {
+      return this.getDateOfWeekByYear(
+        this.year,
+        moment(this.date).weeksInYear()
+      );
     },
 
     year() {
@@ -213,17 +179,33 @@ export default {
     menu(val) {
       val && this.$nextTick(() => (this.activePicker = "YEAR"));
     },
+    series_hours: {
+      handler() {
+        this.series_hours;
+        this.$refs.hours.updateSeries(this.series_hours);
+      },
+      deep: true,
+    },
   },
   methods: {
     ...mapMutations("statistics", ["SET_YEAR"]),
-    ...mapActions("statistics", ["getPercentageLodgingsByTime"]),
+    ...mapActions("statistics", ["getLodgingHoursReport"]),
     save(date) {
       this.$refs.menu.save(date);
       this.activePicker = "YEAR";
       // this.$refs.picker.activePicker = "YEAR";
       this.menu = false;
       this.SET_YEAR(this.year);
-      this.getPercentageLodgingsByTime();
+      this.getLodgingHoursReport();
+    },
+
+    getDateOfWeekByYear(year, week) {
+      // Create moment object for the first day of the given year
+      let func = moment({ year: year });
+      // Check if 1st of January is in the first week of the year
+      func.startOf("week").add(week, "week");
+      // Return result using english locale
+      return func.locale("en").format("D MMM YYYY");
     },
   },
 };

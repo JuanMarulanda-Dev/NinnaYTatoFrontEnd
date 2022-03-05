@@ -142,6 +142,7 @@ export default {
       "getPlanCustomerReportByDates",
       "getPercentageLodgingsByTime",
       "getIncomesAndEgressByMonths",
+      "getLodgingHoursReport",
     ]),
     initialize() {
       try {
@@ -149,6 +150,7 @@ export default {
         this.getPlanCustomerReportByDates();
         this.getPercentageLodgingsByTime();
         this.getIncomesAndEgressByMonths();
+        this.getLodgingHoursReport();
       } catch (errors) {
         this.showToastMessage(
           errors.response.status,

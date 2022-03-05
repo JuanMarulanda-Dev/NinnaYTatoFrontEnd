@@ -15,10 +15,10 @@ export default {
     series: [
       { name: "Lunes", data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
       { name: "Martes", data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
-      { name: "Miercoles", data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
+      { name: "Miércoles", data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
       { name: "Jueves", data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
       { name: "Viernes", data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
-      { name: "Sabado", data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
+      { name: "Sábado", data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
       { name: "Domingo", data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
     ],
     months: [
@@ -37,12 +37,7 @@ export default {
     ],
     series_hours: [
       {
-        name: "Horas",
-        data: [
-          10, 41, 35, 51, 49, 62, 69, 91, 148, 200, 10, 41, 35, 51, 49, 62, 69,
-          91, 148, 200, 1000, 41, 35, 51, 49, 62, 69, 91, 148, 200, 10, 41, 35,
-          51, 49, 62, 69, 91, 148, 200, 10, 41, 35,
-        ],
+        data: [],
       },
     ],
     series_incomes_egress: [
@@ -139,6 +134,10 @@ export default {
       state.series_incomes_egress[1].data = series.egresses.data;
     },
 
+    SET_LODGING_HOURS_REPORT(state, data) {
+      state.series_hours[0].data = data;
+    },
+
     SET_YEAR(state, year) {
       state.year = year;
     },
@@ -171,6 +170,16 @@ export default {
         )
         .then((result) => {
           commit("SET_INCOMES_EGRESS_REPORT", result.data);
+        })
+        .catch(() => {});
+    },
+    getLodgingHoursReport({ commit, rootState, state }) {
+      axios
+        .get(
+          `/api/lodging-hours-report?branch_office_id=${rootState.mainBranchOffice}&year=${state.year}`
+        )
+        .then((result) => {
+          commit("SET_LODGING_HOURS_REPORT", result.data.hours);
         })
         .catch(() => {});
     },
