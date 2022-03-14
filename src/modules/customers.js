@@ -61,6 +61,7 @@ export default {
     },
 
     customer_plans: [],
+    customer_sales: [],
   },
   mutations: {
     SET_PERMISSIONS(state, permissions) {
@@ -103,6 +104,10 @@ export default {
         type: 1, //PlanCustomer
       }));
     },
+
+    SET_CUSTOMER_SALES(state, customer_sales) {
+      state.customer_sales = customer_sales;
+    },
   },
   actions: {
     getAllCustomers({ commit, rootState }, status = 0) {
@@ -136,6 +141,7 @@ export default {
           commit("SET_CUSTOMER_DETAILS", result.data.customer);
           commit("SET_CUSTOMER_PETS", result.data.pets);
           commit("SET_CUSTOMER_PLANS", result.data.customerPlans);
+          commit("SET_CUSTOMER_SALES", result.data.sales);
         })
         .catch((errors) => {
           // show error message

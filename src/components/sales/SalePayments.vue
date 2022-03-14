@@ -147,10 +147,12 @@ export default {
     },
   },
   created() {
-    this.getAllCashRegisters(1);
+    if (!this.user.is_customer) {
+      this.getAllCashRegisters(1);
+    }
   },
   computed: {
-    ...mapState(["editIcon", "deleteIcon"]),
+    ...mapState(["editIcon", "deleteIcon", "user"]),
     ...mapState("sales", [
       "dialogPayments",
       "payments",
