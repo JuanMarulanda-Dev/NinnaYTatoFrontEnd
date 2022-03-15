@@ -302,18 +302,6 @@
     ></monitoring-form>
 
     <history-lodging-table
-      @showMonitoring="
-        showMonitoringForm(
-          $event.name,
-          $event.id,
-          $event.pet_avatar,
-          $event.arrival_data.day_instructions,
-          false
-        )
-      "
-      @showPetDetails="
-        showPetDetails($event.customer_id, $event.arrival_data.pet_id)
-      "
       @date="date = $event"
       v-model="dialogHistoryLodgingTable"
     >
