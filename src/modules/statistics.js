@@ -40,6 +40,11 @@ export default {
         data: [],
       },
     ],
+    series_nights: [
+      {
+        data: [],
+      },
+    ],
     series_incomes_egress: [
       {
         name: "Ingresos",
@@ -138,6 +143,10 @@ export default {
       state.series_hours[0].data = data;
     },
 
+    SET_LODGING_NIGHTS_REPORT(state, data) {
+      state.series_nights[0].data = data;
+    },
+
     SET_YEAR(state, year) {
       state.year = year;
     },
@@ -180,6 +189,16 @@ export default {
         )
         .then((result) => {
           commit("SET_LODGING_HOURS_REPORT", result.data.hours);
+        })
+        .catch(() => {});
+    },
+    getLodgingNightsReport({ commit, rootState, state }) {
+      axios
+        .get(
+          `/api/lodging-nights-report?branch_office_id=${rootState.mainBranchOffice}&year=${state.year}`
+        )
+        .then((result) => {
+          commit("SET_LODGING_NIGHTS_REPORT", result.data.nights);
         })
         .catch(() => {});
     },

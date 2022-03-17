@@ -139,10 +139,6 @@ export default {
       return this.buildDataTasks(this.sortReservations());
     },
   },
-  created() {
-    // Ordenar array por habitaciones
-    console.log(this.tasks);
-  },
   methods: {
     ...mapMutations("reservations", ["SET_DIALOG_SCHEDULE_GANTT"]),
     toTimeStamp(date) {

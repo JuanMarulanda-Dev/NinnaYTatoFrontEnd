@@ -83,6 +83,9 @@
           <hours-lodgings-by-week-report></hours-lodgings-by-week-report>
         </v-col>
         <v-col cols="12" class="px-0 pb-0">
+          <nights-lodgings-by-week-report></nights-lodgings-by-week-report>
+        </v-col>
+        <v-col cols="12" class="px-0 pb-0">
           <income-vs-expenses-report></income-vs-expenses-report>
         </v-col>
         <v-col cols="12" class="px-0">
@@ -100,6 +103,7 @@ import { mapActions, mapMutations, mapState } from "vuex";
 import PlansCustomersReport from "@/components/statistics/PlansCustomersReport.vue";
 import LodgingBarReport from "@/components/statistics/LodgingBarReport.vue";
 import HoursLodgingsByWeekReport from "@/components/statistics/HoursLodgingsByWeekReport.vue";
+import NightsLodgingsByWeekReport from "@/components/statistics/NightsLodgingsByWeekReport.vue";
 import IncomeVsExpensesReport from "@/components/statistics/IncomeVsExpensesReport.vue";
 
 export default {
@@ -143,6 +147,7 @@ export default {
       "getPercentageLodgingsByTime",
       "getIncomesAndEgressByMonths",
       "getLodgingHoursReport",
+      "getLodgingNightsReport",
     ]),
     initialize() {
       try {
@@ -151,6 +156,7 @@ export default {
         this.getPercentageLodgingsByTime();
         this.getIncomesAndEgressByMonths();
         this.getLodgingHoursReport();
+        this.getLodgingNightsReport();
       } catch (errors) {
         this.showToastMessage(
           errors.response.status,
@@ -165,6 +171,7 @@ export default {
     PlansCustomersReport,
     LodgingBarReport,
     HoursLodgingsByWeekReport,
+    NightsLodgingsByWeekReport,
     IncomeVsExpensesReport,
   },
 };

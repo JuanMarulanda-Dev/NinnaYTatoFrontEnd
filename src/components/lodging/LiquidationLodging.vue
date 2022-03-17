@@ -226,7 +226,6 @@ export default {
 
     totalTimeExtra() {
       let total = 0;
-      console.log(1);
       if (this.ticketsExtra > 0) {
         total += this.calculatePriceTotalCartItem(
           this.ticketsExtra,
