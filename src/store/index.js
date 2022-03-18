@@ -51,6 +51,9 @@ export default new Vuex.Store({
     editIcon: process.env.VUE_APP_ICON_EDIT ?? "mdi-pencil",
     deleteIcon: process.env.VUE_APP_ICON_DELETE ?? "mdi-delete",
     detailsIcon: process.env.VUE_APP_ICON_DETAILS ?? "mdi-book-open-variant",
+
+    // Terms and conditions
+    dialogTermsAndConditions: false,
   },
   mutations: {
     SET_USER(state, user) {
@@ -69,6 +72,11 @@ export default new Vuex.Store({
     },
     SET_OVERLAY_LOADING(state, loader = false) {
       state.loadingOverlay = loader;
+    },
+    SET_DIALOG_TERMS_AND_CONDITIONS(state, dialogTermsAndConditions) {
+      if (state.user.is_customer) {
+        state.dialogTermsAndConditions = dialogTermsAndConditions;
+      }
     },
   },
   actions: {
@@ -135,11 +143,30 @@ export default new Vuex.Store({
         .get("/api/user", this.form)
         .then((result) => {
           commit("SET_USER", result.data);
+          commit(
+            "SET_DIALOG_TERMS_AND_CONDITIONS",
+            !result.data.terms_and_conditions
+          );
           // Guardar el usuario en el local storage
           dispatch("storeUserLocalStorage");
         })
         .catch(() => {
           commit("SET_USER", null);
+        });
+    },
+
+    async acceptTermsAndConditions() {
+      await axios
+        .post("/api/terms-and-conditions")
+        .then((result) => {
+          return result.status == 201;
+        })
+        .catch((errors) => {
+          this._vm.showToastMessage(
+            errors.response.status,
+            this._vm.createMessageError(errors.response.data.errors)
+          );
+          return false;
         });
     },
 
@@ -170,11 +197,15 @@ export default new Vuex.Store({
       localStorage.setItem("Menu", encrypt);
     },
 
-    getUserLocalStorage({ commit }) {
+    getUserLocalStorage({ state, commit }) {
       let user = localStorage.getItem("User");
       if (user) {
         let decryp = JSON.parse(atob(user));
         commit("SET_USER", decryp);
+        commit(
+          "SET_DIALOG_TERMS_AND_CONDITIONS",
+          state.user.is_customer ? !decryp.terms_and_conditions : false
+        );
       }
     },
 

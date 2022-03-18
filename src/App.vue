@@ -170,6 +170,9 @@
           </v-footer>
         </v-main>
       </v-app>
+
+      <!-- Terms and conditions -->
+      <terms-and-conditions-dialog></terms-and-conditions-dialog>
     </template>
 
     <!-- Login page-->
@@ -186,6 +189,7 @@
 <script>
 import { mapState, mapActions } from "vuex";
 import pawLoading from "@/components/pawLoading.vue";
+import TermsAndConditionsDialog from "@/components/TermsAndConditionsDialog.vue";
 import notifications from "@/components/notifications.vue";
 
 export default {
@@ -264,6 +268,7 @@ export default {
   components: {
     pawLoading,
     notifications,
+    TermsAndConditionsDialog,
   },
 };
 </script>
