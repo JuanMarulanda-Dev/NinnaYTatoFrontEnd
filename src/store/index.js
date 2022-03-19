@@ -115,7 +115,10 @@ export default new Vuex.Store({
 
         // Obtener la ruta principal a donde se va a redireccionar al usuario
         // Redirrecionar a la ruta pertiente para el usuario
-        router.push({ path: state.menu[0].to });
+        router.push({
+          path:
+            state.menu[0].to + (state.user.is_customer ? state.user.id : ""),
+        });
       } catch (error) {
         // Mostrar el mensaje al usuario que ocurrio algun inconveninte (Los mensajes deben venir del backend)
         this._vm.$toast.warning("El usuario o la contraseña son incorrectos.");

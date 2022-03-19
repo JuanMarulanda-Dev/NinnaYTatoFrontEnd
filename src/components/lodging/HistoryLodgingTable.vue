@@ -22,19 +22,13 @@
       </v-toolbar>
       <v-card-text>
         <v-container>
-          <!-- Datatable history lodging-->
-          <v-data-table
-            fixed-header
+          <lodging-data-table
+            v-model="lodgings_history"
             :headers="headers"
-            :items="lodgings_history"
-            sort-by="name"
-            class="elevation-3"
             :search="search"
-            :loading="loading"
-            :loading-text="loadingText"
           >
-            <!-- Header content datatable -->
-            <template v-slot:top>
+            <!-- Datatable history lodging-->
+            <template v-slot:header>
               <v-toolbar flat color="white" class="rounded-xl">
                 <!-- Start date -->
                 <v-dialog
@@ -86,71 +80,7 @@
                 ></v-text-field>
               </v-toolbar>
             </template>
-
-            <!-- Avatar + nombre -->
-            <template v-slot:[`item.name`]="{ item }">
-              <!-- Image profile -->
-              <v-tooltip right v-if="item.pet_avatar">
-                <template v-slot:activator="{ on, attrs }">
-                  <v-avatar v-bind="attrs" v-on="on" class="my-2 mr-1">
-                    <img :src="item.pet_avatar" :alt="item.name" />
-                  </v-avatar>
-                </template>
-                <span>
-                  <v-avatar size="200">
-                    <img :src="item.pet_avatar" :alt="item.name" />
-                  </v-avatar>
-                </span>
-              </v-tooltip>
-
-              <!-- Icon profile -->
-              <v-avatar v-else color="grey lighten-1" class="my-2 mr-1">
-                <v-icon dark> mdi-dog-side </v-icon>
-              </v-avatar>
-              <span>
-                {{ item.name }}
-              </span>
-            </template>
-
-            <!-- Actions -->
-            <template v-slot:[`item.actions`]="{ item }">
-              <!-- Details -->
-              <v-tooltip bottom>
-                <template v-slot:activator="{ on, attrs }">
-                  <v-btn
-                    fab
-                    x-small
-                    dark
-                    color="info mr-1"
-                    v-bind="attrs"
-                    v-on="on"
-                    @click="showPetDetails(item)"
-                  >
-                    <v-icon> mdi-paw</v-icon>
-                  </v-btn>
-                </template>
-                <span>Detalles Mascotas</span>
-              </v-tooltip>
-
-              <!-- Timelines -->
-              <v-tooltip bottom>
-                <template v-slot:activator="{ on, attrs }">
-                  <v-btn
-                    fab
-                    x-small
-                    dark
-                    color="warning mr-1"
-                    v-bind="attrs"
-                    v-on="on"
-                    @click="showMonitoring(item)"
-                  >
-                    <v-icon>mdi-timeline</v-icon>
-                  </v-btn>
-                </template>
-                <span>Seguimiento</span>
-              </v-tooltip>
-            </template>
-          </v-data-table>
+          </lodging-data-table>
         </v-container>
       </v-card-text>
     </v-card>
@@ -159,14 +89,15 @@
 
 <script>
 import { mapState, mapActions } from "vuex";
+import LodgingDataTable from "@/components/lodging/LodgingDataTable.vue";
 
 export default {
   name: "history-lodging-table",
   data() {
     return {
       editedIndex: -1,
-      search: "",
       startDate: "",
+      search: "",
       modalStartDatePicker: false,
       headers: [
         {
@@ -199,8 +130,8 @@ export default {
     },
   },
   computed: {
-    ...mapState(["user", "loadingText", "editIcon"]),
-    ...mapState("lodging", ["lodgings_history", "loading"]),
+    ...mapState(["user"]),
+    ...mapState("lodging", ["lodgings_history"]),
     dialogHistoryLodging: {
       get: function () {
         return this.value;
@@ -232,6 +163,9 @@ export default {
     showPetDetails(item) {
       this.$emit("showPetDetails", item);
     },
+  },
+  components: {
+    LodgingDataTable,
   },
 };
 </script>

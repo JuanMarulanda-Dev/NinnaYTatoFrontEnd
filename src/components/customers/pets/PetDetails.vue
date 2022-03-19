@@ -47,7 +47,7 @@
                   <span>Días que a dejado de asistir</span>
                 </v-tooltip>
               </h3>
-              <v-tooltip bottom v-show="permissions.update">
+              <v-tooltip bottom>
                 <template v-slot:activator="{ on, attrs }">
                   <v-btn
                     color="secondary"
@@ -55,6 +55,7 @@
                     v-bind="attrs"
                     v-on="on"
                     @click="goToEditPetForm()"
+                    v-show="permissions.update || !user.is_customer"
                   >
                     <v-icon>mdi-pencil-box-multiple-outline</v-icon>
                   </v-btn>
@@ -362,21 +363,49 @@
           </v-container>
         </v-card>
       </v-col>
+      <!-- Lodgings -->
+      <v-col cols="12">
+        <lodging-data-table v-model="pet_lodgings" :headers="headers">
+        </lodging-data-table>
+      </v-col>
     </v-row>
   </div>
 </template>
 
 <script>
 import { mapActions, mapState, mapMutations } from "vuex";
+import LodgingDataTable from "@/components/lodging/LodgingDataTable.vue";
 
 export default {
   data() {
     return {
       petId: null,
+      headers: [
+        { text: "Ingreso", align: "center", value: "arrival_date" },
+        { text: "Salida", align: "center", value: "departure_date" },
+        { text: "Horas", align: "center", value: "departure_data.hours" },
+        {
+          text: "Nombre del plan",
+          align: "center",
+          value: "departure_data.plan_name",
+        },
+        {
+          text: "Acciones",
+          align: "center",
+          value: "actions",
+          sortable: false,
+        },
+      ],
     };
   },
   computed: {
-    ...mapState("pets", ["pet", "vet_information", "pet_behavior"]),
+    ...mapState("pets", [
+      "pet",
+      "vet_information",
+      "pet_behavior",
+      "pet_lodgings",
+    ]),
+    ...mapState(["user"]),
     ...mapState("customers", ["personal_infomation", "permissions"]),
   },
   methods: {
@@ -435,6 +464,9 @@ export default {
       this.petId = this.$route.params.pet;
       this.getDetailsPet(this.petId);
     }
+  },
+  components: {
+    LodgingDataTable,
   },
 };
 </script>

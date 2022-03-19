@@ -91,6 +91,7 @@ export default {
       general_temperament: null,
       ride: false,
     },
+    pet_lodgings: [],
   },
   mutations: {
     SET_BREEDS(state, breeds) {
@@ -114,6 +115,9 @@ export default {
       state.pet = details.pet;
       state.vet_information = details.vet_information;
       state.pet_behavior = details.pet_behavior;
+    },
+    SET_PET_LODGINGS(state, pet_lodgings) {
+      state.pet_lodgings = pet_lodgings;
     },
   },
   actions: {
@@ -248,6 +252,7 @@ export default {
         .then((result) => {
           // save all
           commit("SET_PET_DETAILS", result.data.pet);
+          commit("SET_PET_LODGINGS", result.data.lodgings);
         })
         .catch((errors) => {
           // show error message

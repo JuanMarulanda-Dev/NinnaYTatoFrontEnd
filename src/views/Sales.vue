@@ -37,13 +37,13 @@
     </v-card>
 
     <!-- Sales -->
-    <sales-data-table></sales-data-table>
+    <sales-card></sales-card>
   </div>
 </template>
 
 <script>
 import { mapMutations } from "vuex";
-import SalesDataTable from "@/components/sales/SalesDataTable.vue";
+import SalesCard from "@/components/sales/SalesCard.vue";
 import SaleForm from "@/components/sales/SaleForm.vue";
 
 export default {
@@ -54,7 +54,7 @@ export default {
     this.SET_SALE_DEFAULT();
   },
   components: {
-    SalesDataTable,
+    SalesCard,
     SaleForm,
   },
 };

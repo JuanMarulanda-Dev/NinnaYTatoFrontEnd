@@ -16,7 +16,7 @@
               icon
               v-bind="attrs"
               v-on="on"
-              v-show="add_monitoring"
+              v-show="add_monitoring && !user.is_customer"
             >
               <v-icon>mdi-plus-thick</v-icon>
             </v-btn>
@@ -363,6 +363,7 @@ export default {
     },
   },
   computed: {
+    ...mapState(["user"]),
     ...mapState("monitorings", [
       "monitorings",
       "monitoring_types",

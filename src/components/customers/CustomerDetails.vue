@@ -34,7 +34,7 @@
                   Inactivo
                 </v-chip>
               </h3>
-              <v-tooltip bottom v-show="permissions.update">
+              <v-tooltip bottom>
                 <template v-slot:activator="{ on, attrs }">
                   <v-btn
                     color="secondary"
@@ -42,6 +42,7 @@
                     v-bind="attrs"
                     v-on="on"
                     @click="goToCustomerFormUpdate()"
+                    v-show="permissions.update"
                   >
                     <v-icon>mdi-pencil-box-multiple-outline</v-icon>
                   </v-btn>
@@ -163,7 +164,7 @@
           <v-container class="pa-6">
             <v-row justify="space-between">
               <h3><v-icon>mdi-paw</v-icon>&nbsp;Mascotas</h3>
-              <v-tooltip bottom v-show="permissions.create">
+              <v-tooltip bottom>
                 <template v-slot:activator="{ on, attrs }">
                   <v-btn
                     color="secondary"
@@ -171,6 +172,7 @@
                     v-bind="attrs"
                     v-on="on"
                     @click="goToPetFormCreate()"
+                    v-show="permissions.create"
                   >
                     <v-icon>mdi-plus-thick</v-icon>
                   </v-btn>
@@ -233,18 +235,19 @@
       </v-col>
       <v-col cols="12">
         <v-card>
-          <v-container class="pa-6">
+          <v-container class="pa-6" fluid>
             <v-row justify="space-between">
               <h3><v-icon>mdi-note-outline</v-icon>&nbsp;Planes activos</h3>
-              <v-tooltip bottom v-show="permissions.create">
+              <v-tooltip bottom>
                 <template v-slot:activator="{ on, attrs }">
                   <v-btn
                     color="secondary"
                     icon
                     v-bind="attrs"
                     v-on="on"
-                    @click="saveCustomersPlan()"
                     class="mb-1"
+                    @click="saveCustomersPlan()"
+                    v-show="permissions.create"
                   >
                     <v-icon>mdi-check-bold</v-icon>
                   </v-btn>
@@ -294,13 +297,39 @@
           </v-container>
         </v-card>
       </v-col>
+
+      <v-col cols="12">
+        <v-card>
+          <v-container fluid>
+            <v-row justify="space-between">
+              <h3 class="pa-3">
+                <v-icon>mdi-note-outline</v-icon>&nbsp;Compras del cliente
+              </h3>
+            </v-row>
+            <v-row>
+              <v-divider></v-divider>
+            </v-row>
+            <v-row>
+              <v-col cols="12" class="pa-0">
+                <sales-data-table
+                  v-model="customer_sales"
+                  :headers="headersSalesCustomer"
+                  @rollback="rollbackStateSale($event)"
+                >
+                </sales-data-table>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card>
+      </v-col>
     </v-row>
   </div>
 </template>
 
 <script>
-import { mapState, mapActions } from "vuex";
+import { mapState, mapActions, mapMutations } from "vuex";
 import vueNumberInput from "@/components/vueNumberInput.vue";
+import SalesDataTable from "@/components/sales/SalesDataTable.vue";
 
 export default {
   data() {
@@ -309,21 +338,49 @@ export default {
     };
   },
   computed: {
+    ...mapState(["user"]),
     ...mapState("customers", [
       "personal_infomation",
       "contact_information",
       "additional_information",
       "pets",
       "customer_plans",
+      "customer_sales",
       "permissions",
     ]),
+
+    headersSalesCustomer() {
+      let header = [
+        { text: "N°", value: "number_payment_proof", align: "center" },
+        { text: "Total", value: "total" },
+        { text: "Pagado", value: "payment" },
+        { text: "Saldo pendiente", value: "pending" },
+        { text: "Usuario", value: "user_name" },
+        { text: "Estado", value: "state" },
+        { text: "Fecha", value: "created_at" },
+      ];
+
+      if (!this.user.is_customer) {
+        header.push({ text: "Nota", value: "note", width: "16%" });
+      }
+
+      header.push({ text: "Acciones", value: "actions", sortable: false });
+
+      return header;
+    },
   },
   created() {
+    // Obtener los permisos
+    if (this.user.is_customer) {
+      this.SET_PERMISSIONS(this.$route.meta.permissions);
+    }
+
     //take id customer details
     this.customerId = this.$route.params.customer;
     this.getDetailsCustomer(this.customerId);
   },
   methods: {
+    ...mapMutations("customers", ["SET_PERMISSIONS"]),
     goBack() {
       this.$router.push({
         path: `/clientes`,
@@ -355,9 +412,14 @@ export default {
         }
       });
     },
+    rollbackStateSale(saleIndex) {
+      this.customer_sales[saleIndex].state =
+        !this.customer_sales[saleIndex].state;
+    },
   },
   components: {
     vueNumberInput,
+    SalesDataTable,
   },
 };
 </script>

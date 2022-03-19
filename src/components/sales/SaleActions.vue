@@ -30,7 +30,7 @@
           v-bind="attrs"
           v-on="on"
           @click="searchPayments(item.id, item.number_payment_proof, item.note)"
-          v-show="item.pending > 0 || user.is_admin"
+          v-show="!user.is_customer && (item.pending > 0 || user.is_admin)"
         >
           <v-icon>mdi-cash-multiple</v-icon>
         </v-btn>
@@ -54,6 +54,7 @@
               name: item.number_payment_proof,
             })
           "
+          v-show="!user.is_customer"
         >
           <v-icon>mdi-printer</v-icon>
         </v-btn>
@@ -74,6 +75,7 @@
           @click="
             showNoteFormDialog(item.id, item.number_payment_proof, item.note)
           "
+          v-show="!user.is_customer"
         >
           <v-icon>mdi-note-text</v-icon>
         </v-btn>
