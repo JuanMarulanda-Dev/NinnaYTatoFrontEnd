@@ -209,7 +209,7 @@ export default {
     }
 
     // Hacer estas consultas solo si exciste la cookie de autentificación
-    if (this.user) {
+    if (this.user.id) {
       this.getNotificationsByUser(this.user.id);
     }
 

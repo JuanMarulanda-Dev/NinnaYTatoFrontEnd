@@ -242,7 +242,8 @@ router.beforeEach((to, from, next) => {
       localStorage.getItem("Menu") == null
     ) {
       // Hacer logout del usuario (Pendiente)
-      // *******
+      localStorage.clear();
+      Vue.prototype.deleteAllCookies();
       // Redireccionar al login
       next({ name: "Login" });
     } else {
