@@ -85,7 +85,7 @@ exports.install = function (Vue, options) {
   Vue.prototype.sendSubscriptionToBackEnd = (subscription, user_id) => {
     return Vue.axios
       .post(
-        `https://ninnaytato.ga/api/save-subscription/${user_id}`,
+        `https://app.ninnaytato.com/api/save-subscription/${user_id}`,
         subscription
       )
       .then(function (response) {
