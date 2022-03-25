@@ -4,6 +4,7 @@
       <v-text-field
         label="E-mail*"
         required
+        autocomplete="off"
         v-model="contact_information.email"
         prepend-inner-icon="mdi-email-outline"
         :error-messages="emailErrors"
@@ -15,6 +16,7 @@
       <v-text-field
         label="Teléfono*"
         required
+        autocomplete="off"
         v-model="contact_information.phone"
         prepend-inner-icon="mdi-phone"
         type="number"
@@ -27,6 +29,7 @@
       <v-text-field
         label="Nombre contacto de emergencia"
         required
+        autocomplete="off"
         v-model="contact_information.emergency_contact_name"
         prepend-inner-icon="mdi-alphabet-latin"
         :error-messages="emergency_contact_nameErrors"
@@ -38,6 +41,7 @@
       <v-text-field
         label="Teléfono"
         required
+        autocomplete="off"
         v-model="contact_information.emergency_contact_phone"
         prepend-inner-icon="mdi-phone"
         type="number"
@@ -50,6 +54,7 @@
       <v-text-field
         label="Nombre contacto de respaldo"
         required
+        autocomplete="off"
         v-model="contact_information.backup_contact_name"
         prepend-inner-icon="mdi-alphabet-latin"
         :error-messages="backup_contact_nameErrors"
@@ -61,6 +66,7 @@
       <v-text-field
         label="Teléfono"
         required
+        autocomplete="off"
         v-model="contact_information.backup_contact_phone"
         prepend-inner-icon="mdi-phone"
         type="number"

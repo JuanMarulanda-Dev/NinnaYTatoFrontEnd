@@ -6,6 +6,7 @@
         required
         type="number"
         min="1"
+        autocomplete="off"
         v-model="personal_infomation.dni"
         prepend-inner-icon="mdi-card-account-details-outline"
         :error-messages="dniErrors"
@@ -17,6 +18,7 @@
       <v-text-field
         label="Nombres*"
         required
+        autocomplete="off"
         v-model="personal_infomation.first_name"
         prepend-inner-icon="mdi-alphabet-latin"
         :error-messages="first_nameErrors"
@@ -28,6 +30,7 @@
       <v-text-field
         label="Apellidos*"
         required
+        autocomplete="off"
         v-model="personal_infomation.last_name"
         prepend-inner-icon="mdi-alphabet-latin"
         :error-messages="last_nameErrors"
@@ -61,6 +64,7 @@
       <v-text-field
         label="Dirección"
         required
+        autocomplete="off"
         v-model="personal_infomation.address"
         prepend-inner-icon="mdi-home-account"
         :error-messages="addressErrors"

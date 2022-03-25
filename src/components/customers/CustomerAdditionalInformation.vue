@@ -25,6 +25,7 @@
           <v-text-field
             label="Red social"
             required
+            autocomplete="off"
             v-model="additional_information.social_network"
             prepend-inner-icon="mdi-instagram"
             :error-messages="social_networkErrors"

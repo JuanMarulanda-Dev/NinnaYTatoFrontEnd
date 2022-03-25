@@ -112,7 +112,12 @@ export default {
     };
   },
   computed: {
-    ...mapState(["detailsIcon", "loadingText", "loadingText"]),
+    ...mapState([
+      "detailsIcon",
+      "loadingText",
+      "loadingText",
+      "mainBranchOffice",
+    ]),
     ...mapState("customers", ["customers", "loading", "permissions"]),
   },
   created() {
@@ -122,6 +127,13 @@ export default {
     if (this.permissions.read) {
       this.initialize();
     }
+  },
+  watch: {
+    mainBranchOffice() {
+      if (this.permissions.read) {
+        this.initialize();
+      }
+    },
   },
   methods: {
     ...mapActions("customers", ["getAllCustomers", "changeStatusCustomers"]),
