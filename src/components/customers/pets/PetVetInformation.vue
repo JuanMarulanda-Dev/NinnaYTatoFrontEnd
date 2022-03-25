@@ -162,7 +162,7 @@
             required
             v-model="vet_information.vaccination_card"
             placeholder="Carnet"
-            label="Carnet"
+            label="Carnet*"
             :error-messages="vaccination_cardErrors"
             @input="$v.vet_information.vaccination_card.$touch()"
             @blur="$v.vet_information.vaccination_card.$touch()"
