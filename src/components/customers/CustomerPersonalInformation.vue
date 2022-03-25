@@ -70,7 +70,7 @@
     </v-col>
     <v-col xs="12" sm="12" md="6" cols="12">
       <v-select
-        :items="branchOffices"
+        :items="branch_offices"
         item-text="name"
         item-value="id"
         label="Sucursal"
@@ -112,7 +112,7 @@ export default {
   },
   computed: {
     ...mapState("customers", ["personal_infomation"]),
-    ...mapState("users", ["branchOffices"]),
+    ...mapState("users", ["branch_offices"]),
     dniErrors() {
       const errors = [];
       if (!this.$v.personal_infomation.dni.$dirty) return errors;

@@ -9,7 +9,7 @@ export default {
     loading: false,
     users: [],
     roles: [],
-    branchOffices: [],
+    branch_offices: [],
     editedItem: {
       id: 0,
       first_name: "",
@@ -42,8 +42,8 @@ export default {
     SET_ROLES(state, roles) {
       state.roles = roles;
     },
-    SET_BRANCH_OFFICES_AVAILABLES(state, branchOffices) {
-      state.branchOffices = branchOffices;
+    SET_BRANCH_OFFICES_AVAILABLES(state, branch_offices) {
+      state.branch_offices = branch_offices;
     },
     SET_LOADING_DATATABLE(state, status) {
       state.loading = status;
