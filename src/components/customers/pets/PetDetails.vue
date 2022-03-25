@@ -126,7 +126,7 @@
                   <!-- Numero de Chip -->
                   <v-col xs="12" sm="4" md="4" cols="12">
                     <small>Chip</small><br />
-                    <label> {{ pet.pet_chip_number }} </label>
+                    <label> {{ formattValue(pet.pet_chip_number) }} </label>
                   </v-col>
                   <!-- Pelaje -->
                   <v-col xs="12" sm="4" md="4" cols="12">
@@ -167,7 +167,7 @@
                   <!-- Eliminado -->
                   <v-col xs="12" sm="4" md="4" cols="12">
                     <small>Eliminado </small><br />
-                    <label> {{ pet.updated_at }} </label>
+                    <label> {{ formattValue(pet.deleted_at) }} </label>
                   </v-col>
                   <!-- Dueño -->
                   <v-col xs="12" sm="4" md="4" cols="12">
@@ -189,7 +189,7 @@
                   <v-col cols="12">
                     <small>Instrucciones generales</small><br />
                     <label>
-                      {{ pet.pet_general_instructions }}
+                      {{ formattValue(pet.pet_general_instructions) }}
                     </label>
                   </v-col>
                 </v-row>
@@ -321,31 +321,33 @@
               <!-- Estado general -->
               <v-col xs="12" sm="4" md="4" cols="12" class="pb-0">
                 <small>Locomoción</small><br />
-                <label>{{ vet_information.normal_locomotion }}</label>
+                <label>
+                  {{ formattValue(vet_information.normal_locomotion) }}
+                </label>
               </v-col>
               <v-col xs="12" sm="4" md="4" cols="12" class="pb-0">
                 <small>Dorso</small><br />
-                <label>{{ vet_information.back }}</label>
+                <label>{{ formattValue(vet_information.back) }}</label>
               </v-col>
               <v-col xs="12" sm="4" md="4" cols="12" class="pb-0">
                 <small>Cabeza</small><br />
-                <label>{{ vet_information.head }}</label>
+                <label>{{ formattValue(vet_information.head) }}</label>
               </v-col>
               <v-col xs="12" sm="4" md="4" cols="12" class="pb-0">
                 <small>Vientre</small><br />
-                <label>{{ vet_information.belly }}</label>
+                <label>{{ formattValue(vet_information.belly) }}</label>
               </v-col>
               <v-col xs="12" sm="4" md="4" cols="12" class="pb-0">
                 <small>Cuello</small><br />
-                <label>{{ vet_information.neck }}</label>
+                <label>{{ formattValue(vet_information.neck) }}</label>
               </v-col>
               <v-col xs="12" sm="4" md="4" cols="12" class="pb-0">
                 <small>Patas traseras</small><br />
-                <label>{{ vet_information.hind_legs }}</label>
+                <label>{{ formattValue(vet_information.hind_legs) }}</label>
               </v-col>
               <v-col xs="12" sm="4" md="4" cols="12" class="pb-0">
                 <small>Patas delanteras</small><br />
-                <label>{{ vet_information.front_legs }}</label>
+                <label>{{ formattValue(vet_information.front_legs) }}</label>
               </v-col>
               <v-col xs="12" sm="4" md="4" cols="12" class="pb-0">
                 <small>Carnet</small><br />
@@ -366,6 +368,15 @@
       <!-- Lodgings -->
       <v-col cols="12">
         <lodging-data-table v-model="pet_lodgings" :headers="headers">
+          <!-- Datatable history lodging-->
+          <template v-slot:header>
+            <v-toolbar flat color="white" class="rounded-xl">
+              <v-toolbar-title>
+                <h4><v-icon>mdi-paw</v-icon>&nbsp;Alojamientos en guarderia</h4>
+              </v-toolbar-title>
+              <v-divider class="mx-4" inset vertical></v-divider>
+            </v-toolbar>
+          </template>
         </lodging-data-table>
       </v-col>
     </v-row>
@@ -448,6 +459,9 @@ export default {
     },
     showCarnet() {
       window.open(this.vet_information.url_vaccination_card, "_blank");
+    },
+    formattValue(value) {
+      return value ?? "-";
     },
   },
   created() {
