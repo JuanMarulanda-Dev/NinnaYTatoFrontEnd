@@ -124,24 +124,6 @@
         </template>
         <span>Editar</span>
       </v-tooltip>
-
-      <!-- Detalles sucursal -->
-      <v-tooltip bottom>
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn
-            fab
-            x-small
-            dark
-            color="info"
-            v-bind="attrs"
-            v-on="on"
-            @click="goToShowDetailSucursal(item)"
-          >
-            <v-icon> {{ detailsIcon }} </v-icon>
-          </v-btn>
-        </template>
-        <span>Detalles</span>
-      </v-tooltip>
     </template>
   </v-data-table>
 </template>
@@ -281,13 +263,6 @@ export default {
       this.SET_EDIT_ITEM(Object.assign({}, item));
       // this.editedItem = ;
       this.dialog = true;
-    },
-
-    goToShowDetailSucursal(item) {
-      // Esto de desarrollara más adelante
-      // Ir a monstrar los detalles de esta sucursal (Caja, stocks, trabajadores, clientes registrados en esa sucursal, mascotas en esa sucursal, sus habitaciones, etc)
-      this.editedIndex = this.branch_offices.indexOf(item);
-      // let itemObject = Object.assign({}, item); // Convertir a un objeto json
     },
 
     close() {
