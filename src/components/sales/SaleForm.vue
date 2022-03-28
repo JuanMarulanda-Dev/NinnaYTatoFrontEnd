@@ -109,6 +109,8 @@
           item-text="name"
           return-object
           dense
+          :search-input.sync="searchInputProduct"
+          clearable
         >
           <template slot="item" slot-scope="{ item }">
             {{ item.name }}
@@ -132,6 +134,8 @@
           return-object
           dense
           :disabled="customerSelected"
+          :search-input.sync="searchInputService"
+          clearable
         >
           <template slot="item" slot-scope="{ item }">
             {{ item.name }}
@@ -193,6 +197,8 @@ export default {
   data: () => ({
     changes: 0,
     itemSelected: {},
+    searchInputService: "",
+    searchInputProduct: "",
   }),
   props: {
     lg: {
@@ -230,7 +236,9 @@ export default {
       return result;
     },
     devuelta() {
-      return this.sale.payment - this.total;
+      return this.sale.payment - this.total > 0
+        ? this.sale.payment - this.total
+        : 0;
     },
     customerSelected() {
       return this.sale.customer_id === "" || this.sale.customer_id === null;
@@ -322,8 +330,9 @@ export default {
                   });
                 }
                 this.SET_SALE_DEFAULT();
-                // Research products}
+                // Research products
                 this.getAllProducts(1);
+                this.clear();
               }
             });
           }
@@ -339,38 +348,47 @@ export default {
     clear() {
       this.SET_SALE_DEFAULT();
       this.$v.$reset();
+      this.itemSelected = {};
     },
   },
   watch: {
     itemSelected(itemSelected) {
-      let disponibleToAdd = true;
-      let cartItemIndex = this.searchSameProductOnTheCart(
-        itemSelected.id,
-        itemSelected.type
-      );
-      // Is it a product?
-      if (itemSelected.type === 1) {
-        //
-        let cartItemQuantity =
-          cartItemIndex > -1 ? this.sale.cart[cartItemIndex].quantity : 0;
-        //
-        disponibleToAdd = this.validateAvaliableStockProduct(
-          itemSelected.stock - cartItemQuantity
+      if (Object.keys(itemSelected).length > 0) {
+        let disponibleToAdd = true;
+        let cartItemIndex = this.searchSameProductOnTheCart(
+          itemSelected.id,
+          itemSelected.type
         );
-        if (!disponibleToAdd) {
-          // Does't have stock avaliable.
-          this.$toast.warning(
-            "No tienes stock disponible del producto seleccionado"
+        // Is it a product?
+        if (itemSelected.type === 1) {
+          //
+          let cartItemQuantity =
+            cartItemIndex > -1 ? this.sale.cart[cartItemIndex].quantity : 0;
+          //
+          disponibleToAdd = this.validateAvaliableStockProduct(
+            itemSelected.stock - cartItemQuantity
           );
+          if (!disponibleToAdd) {
+            // Does't have stock avaliable.
+            this.$toast.warning(
+              "No tienes stock disponible del producto seleccionado"
+            );
+          }
         }
-      }
 
-      if (disponibleToAdd) {
-        this.addCartItem(itemSelected, cartItemIndex);
+        if (disponibleToAdd) {
+          this.addCartItem(itemSelected, cartItemIndex);
+        }
+      } else {
+        this.$nextTick(() => {
+          this.searchInputService = "";
+          this.searchInputProduct = "";
+        });
       }
     },
     mainBranchOffice() {
       this.getAllProducts(1);
+      this.getAllCustomers(1);
       this.SET_SALE_DEFAULT();
     },
   },

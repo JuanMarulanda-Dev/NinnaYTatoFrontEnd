@@ -5,6 +5,7 @@ self.addEventListener("push", function (event) {
       body: data.data.description,
       icon: "favicon.png",
       vibrate: [200, 100, 200],
+      // badge: "favicon.png",
     });
     //
     // navigator.serviceWorker.controller.postMessage(data);

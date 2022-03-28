@@ -28,7 +28,7 @@
 // creador: https://github.com/juareznasato/vuetify-money
 import { validationMixin } from "vuelidate";
 import { moneyFormatMixin } from "@/mixins/moneyFormatMixin.js";
-import { required, maxLength, numeric } from "vuelidate/lib/validators";
+import { required, maxLength } from "vuelidate/lib/validators";
 export default {
   name: "vuetify-money",
   model: { prop: "value", event: "input" },
@@ -85,7 +85,7 @@ export default {
   },
   mixins: [validationMixin, moneyFormatMixin],
   validations: {
-    cmpValue: { required, maxLength: maxLength(255), numeric },
+    cmpValue: { required, maxLength: maxLength(255) },
   },
   computed: {
     cmpValue: {
@@ -103,8 +103,6 @@ export default {
       if (!this.$v.cmpValue.$dirty) return errors;
       !this.$v.cmpValue.required && errors.push("El valor es requerido");
       !this.$v.cmpValue.maxLength && errors.push("Longitud no permitida");
-      !this.$v.cmpValue.numeric &&
-        errors.push("Solo se permiten valores numericos");
       return errors;
     },
   },

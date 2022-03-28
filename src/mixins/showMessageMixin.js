@@ -58,13 +58,11 @@ exports.install = function (Vue) {
       },
       401: () => {
         // Unauthenticate
-        Vue.$toast.warning(message);
+        // Vue.$toast.warning("Tu sesion a caducado, por favor vuelve a ingresar");
         // Eliminar la sesssion (cookies y localstorage) y retornar al login
         localStorage.clear();
         Vue.prototype.deleteAllCookies();
-        // Vue.$router.push({
-        //   name: "Login",
-        // });
+        location.replace("/login");
       },
       403: () => {
         // access to the requested resource is forbidden.
