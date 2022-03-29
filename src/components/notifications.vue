@@ -3,7 +3,7 @@
     offset-y
     left
     bottom
-    max-width="30rem"
+    max-width="32rem"
     transition="scroll-y-transition"
     max-height="300px"
     v-model="menuDialog"
@@ -24,38 +24,47 @@
     <!-- Lista de notificaciones -->
     <v-list>
       <v-subheader>Notificaciones</v-subheader>
-      <v-list-item
-        v-for="(notification, i) in notifications"
-        :key="i"
-        @click="
-          () => {
-            // Make a redirect
-          }
-        "
-      >
-        <v-list-item-avatar>
-          <v-icon>{{ notification.icon }}</v-icon>
-        </v-list-item-avatar>
+      <div v-if="notifications.length > 0">
+        <v-list-item
+          v-for="(notification, i) in notifications"
+          :key="i"
+          @click="
+            () => {
+              // Make a redirect
+            }
+          "
+        >
+          <v-list-item-avatar>
+            <v-icon>{{ notification.icon }}</v-icon>
+          </v-list-item-avatar>
 
+          <v-list-item-content>
+            <v-list-item-title>
+              {{ notification.title }}
+            </v-list-item-title>
+
+            <v-list-item-subtitle>
+              {{ notification.description }}
+            </v-list-item-subtitle>
+          </v-list-item-content>
+
+          <v-list-item-action>
+            <v-list-item-action-text>
+              {{ calculateDifferenceTimeNotification(notification.created_at) }}
+            </v-list-item-action-text>
+            <label v-show="!notification.viewed">
+              <v-icon x-large color="secondary"> mdi-circle-small </v-icon>
+              <small>Nueva</small>
+            </label>
+          </v-list-item-action>
+        </v-list-item>
+      </div>
+      <v-list-item v-else>
         <v-list-item-content>
-          <v-list-item-title>
-            {{ notification.title }}
-          </v-list-item-title>
-
           <v-list-item-subtitle>
-            {{ notification.description }}
+            {{ "No tienes ninguna notificación pendiente" }}
           </v-list-item-subtitle>
         </v-list-item-content>
-
-        <v-list-item-action>
-          <v-list-item-action-text>
-            {{ calculateDifferenceTimeNotification(notification.created_at) }}
-          </v-list-item-action-text>
-          <label v-show="!notification.viewed">
-            <v-icon x-large color="secondary"> mdi-circle-small </v-icon>
-            <small>Nueva</small>
-          </label>
-        </v-list-item-action>
       </v-list-item>
     </v-list>
   </v-menu>

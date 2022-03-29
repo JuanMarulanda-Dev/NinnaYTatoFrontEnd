@@ -101,16 +101,16 @@ export default new Vuex.Store({
         Vue.prototype.askPermission(state.user.id);
 
         // Consultar las sucursales para cambiar entre sucursales solo si es administrador
-        if (this.user) {
-          if (this.user.is_admin) {
+        if (state.user) {
+          if (state.user.is_admin) {
             dispatch("branch_offices/getAllBranchOffices");
           }
         }
         // Obtener los permisos del usuario
         await dispatch("getMenu");
 
-        if (this.user) {
-          dispatch("notifications/getNotificationsByUser", this.user.id);
+        if (state.user) {
+          // dispatch("notifications/getNotificationsByUser", state.user.id);
         }
 
         // Obtener la ruta principal a donde se va a redireccionar al usuario
