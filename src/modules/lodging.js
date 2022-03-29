@@ -191,17 +191,15 @@ export default {
         .catch(() => {});
     },
 
-    getAllCustomersPets({ state, commit, rootState }) {
-      if (state.pets.length === 0) {
-        axios
-          .get(
-            `/api/lodgings/pets?branch_office_id=${rootState.mainBranchOffice}`
-          )
-          .then((result) => {
-            commit("SET_PETS", result.data.pets);
-          })
-          .catch(() => {});
-      }
+    getAllCustomersPets({ commit, rootState }) {
+      axios
+        .get(
+          `/api/lodgings/pets?branch_office_id=${rootState.mainBranchOffice}`
+        )
+        .then((result) => {
+          commit("SET_PETS", result.data.pets);
+        })
+        .catch(() => {});
     },
 
     getAllDefaultPlans({ commit }) {

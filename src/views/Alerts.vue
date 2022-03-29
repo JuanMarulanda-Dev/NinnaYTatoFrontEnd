@@ -46,7 +46,7 @@
             <v-card-text>
               <v-container>
                 <v-row>
-                  <v-col md="6">
+                  <v-col cols="12" sm="6">
                     <v-autocomplete
                       label="Mascota*"
                       v-model="editedItem.pet_id"
@@ -83,7 +83,7 @@
                       </template>
                     </v-autocomplete>
                   </v-col>
-                  <v-col md="3">
+                  <v-col cols="12" sm="3">
                     <v-select
                       label="Hora"
                       :items="times"
@@ -93,7 +93,7 @@
                       @blur="$v.editedItem.time.$touch()"
                     ></v-select>
                   </v-col>
-                  <v-col md="3">
+                  <v-col cols="12" sm="3">
                     <v-select
                       label="Tipo de alarma"
                       v-model="editedItem.alert_type_id"
@@ -338,6 +338,7 @@ export default {
     mainBranchOffice() {
       if (this.permissions.read) {
         this.initialize();
+        this.getAllCustomersPets();
       }
     },
     row(newValue) {
@@ -419,6 +420,7 @@ export default {
       this.$nextTick(() => {
         this.SET_EDIT_ITEM(Object.assign({}, this.defaultItem));
         this.editedIndex = -1;
+        this.row = "2";
       });
     },
 
