@@ -3,7 +3,7 @@
     offset-y
     left
     bottom
-    max-width="32rem"
+    :max-width="max_width + 'rem'"
     transition="scroll-y-transition"
     max-height="300px"
     v-model="menuDialog"
@@ -24,6 +24,7 @@
     <!-- Lista de notificaciones -->
     <v-list>
       <v-subheader>Notificaciones</v-subheader>
+      <v-divider></v-divider>
       <div v-if="notifications.length > 0">
         <v-list-item
           v-for="(notification, i) in notifications"
@@ -93,6 +94,22 @@ export default {
       return this.notifications
         .filter((item) => !item.viewed)
         .length.toString();
+    },
+    max_width() {
+      switch (this.$vuetify.breakpoint.name) {
+        case "xs":
+          return 23;
+        case "sm":
+          return 30;
+        case "md":
+          return 32;
+        case "lg":
+          return 33;
+        case "xl":
+          return 35;
+        default:
+          return 23;
+      }
     },
   },
   watch: {
