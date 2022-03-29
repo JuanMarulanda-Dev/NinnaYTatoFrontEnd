@@ -110,7 +110,7 @@ export default new Vuex.Store({
         await dispatch("getMenu");
 
         if (state.user) {
-          // dispatch("notifications/getNotificationsByUser", state.user.id);
+          dispatch("notifications/getNotificationsByUser", state.user.id);
         }
 
         // Obtener la ruta principal a donde se va a redireccionar al usuario
