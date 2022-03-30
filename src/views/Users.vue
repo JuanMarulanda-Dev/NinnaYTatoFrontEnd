@@ -53,6 +53,7 @@
                       required
                       prepend-inner-icon="mdi-format-letter-matches"
                       counter="255"
+                      autocomplete="off"
                       :error-messages="first_nameErrors"
                       @input="$v.editedItem.first_name.$touch()"
                       @blur="$v.editedItem.first_name.$touch()"
@@ -64,6 +65,7 @@
                       label="Apellidos*"
                       prepend-inner-icon="mdi-format-letter-matches"
                       counter="255"
+                      autocomplete="off"
                       :error-messages="last_nameErrors"
                       @input="$v.editedItem.last_name.$touch()"
                       @blur="$v.editedItem.last_name.$touch()"
@@ -75,6 +77,7 @@
                       label="Email*"
                       prepend-inner-icon="mdi-at"
                       counter="255"
+                      autocomplete="off"
                       :error-messages="emailErrors"
                       @input="$v.editedItem.email.$touch()"
                       @blur="$v.editedItem.email.$touch()"
@@ -86,6 +89,7 @@
                       label="Telefono*"
                       prepend-inner-icon="mdi-phone"
                       counter="255"
+                      autocomplete="off"
                       :error-messages="phoneErrors"
                       @input="$v.editedItem.phone.$touch()"
                       @blur="$v.editedItem.phone.$touch()"
@@ -107,7 +111,7 @@
                   </v-col>
                   <v-col cols="12" sm="6" md="6">
                     <v-select
-                      :items="branchOffices"
+                      :items="branch_offices"
                       item-text="name"
                       item-value="id"
                       label="Sucursal"
@@ -126,6 +130,7 @@
                       label="Contraseña*"
                       prepend-inner-icon="mdi-lock"
                       counter="25"
+                      autocomplete="off"
                       :error-messages="passwordErrors"
                       @input="$v.editedItem.password.$touch()"
                       @blur="$v.editedItem.password.$touch()"
@@ -138,6 +143,7 @@
                       label="Confirmar contraseña*"
                       prepend-inner-icon="mdi-lock"
                       counter="25"
+                      autocomplete="off"
                       :error-messages="password_confirmationErrors"
                       @input="$v.editedItem.password_confirmation.$touch()"
                       @blur="$v.editedItem.password_confirmation.$touch()"
@@ -270,7 +276,7 @@ export default {
       "loading",
       "editedItem",
       "defaultItem",
-      "branchOffices",
+      "branch_offices",
       "roles",
     ]),
     formTitle() {

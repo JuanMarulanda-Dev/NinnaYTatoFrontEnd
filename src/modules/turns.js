@@ -79,9 +79,11 @@ export default {
     },
   },
   actions: {
-    getAllCollaborators({ commit }) {
+    getAllCollaborators({ commit, rootState }) {
       axios
-        .get(`/api/turns/collaborators`)
+        .get(
+          `/api/turns/collaborators?branch_office_id=${rootState.mainBranchOffice}`
+        )
         .then((result) => {
           // save all
           commit("SET_COLLABORATORS", result.data.collaborators);
