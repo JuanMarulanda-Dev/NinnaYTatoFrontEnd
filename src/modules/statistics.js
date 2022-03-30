@@ -153,6 +153,7 @@ export default {
   },
   actions: {
     getPlanCustomerReportByDates({ commit, rootState, state }) {
+      commit("SET_OVERLAY_LOADING", true, { root: true });
       axios
         .get(
           `/api/plan-customer-report?branch_office_id=${rootState.mainBranchOffice}&start=${state.start}&end=${state.end}`
@@ -160,9 +161,13 @@ export default {
         .then((result) => {
           commit("PLANS_CUSTOMERS_REPORT", result.data.customerPlanReport);
         })
-        .catch(() => {});
+        .catch(() => {})
+        .finally(() => {
+          commit("SET_OVERLAY_LOADING", false, { root: true });
+        });
     },
     getPercentageLodgingsByTime({ commit, rootState, state }) {
+      commit("SET_OVERLAY_LOADING", true, { root: true });
       axios
         .get(
           `/api/percentage-lodging-report?branch_office_id=${rootState.mainBranchOffice}&year=${state.year}`
@@ -170,9 +175,13 @@ export default {
         .then((result) => {
           commit("PERCENTAGE_LODGING_REPORT", result.data.series);
         })
-        .catch(() => {});
+        .catch(() => {})
+        .finally(() => {
+          commit("SET_OVERLAY_LOADING", false, { root: true });
+        });
     },
     getIncomesAndEgressByMonths({ commit, rootState, state }) {
+      commit("SET_OVERLAY_LOADING", true, { root: true });
       axios
         .get(
           `/api/incomes-egresses-report?branch_office_id=${rootState.mainBranchOffice}&year=${state.year}`
@@ -180,9 +189,13 @@ export default {
         .then((result) => {
           commit("SET_INCOMES_EGRESS_REPORT", result.data);
         })
-        .catch(() => {});
+        .catch(() => {})
+        .finally(() => {
+          commit("SET_OVERLAY_LOADING", false, { root: true });
+        });
     },
     getLodgingHoursReport({ commit, rootState, state }) {
+      commit("SET_OVERLAY_LOADING", true, { root: true });
       axios
         .get(
           `/api/lodging-hours-report?branch_office_id=${rootState.mainBranchOffice}&year=${state.year}`
@@ -190,9 +203,13 @@ export default {
         .then((result) => {
           commit("SET_LODGING_HOURS_REPORT", result.data.hours);
         })
-        .catch(() => {});
+        .catch(() => {})
+        .finally(() => {
+          commit("SET_OVERLAY_LOADING", false, { root: true });
+        });
     },
     getLodgingNightsReport({ commit, rootState, state }) {
+      commit("SET_OVERLAY_LOADING", true, { root: true });
       axios
         .get(
           `/api/lodging-nights-report?branch_office_id=${rootState.mainBranchOffice}&year=${state.year}`
@@ -200,7 +217,10 @@ export default {
         .then((result) => {
           commit("SET_LODGING_NIGHTS_REPORT", result.data.nights);
         })
-        .catch(() => {});
+        .catch(() => {})
+        .finally(() => {
+          commit("SET_OVERLAY_LOADING", false, { root: true });
+        });
     },
   },
 };

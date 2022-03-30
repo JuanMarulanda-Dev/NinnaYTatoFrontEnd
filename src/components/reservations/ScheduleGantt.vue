@@ -184,8 +184,8 @@ export default {
           progress: 0,
           style: {
             base: {
-              fill: `#${element.room_color}`,
-              stroke: `#${element.room_color}`,
+              fill: element.room_color,
+              stroke: element.room_color,
             },
           },
         };

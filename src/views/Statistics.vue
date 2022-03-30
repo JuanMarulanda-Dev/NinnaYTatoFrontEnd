@@ -89,7 +89,7 @@
           <income-vs-expenses-report></income-vs-expenses-report>
         </v-col>
         <v-col cols="12" class="px-0">
-          <!-- Plans Customers Report -->
+          <!-- Plans Customers Report (this we have to changes its location)-->
           <plans-customers-report></plans-customers-report>
         </v-col>
       </v-row>
@@ -121,6 +121,7 @@ export default {
 
   computed: {
     ...mapState("statistics", ["start", "end"]),
+    ...mapState(["mainBranchOffice"]),
     startDate: {
       get: function () {
         return this.start;
@@ -140,7 +141,6 @@ export default {
   },
 
   methods: {
-    ...mapMutations(["SET_OVERLAY_LOADING"]),
     ...mapMutations("statistics", ["SET_START_DATE", "SET_END_DATE"]),
     ...mapActions("statistics", [
       "getPlanCustomerReportByDates",
@@ -151,7 +151,6 @@ export default {
     ]),
     initialize() {
       try {
-        this.SET_OVERLAY_LOADING(true);
         this.getPlanCustomerReportByDates();
         this.getPercentageLodgingsByTime();
         this.getIncomesAndEgressByMonths();
@@ -162,9 +161,12 @@ export default {
           errors.response.status,
           this.createMessageError("")
         );
-      } finally {
-        this.SET_OVERLAY_LOADING(false);
       }
+    },
+  },
+  watch: {
+    mainBranchOffice() {
+      this.initialize();
     },
   },
   components: {
