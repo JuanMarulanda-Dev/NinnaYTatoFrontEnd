@@ -15,7 +15,6 @@ export default {
     end: "",
     reservations: [],
     rooms: [],
-    pets: [],
     editedItem: {
       pet_id: "",
       room_id: "",
@@ -35,9 +34,6 @@ export default {
     },
     SET_ROOMS(state, rooms) {
       state.rooms = rooms;
-    },
-    SET_PETS(state, pets) {
-      state.pets = pets;
     },
     SET_START_DATE(state, start) {
       state.start = start;
@@ -106,17 +102,6 @@ export default {
         .finally(() => {
           commit("SET_LOADING_ROOMS_AUTOCOMPLETE", false);
         });
-    },
-
-    getAllCustomersPets({ commit, rootState }) {
-      axios
-        .get(
-          `/api/lodgings/pets?branch_office_id=${rootState.mainBranchOffice}`
-        )
-        .then((result) => {
-          commit("SET_PETS", result.data.pets);
-        })
-        .catch(() => {});
     },
 
     storeReservation({ state, commit, dispatch }, refresh_datatable = 0) {

@@ -250,9 +250,9 @@ export default {
     ...mapActions("reservations", [
       "getAllReservations",
       "getAllRoomsReservationsBetweenDates",
-      "getAllCustomersPets",
       "destroyReservation",
     ]),
+    ...mapActions("lodging", ["getAllCustomersPets"]),
     ...mapMutations("reservations", [
       "SET_EDIT_ITEM",
       "SET_START_DATE",
