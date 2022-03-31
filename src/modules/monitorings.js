@@ -75,6 +75,12 @@ export default {
       commit("SET_OVERLAY_LOADING", true, { root: true });
 
       let formData = new FormData();
+      // formData.append("image", data.image, data.image.name);
+      // formData.append("description", data.description);
+      // formData.append("option_id", data.option_id);
+      // formData.append("monitoring_type_id", data.monitoring_type_id);
+      // formData.append("date", data.date);
+
       for (var key in data) {
         if (data[key] == null) {
           formData.append(key, "");
@@ -88,16 +94,20 @@ export default {
 
       console.log(formData);
 
+      // , {
+      //   headers: {
+      //     "access-control-allow-credentials": true,
+      //     "access-control-allow-headers":
+      //       "access-control-allow-headers,access-control-allow-methods,access-control-allow-origin,x-xsrf-token",
+      //     "access-control-allow-methods": "POST",
+      //     "access-control-allow-origin": "https://spa.ninnaytato.com",
+      //     "access-control-max-age": 0,
+      //     "cache-control": "no-cache, private",
+      //   },
+      // }
+
       return axios
-        .post(`/api/lodgings/${id}/monitorings`, formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
-            "Access-Control-Allow-Headers":
-              "Content-type, X-Auth-Token, Authorization, Origin",
-          },
-        })
+        .post(`/api/lodgings/${id}/monitorings`, formData)
         .then((result) => {
           if (result.status == 201) {
             // show message
@@ -112,10 +122,9 @@ export default {
           }
         })
         .catch((errors) => {
-          console.log(errors);
           // show error message
           this._vm.showToastMessage(
-            errors.response.status,
+            errors.response.status ?? 500,
             this._vm.createMessageError(errors.response.data.errors)
           );
           return false;
