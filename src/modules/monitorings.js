@@ -81,12 +81,23 @@ export default {
         } else if (typeof data[key] === "boolean") {
           formData.append(key, data[key] ? "1" : "0");
         } else {
+          console.log(data[key]);
           formData.append(key, data[key]);
         }
       }
 
+      console.log(formData);
+
       return axios
-        .post(`/api/lodgings/${id}/monitorings`, formData)
+        .post(`/api/lodgings/${id}/monitorings`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+            "Access-Control-Allow-Headers":
+              "Content-type, X-Auth-Token, Authorization, Origin",
+          },
+        })
         .then((result) => {
           if (result.status == 201) {
             // show message
@@ -101,6 +112,7 @@ export default {
           }
         })
         .catch((errors) => {
+          console.log(errors);
           // show error message
           this._vm.showToastMessage(
             errors.response.status,
