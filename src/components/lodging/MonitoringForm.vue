@@ -496,8 +496,25 @@ export default {
     save() {
       // activate validations form
       this.$v.$touch();
+      let imageFile = this.monitoring.image;
+      let status = true;
+      if (imageFile != null) {
+        let size = imageFile.size / 1024 / 1024;
+        if (!imageFile.type.match("image.*")) {
+          // check whether the upload is an image
+          this.$toast.warning("Por favor selecciona una imagen.");
+          status = false;
+        } else if (size > 10) {
+          // 10MB
+          // check whether the size is greater than the size limit
+          this.$toast.warning(
+            "Tu archivo es demasiado grande! Por favor selecciona una imagen de 3MB o inferior."
+          );
+          status = false;
+        }
+      }
       // Correct validations
-      if (!this.$v.$invalid) {
+      if (!this.$v.$invalid && status) {
         // Save entry
         this.storeMonitoring({
           id: this.lodging_id,
