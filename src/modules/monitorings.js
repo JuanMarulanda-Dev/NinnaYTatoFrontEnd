@@ -107,7 +107,10 @@ export default {
       // }
 
       return axios
-        .post(`/api/lodgings/${id}/monitorings`, formData)
+        .post(`/api/lodgings/${id}/monitorings`, formData, {
+          maxContentLength: Infinity,
+          maxBodyLength: Infinity,
+        })
         .then((result) => {
           if (result.status == 201) {
             // show message
