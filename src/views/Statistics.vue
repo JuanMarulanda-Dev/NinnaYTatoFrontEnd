@@ -7,75 +7,15 @@
             <v-icon large>mdi-chart-timeline-variant</v-icon> Estadisticas
           </v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
-
-          <v-dialog
-            ref="start"
-            v-model="dialogStart"
-            :return-value.sync="startDate"
-            persistent
-            width="290px"
-            :retain-focus="false"
-          >
-            <template v-slot:activator="{ on, attrs }">
-              <v-text-field
-                class="mt-8"
-                v-model="startDate"
-                label="Fecha"
-                prepend-icon="mdi-calendar"
-                readonly
-                v-bind="attrs"
-                v-on="on"
-              ></v-text-field>
-            </template>
-            <v-date-picker
-              @change="initialize()"
-              v-model="startDate"
-              scrollable
-            >
-              <v-spacer></v-spacer>
-              <v-btn text color="primary" @click="dialogStart = false">
-                Cancel
-              </v-btn>
-              <v-btn text color="primary" @click="$refs.start.save(startDate)">
-                OK
-              </v-btn>
-            </v-date-picker>
-          </v-dialog>
-
-          <v-dialog
-            ref="end"
-            v-model="dialogEnd"
-            :return-value.sync="endDate"
-            persistent
-            width="290px"
-            :retain-focus="false"
-          >
-            <template v-slot:activator="{ on, attrs }">
-              <v-text-field
-                class="mt-8"
-                v-model="endDate"
-                label="Fecha"
-                prepend-icon="mdi-calendar"
-                readonly
-                v-bind="attrs"
-                v-on="on"
-              ></v-text-field>
-            </template>
-            <v-date-picker @change="initialize()" v-model="endDate" scrollable>
-              <v-spacer></v-spacer>
-              <v-btn text color="primary" @click="dialogEnd = false">
-                Cancel
-              </v-btn>
-              <v-btn text color="primary" @click="$refs.end.save(endDate)">
-                OK
-              </v-btn>
-            </v-date-picker>
-          </v-dialog>
         </v-toolbar>
       </v-card-text>
     </v-card>
     <v-container fluid>
       <v-row>
+        <v-col cols="12" class="px-0">
+          <!-- Plans Customers Report (this we have to changes its location)-->
+          <plans-customers-report></plans-customers-report>
+        </v-col>
         <v-col cols="12" class="px-0 pb-0">
           <lodging-bar-report></lodging-bar-report>
         </v-col>
@@ -87,10 +27,6 @@
         </v-col>
         <v-col cols="12" class="px-0 pb-0">
           <income-vs-expenses-report></income-vs-expenses-report>
-        </v-col>
-        <v-col cols="12" class="px-0">
-          <!-- Plans Customers Report (this we have to changes its location)-->
-          <plans-customers-report></plans-customers-report>
         </v-col>
       </v-row>
     </v-container>
@@ -107,10 +43,7 @@ import NightsLodgingsByWeekReport from "@/components/statistics/NightsLodgingsBy
 import IncomeVsExpensesReport from "@/components/statistics/IncomeVsExpensesReport.vue";
 
 export default {
-  data: () => ({
-    dialogStart: false,
-    dialogEnd: false,
-  }),
+  data: () => ({}),
 
   created() {
     this.SET_START_DATE(moment().startOf("month").format("YYYY-MM-DD"));
@@ -120,24 +53,7 @@ export default {
   },
 
   computed: {
-    ...mapState("statistics", ["start", "end"]),
     ...mapState(["mainBranchOffice"]),
-    startDate: {
-      get: function () {
-        return this.start;
-      },
-      set: function (newValue) {
-        this.SET_START_DATE(newValue);
-      },
-    },
-    endDate: {
-      get: function () {
-        return this.end;
-      },
-      set: function (newValue) {
-        this.SET_END_DATE(newValue);
-      },
-    },
   },
 
   methods: {

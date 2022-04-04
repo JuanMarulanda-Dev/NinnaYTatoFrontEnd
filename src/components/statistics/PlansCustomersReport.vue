@@ -16,6 +16,65 @@
           <v-icon large>mdi-notebook-multiple</v-icon> Planes de clientes
         </v-toolbar-title>
         <v-divider class="mx-4" inset vertical></v-divider>
+        <v-dialog
+          ref="start"
+          v-model="dialogStart"
+          :return-value.sync="startDate"
+          persistent
+          width="290px"
+          :retain-focus="false"
+        >
+          <template v-slot:activator="{ on, attrs }">
+            <v-text-field
+              class="mt-8"
+              v-model="startDate"
+              label="Fecha"
+              prepend-icon="mdi-calendar"
+              readonly
+              v-bind="attrs"
+              v-on="on"
+            ></v-text-field>
+          </template>
+          <v-date-picker @change="initialize()" v-model="startDate" scrollable>
+            <v-spacer></v-spacer>
+            <v-btn text color="primary" @click="dialogStart = false">
+              Cancel
+            </v-btn>
+            <v-btn text color="primary" @click="$refs.start.save(startDate)">
+              OK
+            </v-btn>
+          </v-date-picker>
+        </v-dialog>
+
+        <v-dialog
+          ref="end"
+          v-model="dialogEnd"
+          :return-value.sync="endDate"
+          persistent
+          width="290px"
+          :retain-focus="false"
+        >
+          <template v-slot:activator="{ on, attrs }">
+            <v-text-field
+              class="mt-8"
+              v-model="endDate"
+              label="Fecha"
+              prepend-icon="mdi-calendar"
+              readonly
+              v-bind="attrs"
+              v-on="on"
+            ></v-text-field>
+          </template>
+          <v-date-picker @change="initialize()" v-model="endDate" scrollable>
+            <v-spacer></v-spacer>
+            <v-btn text color="primary" @click="dialogEnd = false">
+              Cancel
+            </v-btn>
+            <v-btn text color="primary" @click="$refs.end.save(endDate)">
+              OK
+            </v-btn>
+          </v-date-picker>
+        </v-dialog>
         <v-spacer></v-spacer>
         <v-text-field
           v-model="search"
@@ -36,7 +95,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapActions, mapMutations, mapState } from "vuex";
 import { moneyFormatMixin } from "@/mixins/moneyFormatMixin.js";
 export default {
   data() {
@@ -44,23 +103,45 @@ export default {
       search: "",
       headers: [
         {
-          text: "Fecha",
+          text: "Cliente",
           align: "start",
-          value: "created_at",
+          value: "customer",
         },
-        { text: "Mediador", value: "mediator", align: "left" },
-        { text: "Tipo", value: "type_movement" },
-        { text: "Grupo", value: "group", align: "center" },
-        { text: "Origin / Destino", value: "cash_register", align: "center" },
-        { text: "Total", value: "total", align: "center" },
-        { text: "Nota", value: "note" },
-        { text: "Acciones", value: "actions", sortable: false },
+        { text: "Plan", value: "plan", align: "center" },
+        { text: "Tikets / Servicios", value: "tickets", align: "center" },
+        { text: "Inicio", value: "initial_date", align: "center" },
+        { text: "Fin", value: "final_date", align: "center" },
       ],
+      dialogStart: false,
+      dialogEnd: false,
     };
   },
   mixins: [moneyFormatMixin],
   computed: {
-    ...mapState("statistics", ["plans_customers_report"]),
+    ...mapState("statistics", ["plans_customers_report", "start", "end"]),
+    startDate: {
+      get: function () {
+        return this.start;
+      },
+      set: function (newValue) {
+        this.SET_START_DATE(newValue);
+      },
+    },
+    endDate: {
+      get: function () {
+        return this.end;
+      },
+      set: function (newValue) {
+        this.SET_END_DATE(newValue);
+      },
+    },
+  },
+  methods: {
+    ...mapMutations("statistics", ["SET_START_DATE", "SET_END_DATE"]),
+    ...mapActions("statistics", ["getPlanCustomerReportByDates"]),
+    initialize() {
+      this.getPlanCustomerReportByDates();
+    },
   },
 };
 </script>
