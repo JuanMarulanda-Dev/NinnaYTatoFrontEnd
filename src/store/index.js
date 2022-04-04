@@ -117,7 +117,8 @@ export default new Vuex.Store({
         // Redirrecionar a la ruta pertiente para el usuario
         router.push({
           path:
-            state.menu[0].to + (state.user.is_customer ? state.user.id : ""),
+            state.menu[0].to +
+            (state.user.is_customer ? "/" + state.user.id : ""),
         });
       } catch (error) {
         // Mostrar el mensaje al usuario que ocurrio algun inconveninte (Los mensajes deben venir del backend)
