@@ -4,9 +4,13 @@ self.addEventListener("push", function (event) {
     self.registration.showNotification(data.data.title, {
       body: data.data.description,
       icon: "favicon.png",
-      vibrate: [200, 100, 200],
-      // badge: "favicon.png",
+      image: "favicon.png",
+      badge: "favicon.png",
+      vibrate: [300, 100, 400],
     });
+
+    var notification = new Notification("Hi there!");
+    console.log(notification);
     //
     // navigator.serviceWorker.controller.postMessage(data);
     // self.navigator.serviceWorker.postMessage(data);
