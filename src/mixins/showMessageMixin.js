@@ -62,7 +62,9 @@ exports.install = function (Vue) {
         // Eliminar la sesssion (cookies y localstorage) y retornar al login
         localStorage.clear();
         Vue.prototype.deleteAllCookies();
-        location.replace("/login");
+        if (location.pathname !== "/login") {
+          location.replace("/login");
+        }
       },
       403: () => {
         // access to the requested resource is forbidden.
