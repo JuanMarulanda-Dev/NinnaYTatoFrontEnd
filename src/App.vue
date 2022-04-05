@@ -162,9 +162,15 @@
               >&nbsp;-&nbsp;
               <small
                 >Desarrollado con &hearts; por
-                <a href="#" target="_blank">Juan David M</a>
+                <a
+                  href="https://www.instagram.com/jdmarulanda12/"
+                  target="_blank"
+                  >Juan David M</a
+                >
                 y
-                <a href="#" target="_blank">Juan Muñoz L</a>
+                <a href="https://www.instagram.com/jcml1999/" target="_blank"
+                  >Juan Muñoz L</a
+                >
               </small>
             </v-card-text>
           </v-footer>
