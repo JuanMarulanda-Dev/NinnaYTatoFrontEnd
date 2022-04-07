@@ -6,6 +6,7 @@ self.addEventListener("push", function (event) {
       icon: "favicon.png",
       badge: "favicon.png",
       vibrate: [300, 100, 400],
+      requireInteraction: true,
     });
 
     //
