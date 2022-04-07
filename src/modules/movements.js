@@ -112,7 +112,7 @@ export default {
     getAllIncomes({ state, commit, rootState }) {
       axios
         .get(
-          `/api/movements/incomes?branch_office_id=${rootState.mainBranchOffice}&start=${state.start}&end=${state.end}`
+          `/api/movements-incomes?branch_office_id=${rootState.mainBranchOffice}&start=${state.start}&end=${state.end}`
         )
         .then((result) => {
           // save all
