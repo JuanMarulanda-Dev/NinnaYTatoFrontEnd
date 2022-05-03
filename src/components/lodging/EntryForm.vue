@@ -348,9 +348,6 @@ export default {
       pet_id: { required, petAvaliable },
     },
   },
-  created() {
-    this.SET_PETS(this.pets);
-  },
   computed: {
     ...mapState(["user"]),
     ...mapState("reservations", ["defaultItem"]),
@@ -458,7 +455,6 @@ export default {
     ...mapMutations("reservations", [
       "SET_EDIT_ITEM",
       "SET_DIALOG_FORM",
-      "SET_PETS",
       "SET_START_DATE",
       "SET_END_DATE",
     ]),

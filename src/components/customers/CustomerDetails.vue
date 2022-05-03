@@ -235,6 +235,30 @@
       </v-col>
       <v-col cols="12">
         <v-card>
+          <v-container fluid>
+            <v-row justify="space-between">
+              <h3 class="pa-3">
+                <v-icon>mdi-note-outline</v-icon>&nbsp;Compras del cliente
+              </h3>
+            </v-row>
+            <v-row>
+              <v-divider></v-divider>
+            </v-row>
+            <v-row>
+              <v-col cols="12" class="pa-0">
+                <sales-data-table
+                  v-model="customer_sales"
+                  :headers="headersSalesCustomer"
+                  @rollback="rollbackStateSale($event)"
+                >
+                </sales-data-table>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card>
+      </v-col>
+      <v-col cols="12">
+        <v-card>
           <v-container class="pa-6" fluid>
             <v-row justify="space-between">
               <h3><v-icon>mdi-note-outline</v-icon>&nbsp;Planes activos</h3>
@@ -297,31 +321,6 @@
           </v-container>
         </v-card>
       </v-col>
-
-      <v-col cols="12">
-        <v-card>
-          <v-container fluid>
-            <v-row justify="space-between">
-              <h3 class="pa-3">
-                <v-icon>mdi-note-outline</v-icon>&nbsp;Compras del cliente
-              </h3>
-            </v-row>
-            <v-row>
-              <v-divider></v-divider>
-            </v-row>
-            <v-row>
-              <v-col cols="12" class="pa-0">
-                <sales-data-table
-                  v-model="customer_sales"
-                  :headers="headersSalesCustomer"
-                  @rollback="rollbackStateSale($event)"
-                >
-                </sales-data-table>
-              </v-col>
-            </v-row>
-          </v-container>
-        </v-card>
-      </v-col>
     </v-row>
   </div>
 </template>
@@ -351,7 +350,11 @@ export default {
 
     headersSalesCustomer() {
       let header = [
-        { text: "N°", value: "number_payment_proof", align: "center" },
+        {
+          text: "N°",
+          value: "number_payment_proof",
+          align: "center",
+        },
         { text: "Total", value: "total" },
         { text: "Pagado", value: "payment" },
         { text: "Saldo pendiente", value: "pending" },

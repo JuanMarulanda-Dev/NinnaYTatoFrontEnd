@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialogOutput" persistent scrollable max-width="700px">
+  <v-dialog v-model="dialogOutput" persistent scrollable max-width="750px">
     <!-- Modal Form -->
     <v-card>
       <v-card-title>
@@ -21,7 +21,6 @@
                 :disabled="!user.is_admin"
                 :return-value.sync="outputData.date"
                 persistent
-                width="290px"
               >
                 <template v-slot:activator="{ on, attrs }">
                   <v-text-field
@@ -128,6 +127,7 @@
                   <v-card-text>
                     <liquidation-lodging
                       :arrival_date="arrival_date"
+                      :$v="$v"
                     ></liquidation-lodging>
                   </v-card-text>
                 </v-card>
@@ -188,6 +188,16 @@
                             {{ currencyFormat(item.total) }}
                           </template>
 
+                          <template v-slot:[`item.difference`]="{ item }">
+                            <v-icon>{{ moneyIcon }}</v-icon>
+                            {{ currencyFormat(item.total - item.paymented) }}
+                          </template>
+
+                          <template v-slot:[`item.paymented`]="{ item }">
+                            <v-icon>{{ moneyIcon }}</v-icon>
+                            {{ currencyFormat(item.paymented) }}
+                          </template>
+
                           <template v-slot:[`item.payment`]="{ item }">
                             <vuetify-money
                               class="mt-4"
@@ -219,7 +229,7 @@
                                         {{ detail.quantity }}
                                       </td>
                                       <td class="text-center">
-                                        {{ currencyFormat(detail.price) }}
+                                        {{ currencyFormat(detail.total) }}
                                       </td>
                                       <td class="text-center">
                                         {{ detail.discount }}
@@ -274,7 +284,9 @@ export default {
           value: "id",
         },
         { text: "total", align: "center", value: "total" },
-        { text: "pago", align: "center", value: "payment" },
+        { text: "Pagado", align: "center", value: "paymented" },
+        { text: "A pagar", align: "center", value: "difference" },
+        { text: "Pago", align: "center", value: "payment" },
         { text: "", value: "data-table-expand" },
       ],
     };
@@ -316,6 +328,7 @@ export default {
       date: { required },
       time: { required },
       cash_register_id: { required },
+      plan: { required },
     },
   },
   computed: {

@@ -1,16 +1,22 @@
 <template>
   <v-row>
-    <v-col cols="12" sm="6" md="6">
+    <v-col cols="12" md="3">
       <!-- Horas debitadas -->
       <v-text-field
         label="Tiempo debitado (H)"
-        readonly
         :value="calculateHours"
+        readonly
       >
       </v-text-field>
     </v-col>
 
-    <v-col cols="12" sm="6" md="6">
+    <v-col cols="12" md="4">
+      <!-- Debitacion de plan -->
+      <v-text-field label="Tikets / Usos completos" :value="tickets" readonly>
+      </v-text-field>
+    </v-col>
+
+    <v-col cols="12" md="4">
       <!-- plans -->
       <v-select
         v-model="outputData.plan"
@@ -19,6 +25,9 @@
         :item-value="(value) => `${value.id}-${value.type}`"
         return-object
         @change="liquidation()"
+        :error-messages="plansErrors"
+        @input="$v.outputData.plan.$touch()"
+        @blur="$v.outputData.plan.$touch()"
       >
         <template v-slot:selection="{ item }">
           {{ item.name }}&nbsp;
@@ -37,7 +46,28 @@
       </v-select>
     </v-col>
 
-    <v-col cols="12" md="6">
+    <v-col cols="12" md="1">
+      <!-- Over time liquidation -->
+      <v-tooltip bottom>
+        <template v-slot:activator="{ on }">
+          <v-checkbox
+            v-on="on"
+            class="mt-0"
+            v-model="outputData.overtime_liquidity_option"
+            @click="liquidation()"
+            :hide-details="false"
+          ></v-checkbox>
+        </template>
+        <span>Las horas extras de un tickets del plan</span>
+      </v-tooltip>
+    </v-col>
+
+    <v-col cols="12" md="4">
+      <!-- Total -->
+      <vuetify-money v-model="totalTimeExtra" label="Total" readonly dense />
+    </v-col>
+
+    <v-col cols="12" md="4">
       <!-- cajas -->
       <v-select
         v-model="outputData.cash_register_id"
@@ -52,7 +82,7 @@
       ></v-select>
     </v-col>
 
-    <v-col cols="12" md="6">
+    <v-col cols="12" md="4">
       <!-- Pago -->
       <vuetify-money
         v-model="outputData.payment"
@@ -61,77 +91,63 @@
       />
     </v-col>
 
-    <v-col cols="12" md="4">
-      <!-- Debitacion de plan -->
-      <v-text-field
-        label="Tikets / Usos completos"
-        :value="tickets"
-        readonly
-        dense
-      >
-      </v-text-field>
-    </v-col>
+    <!-- Liquidation -->
+    <v-card class="rounded" elevation="2">
+      <v-card-text>
+        <v-container>
+          <v-row>
+            <v-col cols="12" md="6">
+              <!-- Tickets extras -->
+              <v-text-field
+                label="Tickets extras"
+                :value="ticketsExtra"
+                readonly
+                dense
+              >
+              </v-text-field>
+            </v-col>
 
-    <v-col cols="12" md="4">
-      <!-- Tickets extras -->
-      <v-text-field label="Tickets extras" :value="ticketsExtra" readonly dense>
-      </v-text-field>
-    </v-col>
+            <v-col cols="12" md="6">
+              <!-- Horas extras -->
+              <v-text-field
+                label="Horas extras"
+                :value="hoursExtra"
+                readonly
+                dense
+              >
+              </v-text-field>
+            </v-col>
 
-    <v-col cols="12" md="3">
-      <!-- Horas extras -->
-      <v-text-field label="Horas extras" :value="hoursExtra" readonly dense>
-      </v-text-field>
-    </v-col>
+            <v-col cols="12" md="6">
+              <!-- Descuento tickets extra -->
+              <v-text-field
+                label="Descuento tickets extras (%)"
+                v-model="calculateDiscountTicketsExtra"
+                readonly
+                dense
+              >
+              </v-text-field>
+            </v-col>
 
-    <v-col cols="12" md="1">
-      <!-- Over time liquidation -->
-      <v-tooltip bottom>
-        <template v-slot:activator="{ on }">
-          <v-checkbox
-            v-on="on"
-            class="mt-0"
-            v-model="outputData.overtime_liquidity_option"
-            @click="liquidation()"
-          ></v-checkbox>
-        </template>
-        <span>Las horas extras de un tickets del plan</span>
-      </v-tooltip>
-    </v-col>
-
-    <v-col cols="12" md="4">
-      <!-- Total -->
-      <vuetify-money v-model="totalTimeExtra" label="Total" readonly dense />
-    </v-col>
-
-    <v-col cols="12" md="4">
-      <!-- Descuento tickets extra -->
-      <v-text-field
-        label="Descuento tickets extras (%)"
-        v-model="calculateDiscountTicketsExtra"
-        readonly
-        dense
-      >
-      </v-text-field>
-    </v-col>
-
-    <v-col cols="12" md="4">
-      <!-- Descuento tickets extra -->
-      <v-text-field
-        label="Descuento horas extras (%)"
-        v-model="calculateDiscountHourEstraExtra"
-        readonly
-        dense
-      >
-      </v-text-field>
-    </v-col>
+            <v-col cols="12" md="6">
+              <!-- Descuento tickets extra -->
+              <v-text-field
+                label="Descuento horas extras (%)"
+                v-model="calculateDiscountHourEstraExtra"
+                readonly
+                dense
+              >
+              </v-text-field>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-card-text>
+    </v-card>
   </v-row>
 </template>
 
 <script>
 import { mapState } from "vuex";
-import { validationMixin } from "vuelidate";
-import { required } from "vuelidate/lib/validators";
 import VuetifyMoney from "@/components/vuetifyMoney.vue";
 import { moneyFormatMixin } from "@/mixins/moneyFormatMixin.js";
 import { liquidationItemSaleMixin } from "@/mixins/sales/liquidationItemSaleMixin.js";
@@ -153,13 +169,12 @@ export default {
       type: String,
       required: true,
     },
-  },
-  mixins: [validationMixin, moneyFormatMixin, liquidationItemSaleMixin],
-  validations: {
-    outputData: {
-      cash_register_id: { required },
+    $v: {
+      type: Object,
+      required: true,
     },
   },
+  mixins: [moneyFormatMixin, liquidationItemSaleMixin],
   computed: {
     ...mapState("lodging", [
       "default_plans_details",
@@ -195,6 +210,13 @@ export default {
       if (!this.$v.outputData.cash_register_id.$dirty) return errors;
       !this.$v.outputData.cash_register_id.required &&
         errors.push("La caja es requerida");
+      return errors;
+    },
+
+    plansErrors() {
+      const errors = [];
+      if (!this.$v.outputData.plan.$dirty) return errors;
+      !this.$v.outputData.plan.required && errors.push("El plan es requerido.");
       return errors;
     },
 

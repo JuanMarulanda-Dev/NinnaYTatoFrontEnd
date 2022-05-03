@@ -281,6 +281,22 @@
           </v-container>
         </v-card>
       </v-col>
+
+      <!-- Lodgings -->
+      <v-col cols="12">
+        <lodging-data-table v-model="pet_lodgings" :headers="headers">
+          <!-- Datatable history lodging-->
+          <template v-slot:header>
+            <v-toolbar flat color="white" class="rounded-xl">
+              <v-toolbar-title>
+                <h4><v-icon>mdi-paw</v-icon>&nbsp;Alojamientos en guarderia</h4>
+              </v-toolbar-title>
+              <v-divider class="mx-4" inset vertical></v-divider>
+            </v-toolbar>
+          </template>
+        </lodging-data-table>
+      </v-col>
+
       <!-- Info veterinaria -->
       <v-col xs="12" sm="12" md="12" cols="12">
         <v-card>
@@ -364,20 +380,6 @@
             </v-row>
           </v-container>
         </v-card>
-      </v-col>
-      <!-- Lodgings -->
-      <v-col cols="12">
-        <lodging-data-table v-model="pet_lodgings" :headers="headers">
-          <!-- Datatable history lodging-->
-          <template v-slot:header>
-            <v-toolbar flat color="white" class="rounded-xl">
-              <v-toolbar-title>
-                <h4><v-icon>mdi-paw</v-icon>&nbsp;Alojamientos en guarderia</h4>
-              </v-toolbar-title>
-              <v-divider class="mx-4" inset vertical></v-divider>
-            </v-toolbar>
-          </template>
-        </lodging-data-table>
       </v-col>
     </v-row>
   </div>
@@ -488,7 +490,7 @@ export default {
 <style scoped>
 @media (min-width: 960px) {
   .default {
-    min-height: 70vh;
+    /* min-height: 60vh; */
   }
 }
 </style>

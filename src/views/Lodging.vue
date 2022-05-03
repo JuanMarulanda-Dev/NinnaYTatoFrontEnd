@@ -110,7 +110,15 @@
       <template v-slot:[`item.arrival_data.breakfast`]="{ item }">
         <v-tooltip bottom>
           <template v-slot:activator="{ on, attrs }">
-            <v-icon v-on="on" v-bind="attrs" :color="item.breakfast.color">
+            <v-icon
+              v-on="on"
+              v-bind="attrs"
+              :color="
+                item.breakfast.color
+                  ? item.breakfast.color
+                  : defaultColorChecks(item, 'breakfast')
+              "
+            >
               mdi-{{
                 item.arrival_data.breakfast ? "check-circle" : "close-circle"
               }}
@@ -124,7 +132,15 @@
       <template v-slot:[`item.arrival_data.lunch`]="{ item }">
         <v-tooltip bottom>
           <template v-slot:activator="{ on, attrs }">
-            <v-icon v-on="on" v-bind="attrs" :color="item.lunch.color">
+            <v-icon
+              v-on="on"
+              v-bind="attrs"
+              :color="
+                item.lunch.color
+                  ? item.breakfast.color
+                  : defaultColorChecks(item, 'lunch')
+              "
+            >
               mdi-{{
                 item.arrival_data.lunch ? "check-circle" : "close-circle"
               }}
@@ -138,7 +154,15 @@
       <template v-slot:[`item.arrival_data.dinner`]="{ item }">
         <v-tooltip bottom>
           <template v-slot:activator="{ on, attrs }">
-            <v-icon v-on="on" v-bind="attrs" :color="item.dinner.color">
+            <v-icon
+              v-on="on"
+              v-bind="attrs"
+              :color="
+                item.dinner.color
+                  ? item.breakfast.color
+                  : defaultColorChecks(item, 'dinner')
+              "
+            >
               mdi-{{
                 item.arrival_data.dinner ? "check-circle" : "close-circle"
               }}
@@ -150,26 +174,6 @@
 
       <!-- Actions -->
       <template v-slot:[`item.actions`]="{ item }">
-        <!-- Details -->
-        <v-tooltip bottom>
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              fab
-              x-small
-              dark
-              color="info mr-1"
-              v-bind="attrs"
-              v-on="on"
-              @click="
-                showPetDetails(item.customer_id, item.arrival_data.pet_id)
-              "
-            >
-              <v-icon> mdi-paw</v-icon>
-            </v-btn>
-          </template>
-          <span>Detalles Mascotas</span>
-        </v-tooltip>
-
         <!-- Timelines -->
         <v-tooltip bottom>
           <template v-slot:activator="{ on, attrs }">
@@ -195,23 +199,22 @@
           <span>Seguimiento</span>
         </v-tooltip>
 
-        <!-- Edit in-->
+        <!-- Additional charge -->
         <v-tooltip bottom>
           <template v-slot:activator="{ on, attrs }">
             <v-btn
               fab
               x-small
               dark
-              color="secondary mr-1"
+              color="primary mr-1"
               v-bind="attrs"
               v-on="on"
-              @click="showEditEntryForm(item.arrival_data, item.id)"
-              v-show="permissions.update"
+              @click="showAdditionalChargeForm(item.id, item.customer_id)"
             >
-              <v-icon> {{ editIcon }} </v-icon>
+              <v-icon> mdi-ballot </v-icon>
             </v-btn>
           </template>
-          <span>Editar ingreso</span>
+          <span>Costos adicionales</span>
         </v-tooltip>
 
         <!-- Out -->
@@ -241,6 +244,45 @@
           <span>Salir</span>
         </v-tooltip>
 
+        <!-- Details -->
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              fab
+              x-small
+              dark
+              color="info mr-1"
+              v-bind="attrs"
+              v-on="on"
+              @click="
+                showPetDetails(item.customer_id, item.arrival_data.pet_id)
+              "
+            >
+              <v-icon> mdi-paw</v-icon>
+            </v-btn>
+          </template>
+          <span>Detalles Mascotas</span>
+        </v-tooltip>
+
+        <!-- Edit in-->
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              fab
+              x-small
+              dark
+              color="secondary mr-1"
+              v-bind="attrs"
+              v-on="on"
+              @click="showEditEntryForm(item.arrival_data, item.id)"
+              v-show="permissions.update"
+            >
+              <v-icon> {{ editIcon }} </v-icon>
+            </v-btn>
+          </template>
+          <span>Editar ingreso</span>
+        </v-tooltip>
+
         <!-- Delete In -->
         <v-tooltip bottom>
           <template v-slot:activator="{ on, attrs }">
@@ -258,24 +300,6 @@
             </v-btn>
           </template>
           <span>Eliminar</span>
-        </v-tooltip>
-
-        <!-- Additional charge -->
-        <v-tooltip bottom>
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              fab
-              x-small
-              dark
-              color="primary mr-1"
-              v-bind="attrs"
-              v-on="on"
-              @click="showAdditionalChargeForm(item.id, item.customer_id)"
-            >
-              <v-icon> mdi-ballot </v-icon>
-            </v-btn>
-          </template>
-          <span>Costos adicionales</span>
         </v-tooltip>
       </template>
     </v-data-table>
@@ -532,6 +556,10 @@ export default {
           this.deleteEntry(id);
         }
       });
+    },
+
+    defaultColorChecks(item, seccion) {
+      return item.arrival_data[seccion] ? "blue lighten-3" : "";
     },
   },
 
