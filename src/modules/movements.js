@@ -8,6 +8,7 @@ export default {
     // Generals loading datatables
     loading: false,
     movements: [],
+    movements_details: [],
     income_plans: [],
     income_products: [],
     start: "",
@@ -24,6 +25,9 @@ export default {
   mutations: {
     SET_MOVEMENTS(state, movements) {
       state.movements = movements;
+    },
+    SET_MOVEMENT_DETAILS(state, movements_details) {
+      state.movements_details = movements_details;
     },
     SET_INCOMES(state, incomes) {
       state.income_plans = incomes.incomePlans;
@@ -58,6 +62,7 @@ export default {
         .then((result) => {
           // save all
           commit("SET_MOVEMENTS", result.data.movements);
+          commit("SET_MOVEMENT_DETAILS", result.data.details);
         })
         .catch((errors) => {
           // show error message

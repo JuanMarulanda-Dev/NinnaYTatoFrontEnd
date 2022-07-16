@@ -19,6 +19,19 @@
           </v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
           <h2>{{ quantityLodgings }}</h2>
+          <v-divider class="mx-4" inset vertical></v-divider>
+
+          <!-- Incomes Total Daily -->
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <h2 v-bind="attrs" v-on="on">
+                <v-icon>{{ moneyIcon }}</v-icon>
+                {{ currencyFormat(incomes_total_daily) }}
+              </h2>
+            </template>
+            <span>Ingresos totales diarios</span>
+          </v-tooltip>
+
           <v-spacer></v-spacer>
           <v-text-field
             v-model="search"
@@ -347,6 +360,7 @@ import MonitoringForm from "@/components/lodging/MonitoringForm.vue";
 import HistoryLodgingTable from "@/components/lodging/HistoryLodgingTable.vue";
 import AdditionalChargeForm from "@/components/lodging/AdditionalChargeForm.vue";
 import DialogReservationForm from "@/components/reservations/DialogReservationForm.vue";
+import { moneyFormatMixin } from "@/mixins/moneyFormatMixin.js";
 
 export default {
   data: () => ({
@@ -384,9 +398,10 @@ export default {
     ],
     entry_pet_details: {},
   }),
+  mixins: [moneyFormatMixin],
   computed: {
     ...mapState(["editIcon", "loadingText", "mainBranchOffice"]),
-    ...mapState("lodging", ["lodgings", "loading"]),
+    ...mapState("lodging", ["lodgings", "loading", "incomes_total_daily"]),
     ...mapState("customers", ["personal_infomation"]),
     ...mapState("alerts", ["times"]),
     quantityLodgings() {

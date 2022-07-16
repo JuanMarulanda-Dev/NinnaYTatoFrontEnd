@@ -37,7 +37,7 @@
                   <!-- Start date -->
                   <v-dialog
                     ref="start"
-                    v-model="dialogDate"
+                    v-model="dialogDateStart"
                     :return-value.sync="startDate"
                     persistent
                     width="290px"
@@ -61,7 +61,11 @@
                       @change="getAllSales()"
                     >
                       <v-spacer></v-spacer>
-                      <v-btn text color="primary" @click="dialogDate = false">
+                      <v-btn
+                        text
+                        color="primary"
+                        @click="dialogDateStart = false"
+                      >
                         Cancel
                       </v-btn>
                       <v-btn
@@ -76,7 +80,7 @@
                   <!-- End date -->
                   <v-dialog
                     ref="end"
-                    v-model="dialogDate"
+                    v-model="dialogDateEnd"
                     :return-value.sync="endDate"
                     persistent
                     width="290px"
@@ -100,7 +104,11 @@
                       @change="getAllSales()"
                     >
                       <v-spacer></v-spacer>
-                      <v-btn text color="primary" @click="dialogDate = false">
+                      <v-btn
+                        text
+                        color="primary"
+                        @click="dialogDateEnd = false"
+                      >
                         Cancel
                       </v-btn>
                       <v-btn
@@ -130,7 +138,8 @@ import moment from "moment";
 export default {
   name: "sales-card",
   data: () => ({
-    dialogDate: false,
+    dialogDateStart: false,
+    dialogDateEnd: false,
   }),
   created() {
     this.SET_START_DATE(moment().startOf("month").format("YYYY-MM-DD"));

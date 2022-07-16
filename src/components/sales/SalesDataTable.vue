@@ -66,8 +66,8 @@
 
       <template v-slot:[`body.append`]="{ items }">
         <tr>
-          <td class="font-weight-bold"></td>
-          <td class="text-center font-weight-bold">Totals</td>
+          <td v-if="headers.length > 9" class="font-weight-bold"></td>
+          <td class="text-center font-weight-bold">Totales</td>
           <td class="text-left font-weight-bold">
             <v-icon small>
               {{ moneyIcon }}

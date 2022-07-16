@@ -71,6 +71,14 @@
       ></v-switch>
     </template>
 
+    <!-- Debts -->
+    <template v-slot:[`item.debts`]="{ item }">
+      <v-icon small>
+        {{ moneyIcon }}
+      </v-icon>
+      {{ currencyFormat(item.debts) }}
+    </template>
+
     <!-- Actions -->
     <template v-slot:[`item.actions`]="{ item }">
       <!-- Detalles sucursal -->
@@ -96,6 +104,7 @@
 
 <script>
 import { mapState, mapActions, mapMutations } from "vuex";
+import { moneyFormatMixin } from "@/mixins/moneyFormatMixin.js";
 
 export default {
   data() {
@@ -107,10 +116,12 @@ export default {
         { text: "Telefono", value: "phone" },
         { text: "Email", value: "email" },
         { text: "Estado", value: "state" },
+        { text: "Deuda", value: "debts" },
         { text: "Acciones", value: "actions", align: "start", sortable: false },
       ],
     };
   },
+  mixins: [moneyFormatMixin],
   computed: {
     ...mapState([
       "detailsIcon",

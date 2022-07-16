@@ -463,6 +463,13 @@
       </v-col>
     </v-row>
 
+    <v-row>
+      <v-col cols="12">
+        <!-- Movement all details -->
+        <movement-user-details-table></movement-user-details-table>
+      </v-col>
+    </v-row>
+
     <!-- Notes dialog -->
     <note-form-dialog @saved="updateRowNote($event)"></note-form-dialog>
 
@@ -487,6 +494,7 @@ import VuetifyMoney from "@/components/vuetifyMoney.vue";
 import NoteFormDialog from "@/components/NoteFormDialog.vue";
 import MovementCashRegisterChangeForm from "@/components/movements/MovementCashRegisterChangeForm.vue";
 import MovementDetailsTable from "@/components/movements/MovementDetailsTable.vue";
+import MovementUserDetailsTable from "@/components/movements/MovementUserDetailsTable.vue";
 import moment from "moment";
 
 export default {
@@ -511,7 +519,7 @@ export default {
       },
       { text: "Mediador", value: "mediator", align: "left" },
       { text: "Tipo", value: "type_movement" },
-      { text: "Grupo", value: "group", align: "center" },
+      { text: "Modulo", value: "group", align: "center" },
       { text: "Origin / Destino", value: "cash_register", align: "center" },
       { text: "Total", value: "total", align: "center" },
       { text: "Nota", value: "note" },
@@ -824,6 +832,7 @@ export default {
     NoteFormDialog,
     MovementCashRegisterChangeForm,
     MovementDetailsTable,
+    MovementUserDetailsTable,
   },
 };
 </script>

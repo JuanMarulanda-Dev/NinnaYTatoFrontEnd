@@ -9,6 +9,7 @@ export default {
     loading: false,
     dialogEntry: false,
     lodgings: [],
+    incomes_total_daily: 0,
     lodgings_history: [],
     accessories: [],
     default_accessories: [],
@@ -68,6 +69,9 @@ export default {
   mutations: {
     SET_LODGINGS(state, lodgings) {
       state.lodgings = lodgings;
+    },
+    SET_INCOMES_TOTAL_DAILY(state, incomes_total_daily) {
+      state.incomes_total_daily = incomes_total_daily;
     },
     SET_SALE_DETAILS_LODGING(state, sales_lodging) {
       state.sales_lodging = sales_lodging.map((obj) => ({
@@ -146,6 +150,10 @@ export default {
           commit(
             status == 1 ? "SET_LODGINGS" : "SET_LODGINGS_HISTORY",
             result.data.lodgings
+          );
+          commit(
+            "SET_INCOMES_TOTAL_DAILY",
+            result.data.incomes_total_daily ?? 0
           );
         })
         .catch((errors) => {

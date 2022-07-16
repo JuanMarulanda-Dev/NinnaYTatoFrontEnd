@@ -186,6 +186,7 @@
                           <v-chip>
                             <span>
                               {{ item.name }}
+                              - ({{ item.pet_days_last_lodging }})
                               <v-badge
                                 dot
                                 class="mx-1"
@@ -198,6 +199,7 @@
                         <template v-slot:item="{ item }">
                           <span>
                             {{ item.name }}
+                            - ({{ item.pet_days_last_lodging }})
                             <v-badge
                               class="ml-1"
                               :color="item.state ? 'success' : 'error'"
