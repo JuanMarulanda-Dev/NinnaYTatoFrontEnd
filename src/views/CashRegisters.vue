@@ -78,8 +78,10 @@
 
     <!-- amount -->
     <template v-slot:[`item.amount`]="{ item }">
-      <v-icon small>{{ moneyIcon }}</v-icon>
-      {{ currencyFormat(item.amount) }}
+      <div v-if="user.is_admin">
+        <v-icon small>{{ moneyIcon }}</v-icon>
+        {{ currencyFormat(item.amount) }}
+      </div>
     </template>
 
     <!-- State -->
@@ -151,7 +153,7 @@ export default {
     CashRegisterChangeForm,
   },
   computed: {
-    ...mapState(["editIcon", "loadingText", "mainBranchOffice"]),
+    ...mapState(["user", "editIcon", "loadingText", "mainBranchOffice"]),
     ...mapState("cash_registers", [
       "cash_registers",
       "loading",
