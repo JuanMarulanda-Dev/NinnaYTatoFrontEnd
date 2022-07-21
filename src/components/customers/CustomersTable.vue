@@ -99,6 +99,23 @@
         <span>Detalles</span>
       </v-tooltip>
     </template>
+
+    <!-- footer -->
+    <template v-slot:[`body.append`]="{ items }">
+      <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td class="text-center font-weight-bold">Total</td>
+        <td class="text-left font-weight-bold">
+          <v-icon small>
+            {{ moneyIcon }}
+          </v-icon>
+          {{ currencyFormat(totalsDebts(items)) }}
+        </td>
+      </tr>
+    </template>
   </v-data-table>
 </template>
 
@@ -185,6 +202,14 @@ export default {
       this.$router.push({ path: `/clientes/detalles/${id}` }).catch((error) => {
         console.log(error);
       });
+    },
+    totalsDebts(items) {
+      const initial = 0;
+      const total = items.reduce(
+        (previos, current) => previos.debts ?? 0.0 + current.debts,
+        initial
+      );
+      return total;
     },
   },
 };

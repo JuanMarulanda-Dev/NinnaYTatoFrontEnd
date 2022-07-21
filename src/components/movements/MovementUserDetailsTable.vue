@@ -51,6 +51,7 @@
         <td></td>
         <td></td>
         <td></td>
+        <td></td>
         <td class="text-center font-weight-bold">Total</td>
         <td class="text-center font-weight-bold">
           <v-icon small>
@@ -80,6 +81,7 @@ export default {
         { text: "Tercero", value: "mediator", align: "left" },
         { text: "Movimiento", value: "type_movement" },
         { text: "Grupo", value: "group", align: "center" },
+        { text: "Cantidad", value: "quantity", align: "center" },
         { text: "Total", value: "total", align: "center" },
       ],
     };
