@@ -11,11 +11,13 @@ export default {
     editedItem: {
       id: 0,
       name: "",
+      main: "",
       state: false,
     },
     defaultItem: {
       id: 0,
       name: "",
+      main: "",
       state: false,
     },
     exchange: {

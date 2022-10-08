@@ -204,9 +204,11 @@ export default {
       });
     },
     totalsDebts(items) {
-      const initial = 0;
+      let initial = 0;
       const total = items.reduce(
-        (previos, current) => previos.debts ?? 0.0 + current.debts,
+        (previos, current) =>
+          (initial +=
+            parseFloat(previos.debts ?? 0.0) + parseFloat(current.debts)),
         initial
       );
       return total;

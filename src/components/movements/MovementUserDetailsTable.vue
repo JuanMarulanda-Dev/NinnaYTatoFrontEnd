@@ -8,7 +8,7 @@
     :search="search"
     :loading="loading"
     :loading-text="loadingText"
-    item-key="created_at"
+    item-key="id"
   >
     <!-- Header content datatable -->
     <template v-slot:top>
@@ -73,6 +73,11 @@ export default {
     return {
       search: null,
       headers: [
+        {
+          text: "Id",
+          align: "center",
+          value: "id",
+        },
         {
           text: "Fecha",
           align: "start",

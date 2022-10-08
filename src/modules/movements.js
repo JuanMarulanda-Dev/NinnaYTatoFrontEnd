@@ -62,6 +62,10 @@ export default {
         .then((result) => {
           // save all
           commit("SET_MOVEMENTS", result.data.movements);
+          result.data.details = result.data.details.map((item, index) => ({
+            id: index + 1,
+            ...item,
+          }));
           commit("SET_MOVEMENT_DETAILS", result.data.details);
         })
         .catch((errors) => {

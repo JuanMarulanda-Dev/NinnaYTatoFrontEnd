@@ -62,6 +62,12 @@
                       @blur="$v.editedItem.name.$touch()"
                     ></v-text-field>
                   </v-col>
+                  <v-col>
+                    <v-switch
+                      :input-value="editedItem.main"
+                      v-model="editedItem.main"
+                    ></v-switch>
+                  </v-col>
                 </v-row>
               </v-container>
             </v-card-text>
@@ -81,6 +87,13 @@
       <div v-if="user.is_admin">
         <v-icon small>{{ moneyIcon }}</v-icon>
         {{ currencyFormat(item.amount) }}
+      </div>
+    </template>
+
+    <!-- main -->
+    <template v-slot:[`item.main`]="{ item }">
+      <div>
+        {{ item.main == "1" ? "Principal" : "-" }}
       </div>
     </template>
 
@@ -136,6 +149,7 @@ export default {
         value: "name",
       },
       { text: "Monto", value: "amount" },
+      { text: "Mostrador", value: "main", align: "center" },
       { text: "Estado", value: "state" },
       { text: "Creado", value: "created_at" },
       { text: "Eliminado", value: "deleted_at" },

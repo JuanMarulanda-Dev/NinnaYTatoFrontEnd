@@ -264,7 +264,7 @@ export default {
         );
       }
 
-      return total;
+      return Math.ceil(total / 50) * 50;
     },
   },
   methods: {
